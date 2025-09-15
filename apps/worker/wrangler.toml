@@ -1,0 +1,153 @@
+name = "humber-operations-worker"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+[env.production]
+name = "humber-operations-worker-prod"
+
+[env.production.vars]
+ENVIRONMENT = "production"
+API_VERSION = "1.0.0"
+LOG_LEVEL = "warn"
+# JWT_SECRET = "use-wrangler-secret-for-production"
+# REFRESH_SECRET = "use-wrangler-secret-for-production"
+# API_KEY = "use-wrangler-secret-for-production"
+
+[env.staging]
+name = "humber-operations-worker-staging"
+
+[env.staging.vars]
+ENVIRONMENT = "staging"
+API_VERSION = "1.0.0"
+LOG_LEVEL = "info"
+# JWT_SECRET = "use-wrangler-secret-for-staging"
+# REFRESH_SECRET = "use-wrangler-secret-for-staging"
+# API_KEY = "use-wrangler-secret-for-staging"
+
+[env.development]
+name = "humber-operations-worker-dev"
+
+[env.development.vars]
+ENVIRONMENT = "development"
+API_VERSION = "1.0.0"
+LOG_LEVEL = "debug"
+JWT_SECRET = "dev-jwt-secret-change-in-production-2024"
+REFRESH_SECRET = "dev-refresh-secret-change-in-production-2024"
+API_KEY = "dev-api-key-change-in-production"
+
+# Master Database - Tracks tenant assignments and system configuration
+[[d1_databases]]
+binding = "DB_MASTER"
+database_name = "humber_os_master"
+database_id = "1d392f9e-b2f3-4bfb-9bb3-f82484ad140f"
+
+# Tenant Databases - Isolated databases for each engineer/tenant
+# Each database is completely isolated with zero cross-tenant access
+[[d1_databases]]
+binding = "DB_ENGINEER_001"
+database_name = "humber-tenant-001"
+database_id = "YOUR_TENANT_001_DB_ID"
+
+[[d1_databases]]
+binding = "DB_ENGINEER_002"
+database_name = "humber-tenant-002"
+database_id = "YOUR_TENANT_002_DB_ID"
+
+[[d1_databases]]
+binding = "DB_ENGINEER_003"
+database_name = "humber-tenant-003"
+database_id = "YOUR_TENANT_003_DB_ID"
+
+[[d1_databases]]
+binding = "DB_ENGINEER_004"
+database_name = "humber-tenant-004"
+database_id = "YOUR_TENANT_004_DB_ID"
+
+[[d1_databases]]
+binding = "DB_ENGINEER_005"
+database_name = "humber-tenant-005"
+database_id = "YOUR_TENANT_005_DB_ID"
+
+[[d1_databases]]
+binding = "DB_ENGINEER_006"
+database_name = "humber-tenant-006"
+database_id = "YOUR_TENANT_006_DB_ID"
+
+[[d1_databases]]
+binding = "DB_ENGINEER_007"
+database_name = "humber-tenant-007"
+database_id = "YOUR_TENANT_007_DB_ID"
+
+[[d1_databases]]
+binding = "DB_ENGINEER_008"
+database_name = "humber-tenant-008"
+database_id = "YOUR_TENANT_008_DB_ID"
+
+[[d1_databases]]
+binding = "DB_ENGINEER_009"
+database_name = "humber-tenant-009"
+database_id = "YOUR_TENANT_009_DB_ID"
+
+[[d1_databases]]
+binding = "DB_ENGINEER_010"
+database_name = "humber-tenant-010"
+database_id = "YOUR_TENANT_010_DB_ID"
+
+# Legacy DB binding for backward compatibility
+[[d1_databases]]
+binding = "DB"
+database_name = "humber-operations-db"
+database_id = "YOUR_DATABASE_ID"
+
+# KV Namespaces for caching and session management
+[[kv_namespaces]]
+binding = "KV_TENANT_CACHE"
+id = "YOUR_TENANT_CACHE_KV_ID"
+
+[[kv_namespaces]]
+binding = "KV_CACHE"
+id = "YOUR_KV_NAMESPACE_ID"
+
+[[kv_namespaces]]
+binding = "KV_SESSIONS"
+id = "YOUR_SESSIONS_KV_ID"
+
+# Queues for async processing
+[[queues.producers]]
+queue = "operations-queue"
+binding = "OPERATIONS_QUEUE"
+
+[[queues.producers]]
+queue = "reconciliation-queue"
+binding = "RECONCILIATION_QUEUE"
+
+[[queues.producers]]
+queue = "tenant-audit-logs"
+binding = "TENANT_QUEUE"
+
+[[queues.producers]]
+queue = "background-checks"
+binding = "VETTING_QUEUE"
+
+[[queues.producers]]
+queue = "visa-processing"
+binding = "VISA_QUEUE"
+
+[[queues.consumers]]
+queue = "operations-queue"
+max_batch_size = 10
+max_batch_timeout = 30
+
+[[queues.consumers]]
+queue = "reconciliation-queue"
+max_batch_size = 10
+max_batch_timeout = 30
+
+[[r2_buckets]]
+binding = "DOCUMENTS"
+bucket_name = "humber-documents"
+
+[[vectorize]]
+binding = "VECTORIZE_INDEX"
+index_name = "humber-knowledge-base"

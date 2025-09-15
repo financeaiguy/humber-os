@@ -1,0 +1,38 @@
+{
+  "name": "@humber/worker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "build": "wrangler deploy --dry-run --outdir dist",
+    "deploy": "wrangler deploy",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json}\"",
+    "clean": "rm -rf dist .wrangler",
+    "migrate": "tsx scripts/migrate.ts",
+    "migrate:local": "NODE_ENV=development tsx scripts/migrate.ts",
+    "migrate:remote": "NODE_ENV=production tsx scripts/migrate.ts",
+    "init-auth": "tsx scripts/init-auth.ts",
+    "security-test": "tsx scripts/security-test.ts"
+  },
+  "dependencies": {
+    "@humber/database": "workspace:*",
+    "@humber/types": "workspace:*",
+    "@humber/utils": "workspace:*",
+    "drizzle-orm": "^0.38.3",
+    "hono": "^4.6.17",
+    "jose": "^5.10.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250109.0",
+    "@types/node": "^22.10.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8",
+    "wrangler": "^4.37.0"
+  }
+}
