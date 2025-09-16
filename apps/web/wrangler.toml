@@ -1,9 +1,10 @@
 name = "humber-web-frontend"
-main = "src/worker-fixed.js"
+main = ".vercel/output/static/_worker.js/index.js"
 compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]
 
-# Note: Static assets are served directly from worker code for better reliability
+[site]
+bucket = ".vercel/output/static"
 
 [env.production]
 name = "humber-web-frontend-prod"
