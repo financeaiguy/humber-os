@@ -16,12 +16,7 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar
+  ResponsiveContainer
 } from 'recharts';
 import { 
   TrendingUp, 
@@ -173,7 +168,6 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 export default function KPIDashboard() {
   const [data, setData] = useState(generateDynamicData());
   const [selectedTimeRange, setSelectedTimeRange] = useState('6M');
-  const [isLoading, setIsLoading] = useState(false);
 
   // Simulate real-time data updates
   useEffect(() => {
@@ -222,10 +216,8 @@ export default function KPIDashboard() {
                 key={range}
                 onClick={() => {
                   setSelectedTimeRange(range);
-                  setIsLoading(true);
                   setTimeout(() => {
                     setData(generateDynamicData());
-                    setIsLoading(false);
                   }, 500);
                 }}
                 className={`px-4 py-2 rounded-lg transition-all ${
@@ -395,7 +387,7 @@ export default function KPIDashboard() {
                 paddingAngle={2}
                 dataKey="value"
               >
-                {data.clientRetentionData.map((entry, index) => (
+                {data.clientRetentionData.map((_, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>

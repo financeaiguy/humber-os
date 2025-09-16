@@ -14,9 +14,6 @@ const GlobalLoadingIndicator = dynamic(() => import('@/components/global-loading
   loading: () => null
 })
 
-const PageLoadingIndicator = dynamic(() => import('@/components/global-loading').then(mod => ({ default: mod.PageLoadingIndicator })), {
-  loading: () => null
-})
 
 const LoadingProvider = dynamic(() => import('@/components/route-loading').then(mod => ({ default: mod.LoadingProvider })), {
   loading: () => null
