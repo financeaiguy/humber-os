@@ -7,7 +7,7 @@ import {
   FileText, Calculator, TrendingUp, AlertCircle, ChevronRight,
   Zap, Shield, DollarSign, User, Calendar, Download,
   MessageSquare, Mail, Phone, ArrowUpRight, ArrowDownRight,
-  Info, CheckSquare, Square, BarChart3
+  Info, CheckSquare, Square, BarChart3, Briefcase
 } from 'lucide-react'
 
 interface TimeDiscrepancy {

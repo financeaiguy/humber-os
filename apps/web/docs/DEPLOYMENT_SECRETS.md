@@ -6,36 +6,25 @@
 
 Add these secrets to your GitHub repository settings under Settings → Secrets → Actions:
 
-#### Vercel Deployment
-- `VERCEL_TOKEN`: Your Vercel API token (get from https://vercel.com/account/tokens)
-- `VERCEL_ORG_ID`: Your Vercel organization ID
-- `VERCEL_PROJECT_ID`: Your Vercel project ID
-
-To get Vercel IDs:
-```bash
-npx vercel link
-cat .vercel/project.json
-```
-
-#### Cloudflare Workers Deployment
+#### Cloudflare Deployment
 - `CLOUDFLARE_API_TOKEN`: Create at https://dash.cloudflare.com/profile/api-tokens
   - Required permissions: Workers Scripts:Edit, D1:Edit, KV Storage:Edit, R2:Edit
 - `CLOUDFLARE_ACCOUNT_ID`: Found in Cloudflare dashboard right sidebar
 
-### Vercel Environment Variables
+### Cloudflare Pages Environment Variables
 
-Set these in your Vercel project settings:
+Set these in your Cloudflare Pages project settings:
 
 #### Authentication
 - `AUTH_SECRET`: Generate with `openssl rand -base64 32`
-- `NEXTAUTH_URL`: Your production URL (e.g., https://your-domain.vercel.app)
+- `NEXTAUTH_URL`: Your production URL (e.g., https://your-domain.pages.dev)
 
 #### Database
 - `DATABASE_URL`: Your production database connection string
 
 #### Monitoring (Optional)
 - `NEXT_PUBLIC_SENTRY_DSN`: Sentry error tracking DSN
-- `VERCEL_ANALYTICS_ID`: Vercel Analytics ID
+- `CLOUDFLARE_ANALYTICS_TOKEN`: Cloudflare Analytics token
 
 ### Cloudflare Workers Secrets
 
@@ -97,7 +86,7 @@ ENCRYPTION_KEY=your-dev-encryption-key
 Before deploying to production:
 
 - [ ] All GitHub Actions secrets configured
-- [ ] Vercel environment variables set
+- [ ] Cloudflare Pages environment variables set
 - [ ] Cloudflare Workers secrets deployed
 - [ ] Database migrations tested
 - [ ] SSL certificates configured

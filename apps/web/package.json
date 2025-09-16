@@ -5,6 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:worker": "next build",
+    "deploy:worker": "npm run build:worker && wrangler deploy --env production",
+    "deploy:dev": "npm run build:worker && wrangler deploy --env development",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
@@ -49,7 +52,8 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250109.0",
+    "@cloudflare/kv-asset-handler": "^0.4.0",
+    "@cloudflare/workers-types": "^4.20250913.0",
     "@tailwindcss/postcss": "^4.1.13",
     "@types/bcryptjs": "^3.0.0",
     "@types/node": "^22.10.5",
@@ -59,6 +63,7 @@
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",
     "tailwindcss": "3",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "wrangler": "^4.37.0"
   }
 }

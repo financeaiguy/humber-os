@@ -483,7 +483,7 @@ class ReportDataService {
     };
   }
 
-  async getEngineerPerformanceData(engineerId: string, dateRange: { start: Date; end: Date }): Promise<EngineerPerformanceData> {
+  async getEngineerPerformanceData(engineerId: string, _dateRange: { start: Date; end: Date }): Promise<EngineerPerformanceData> {
     // Mock data for now - replace with real database queries
     return {
       engineer: {
@@ -516,7 +516,7 @@ class ReportDataService {
     };
   }
 
-  async getFinancialSummaryData(dateRange: { start: Date; end: Date }, tenantId: string): Promise<FinancialSummaryData> {
+  async getFinancialSummaryData(_dateRange: { start: Date; end: Date }, _tenantId: string): Promise<FinancialSummaryData> {
     // Mock data for now - replace with real database queries
     return {
       summary: {

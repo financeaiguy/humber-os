@@ -14,6 +14,125 @@ LOG_LEVEL = "warn"
 # REFRESH_SECRET = "use-wrangler-secret-for-production"
 # API_KEY = "use-wrangler-secret-for-production"
 
+# Production D1 Databases
+[[env.production.d1_databases]]
+binding = "DB_MASTER"
+database_name = "humber_os_master"
+database_id = "1d392f9e-b2f3-4bfb-9bb3-f82484ad140f"
+
+[[env.production.d1_databases]]
+binding = "DB_ENGINEER_001"
+database_name = "humber-tenant-001"
+database_id = "38c9a86b-64db-4235-b283-b9b8d93b11f1"
+
+[[env.production.d1_databases]]
+binding = "DB_ENGINEER_002"
+database_name = "humber-tenant-002"
+database_id = "ec971ef9-1f98-49ca-8a91-dd3192b12429"
+
+[[env.production.d1_databases]]
+binding = "DB_ENGINEER_003"
+database_name = "humber-tenant-003"
+database_id = "22e3d3e8-fd0d-43f0-a587-bab533ce6e2e"
+
+[[env.production.d1_databases]]
+binding = "DB_ENGINEER_004"
+database_name = "humber-tenant-004"
+database_id = "f9f1b2a3-5643-4aea-90c2-45f2a898ff07"
+
+[[env.production.d1_databases]]
+binding = "DB_ENGINEER_005"
+database_name = "humber-tenant-005"
+database_id = "c5803cf1-6172-4b37-8c7d-29b96012033d"
+
+[[env.production.d1_databases]]
+binding = "DB_ENGINEER_006"
+database_name = "humber-tenant-006"
+database_id = "3b2a57eb-e4e7-4fa2-82a6-4e1e43536a4b"
+
+[[env.production.d1_databases]]
+binding = "DB_ENGINEER_007"
+database_name = "humber-tenant-007"
+database_id = "beb7d523-32ea-4518-afda-38289d88a618"
+
+[[env.production.d1_databases]]
+binding = "DB_ENGINEER_008"
+database_name = "humber-tenant-008"
+database_id = "d85bffd4-3721-4eec-8542-a017a497ae77"
+
+[[env.production.d1_databases]]
+binding = "DB_ENGINEER_009"
+database_name = "humber-tenant-009"
+database_id = "ec5cc1b6-e827-42b3-a912-cbec977266d5"
+
+[[env.production.d1_databases]]
+binding = "DB_ENGINEER_010"
+database_name = "humber-tenant-010"
+database_id = "4b267d2c-d18a-4b6b-a389-496c36c2e2ba"
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "humber-operations-db"
+database_id = "54c318f2-5f98-412e-b521-1ea3cf850a0c"
+
+# Production KV Namespaces
+[[env.production.kv_namespaces]]
+binding = "KV_TENANT_CACHE"
+id = "7d7a6b3d94b24cb5b96177556a2f7130"
+
+[[env.production.kv_namespaces]]
+binding = "KV_CACHE"
+id = "16640e4d080d4de8879962927ad31732"
+
+[[env.production.kv_namespaces]]
+binding = "KV_SESSIONS"
+id = "81526f64e8cf4928a9ec1b903a8024ef"
+
+# Production Queues
+[[env.production.queues.producers]]
+queue = "humber-operations-queue"
+binding = "OPERATIONS_QUEUE"
+
+[[env.production.queues.producers]]
+queue = "humber-reconciliation-queue"
+binding = "RECONCILIATION_QUEUE"
+
+[[env.production.queues.producers]]
+queue = "humber-tenant-audit-logs"
+binding = "TENANT_QUEUE"
+
+[[env.production.queues.producers]]
+queue = "humber-background-checks"
+binding = "VETTING_QUEUE"
+
+[[env.production.queues.producers]]
+queue = "humber-visa-processing"
+binding = "VISA_QUEUE"
+
+[[env.production.queues.consumers]]
+queue = "humber-operations-queue"
+max_batch_size = 10
+max_batch_timeout = 30
+
+[[env.production.queues.consumers]]
+queue = "humber-reconciliation-queue"
+max_batch_size = 10
+max_batch_timeout = 30
+
+# Production R2 Buckets
+[[env.production.r2_buckets]]
+binding = "DOCUMENTS"
+bucket_name = "humber-documents"
+
+# Production Vectorize
+[[env.production.vectorize]]
+binding = "VECTORIZE_INDEX"
+index_name = "humber-knowledge-base"
+
+# Production AI
+[env.production.ai]
+binding = "AI"
+
 [env.staging]
 name = "humber-operations-worker-staging"
 
@@ -47,100 +166,100 @@ database_id = "1d392f9e-b2f3-4bfb-9bb3-f82484ad140f"
 [[d1_databases]]
 binding = "DB_ENGINEER_001"
 database_name = "humber-tenant-001"
-database_id = "YOUR_TENANT_001_DB_ID"
+database_id = "38c9a86b-64db-4235-b283-b9b8d93b11f1"
 
 [[d1_databases]]
 binding = "DB_ENGINEER_002"
 database_name = "humber-tenant-002"
-database_id = "YOUR_TENANT_002_DB_ID"
+database_id = "ec971ef9-1f98-49ca-8a91-dd3192b12429"
 
 [[d1_databases]]
 binding = "DB_ENGINEER_003"
 database_name = "humber-tenant-003"
-database_id = "YOUR_TENANT_003_DB_ID"
+database_id = "22e3d3e8-fd0d-43f0-a587-bab533ce6e2e"
 
 [[d1_databases]]
 binding = "DB_ENGINEER_004"
 database_name = "humber-tenant-004"
-database_id = "YOUR_TENANT_004_DB_ID"
+database_id = "f9f1b2a3-5643-4aea-90c2-45f2a898ff07"
 
 [[d1_databases]]
 binding = "DB_ENGINEER_005"
 database_name = "humber-tenant-005"
-database_id = "YOUR_TENANT_005_DB_ID"
+database_id = "c5803cf1-6172-4b37-8c7d-29b96012033d"
 
 [[d1_databases]]
 binding = "DB_ENGINEER_006"
 database_name = "humber-tenant-006"
-database_id = "YOUR_TENANT_006_DB_ID"
+database_id = "3b2a57eb-e4e7-4fa2-82a6-4e1e43536a4b"
 
 [[d1_databases]]
 binding = "DB_ENGINEER_007"
 database_name = "humber-tenant-007"
-database_id = "YOUR_TENANT_007_DB_ID"
+database_id = "beb7d523-32ea-4518-afda-38289d88a618"
 
 [[d1_databases]]
 binding = "DB_ENGINEER_008"
 database_name = "humber-tenant-008"
-database_id = "YOUR_TENANT_008_DB_ID"
+database_id = "d85bffd4-3721-4eec-8542-a017a497ae77"
 
 [[d1_databases]]
 binding = "DB_ENGINEER_009"
 database_name = "humber-tenant-009"
-database_id = "YOUR_TENANT_009_DB_ID"
+database_id = "ec5cc1b6-e827-42b3-a912-cbec977266d5"
 
 [[d1_databases]]
 binding = "DB_ENGINEER_010"
 database_name = "humber-tenant-010"
-database_id = "YOUR_TENANT_010_DB_ID"
+database_id = "4b267d2c-d18a-4b6b-a389-496c36c2e2ba"
 
 # Legacy DB binding for backward compatibility
 [[d1_databases]]
 binding = "DB"
 database_name = "humber-operations-db"
-database_id = "YOUR_DATABASE_ID"
+database_id = "54c318f2-5f98-412e-b521-1ea3cf850a0c"
 
 # KV Namespaces for caching and session management
 [[kv_namespaces]]
 binding = "KV_TENANT_CACHE"
-id = "YOUR_TENANT_CACHE_KV_ID"
+id = "7d7a6b3d94b24cb5b96177556a2f7130"
 
 [[kv_namespaces]]
 binding = "KV_CACHE"
-id = "YOUR_KV_NAMESPACE_ID"
+id = "16640e4d080d4de8879962927ad31732"
 
 [[kv_namespaces]]
 binding = "KV_SESSIONS"
-id = "YOUR_SESSIONS_KV_ID"
+id = "81526f64e8cf4928a9ec1b903a8024ef"
 
 # Queues for async processing
 [[queues.producers]]
-queue = "operations-queue"
+queue = "humber-operations-queue"
 binding = "OPERATIONS_QUEUE"
 
 [[queues.producers]]
-queue = "reconciliation-queue"
+queue = "humber-reconciliation-queue"
 binding = "RECONCILIATION_QUEUE"
 
 [[queues.producers]]
-queue = "tenant-audit-logs"
+queue = "humber-tenant-audit-logs"
 binding = "TENANT_QUEUE"
 
 [[queues.producers]]
-queue = "background-checks"
+queue = "humber-background-checks"
 binding = "VETTING_QUEUE"
 
 [[queues.producers]]
-queue = "visa-processing"
+queue = "humber-visa-processing"
 binding = "VISA_QUEUE"
 
 [[queues.consumers]]
-queue = "operations-queue"
+queue = "humber-operations-queue"
 max_batch_size = 10
 max_batch_timeout = 30
 
 [[queues.consumers]]
-queue = "reconciliation-queue"
+queue = "humber-reconciliation-queue"
 max_batch_size = 10
 max_batch_timeout = 30
 

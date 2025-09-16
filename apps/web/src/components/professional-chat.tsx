@@ -358,7 +358,7 @@ export function ProfessionalChat({ isOpen, onToggle }: ProfessionalChatProps) {
       exit={{ opacity: 0, y: 40, scale: 0.9 }}
       className={`fixed bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/10 shadow-2xl z-50 overflow-hidden transition-all duration-300 ${
         isMinimized 
-          ? 'bottom-8 right-8 w-80 h-20 flex-row' 
+          ? 'bottom-8 right-8 w-80 h-16' 
           : 'inset-0 flex flex-col'
       }`}
       style={{ 
@@ -367,6 +367,37 @@ export function ProfessionalChat({ isOpen, onToggle }: ProfessionalChatProps) {
         boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1)'
       }}
     >
+      {/* Minimized State */}
+      {isMinimized && (
+        <div className="flex items-center justify-between h-full px-4">
+          <div className="flex items-center space-x-3">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-r from-purple-500 via-pink-500 to-purple-600 flex items-center justify-center shadow-lg">
+              <MessageSquare className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-white">Humber AI</h3>
+              <p className="text-xs text-slate-400">Ready to help</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setIsMinimized(false)}
+              className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              title="Expand chat"
+            >
+              <Maximize2 className="h-4 w-4 text-slate-400 hover:text-white transition-colors" />
+            </button>
+            <button
+              onClick={onToggle}
+              className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              title="Close chat"
+            >
+              <X className="h-4 w-4 text-slate-400 hover:text-white transition-colors" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Chat History Sidebar */}
       {showHistory && !isMinimized && (
         <motion.div

@@ -7,9 +7,7 @@ import { Sidebar } from '@/components/sidebar'
 import dynamic from 'next/dynamic'
 
 // Lazy load heavy components
-const ProfessionalChat = dynamic(() => import('@/components/professional-chat').then(mod => ({ default: mod.ProfessionalChat })), {
-  loading: () => null
-})
+import { ProfessionalChat } from '@/components/professional-chat'
 // import { GlobalHelpTrigger } from '@/components/help-center'
 import { EmployeeHeader } from '@/components/employee-header'
 import { useSession } from '@/components/session-context'

@@ -533,7 +533,7 @@ graph TB
 
     subgraph "Application Layer"
         subgraph "Frontend Servers"
-            NEXT1[Next.js Server 1<br/>Vercel/Cloudflare Pages]
+            NEXT1[Next.js Server 1<br/>Cloudflare Pages]
             NEXT2[Next.js Server 2<br/>Auto-scaling]
         end
         
@@ -902,13 +902,13 @@ graph TB
     end
 
     subgraph "Staging Environment"
-        STAGE_NEXT[Next.js Staging<br/>Vercel Preview]
+        STAGE_NEXT[Next.js Staging<br/>Cloudflare Pages]
         STAGE_WORKER[Worker Staging<br/>Cloudflare]
         STAGE_DB[(Staging D1 DB)]
     end
 
     subgraph "Production Environment"
-        PROD_NEXT[Next.js Production<br/>Vercel/CF Pages]
+        PROD_NEXT[Next.js Production<br/>Cloudflare Pages]
         PROD_WORKER[Worker Production<br/>Cloudflare Global]
         PROD_DB[(Production D1 DB)]
         PROD_CACHE[(Production KV)]
@@ -972,7 +972,7 @@ mindmap
       
     Infrastructure
       Cloudflare Global Network
-      Vercel Frontend Hosting
+      Cloudflare Pages Frontend Hosting
       R2 Object Storage
       KV Key-Value Store
       

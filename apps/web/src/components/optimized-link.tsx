@@ -34,6 +34,13 @@ export function OptimizedLink({
   const [showSkeletonState, setShowSkeletonState] = useState(false)
 
   const handleClick = useCallback((e: React.MouseEvent) => {
+    // Validate href is a string
+    if (typeof href !== 'string') {
+      console.warn('OptimizedLink: href must be a string, received:', typeof href, href)
+      e.preventDefault()
+      return
+    }
+    
     // Don't navigate if it's the current page
     if (href === pathname) {
       e.preventDefault()
@@ -58,11 +65,12 @@ export function OptimizedLink({
       setShowSkeletonState(true)
     }
 
-    // Navigate
+    // Navigate - ensure href is a valid string
+    const targetHref = typeof href === 'string' ? href : String(href)
     if (replace) {
-      router.replace(href)
+      router.replace(targetHref)
     } else {
-      router.push(href)
+      router.push(targetHref)
     }
   }, [href, pathname, onClick, setRouteLoading, setRouteLoadingMessage, loadingMessage, showSkeleton, replace, router])
 
@@ -177,11 +185,12 @@ export function useFastNavigation() {
       router.prefetch(href)
     }
 
-    // Navigate
+    // Navigate - ensure href is a valid string
+    const targetHref = typeof href === 'string' ? href : String(href)
     if (replace) {
-      router.replace(href)
+      router.replace(targetHref)
     } else {
-      router.push(href)
+      router.push(targetHref)
     }
   }, [router, setRouteLoading, setRouteLoadingMessage])
 

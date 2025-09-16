@@ -4,8 +4,7 @@
 
 - Node.js 20.x
 - pnpm 9.x
-- Vercel account
-- Cloudflare account with Workers plan
+- Cloudflare account with Pages and Workers plan
 - GitHub repository
 
 ## Initial Setup
@@ -74,28 +73,28 @@ wrangler secret put ENCRYPTION_KEY --env production
 wrangler deploy --env production
 ```
 
-## Vercel Deployment
+## Cloudflare Pages Deployment
 
-### 1. Link Project
+### 1. Create Pages Project
 
 ```bash
 cd apps/web
-npx vercel link
+npx wrangler pages project create humber-operations-web
 ```
 
 ### 2. Set Environment Variables
 
-Go to [Vercel Dashboard](https://vercel.com) and set:
+Go to [Cloudflare Dashboard](https://dash.cloudflare.com) → Pages → Your Project → Settings → Environment Variables and set:
 
 - `AUTH_SECRET` - Generate with `openssl rand -base64 32`
-- `NEXTAUTH_URL` - Your production URL
+- `NEXTAUTH_URL` - Your production URL (https://your-domain.pages.dev)
 - `NEXT_PUBLIC_API_URL` - Your Cloudflare Worker URL
 - `DATABASE_URL` - Production database connection
 
 ### 3. Deploy
 
 ```bash
-npx vercel --prod
+npx wrangler pages deploy .next --project-name=humber-operations-web
 ```
 
 ## GitHub Actions Setup
@@ -103,11 +102,6 @@ npx vercel --prod
 ### 1. Add Repository Secrets
 
 Go to Settings → Secrets → Actions and add:
-
-**Vercel:**
-- `VERCEL_TOKEN`
-- `VERCEL_ORG_ID`
-- `VERCEL_PROJECT_ID`
 
 **Cloudflare:**
 - `CLOUDFLARE_API_TOKEN`
@@ -127,7 +121,7 @@ git push origin main
 
 ### Verification
 
-- [ ] Health check endpoint responding: `https://your-domain.vercel.app/api/health`
+- [ ] Health check endpoint responding: `https://your-domain.pages.dev/api/health`
 - [ ] Worker API responding: `https://api.your-domain.workers.dev/health`
 - [ ] Authentication working
 - [ ] Database queries functioning
@@ -136,7 +130,7 @@ git push origin main
 ### Monitoring
 
 1. **Application Monitoring**
-   - Check Vercel Analytics dashboard
+   - Check Cloudflare Analytics dashboard
    - Monitor error rates in logs
    - Set up uptime monitoring
 
@@ -162,7 +156,7 @@ git push origin main
 2. **Enable Caching**
    - Configure Cloudflare caching rules
    - Set appropriate Cache-Control headers
-   - Enable Vercel Edge caching
+   - Enable Cloudflare Pages caching
 
 3. **Database Optimization**
    - Create necessary indexes
@@ -173,9 +167,10 @@ git push origin main
 
 ### Quick Rollback
 
-1. **Vercel:**
+1. **Cloudflare Pages:**
    ```bash
-   vercel rollback
+   wrangler pages deployment list --project-name=humber-operations-web
+   wrangler pages deployment rollback <deployment-id> --project-name=humber-operations-web
    ```
 
 2. **Cloudflare Workers:**
@@ -224,7 +219,7 @@ wrangler d1 migrations create humber-operations rollback_description
 wrangler tail --env production
 
 # Check deployment status
-vercel inspect
+wrangler pages deployment list --project-name=humber-operations-web
 
 # Test API endpoint
 curl https://api.your-domain.workers.dev/health
@@ -279,7 +274,7 @@ dig api.your-domain.workers.dev
 ## Support
 
 For issues or questions:
-1. Check logs in Vercel and Cloudflare dashboards
+1. Check logs in Cloudflare Pages and Workers dashboards
 2. Review error tracking in monitoring tools
 3. Contact team lead for infrastructure access
 4. File issues in GitHub repository

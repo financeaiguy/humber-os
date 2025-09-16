@@ -32,6 +32,7 @@ reportsRouter.post('/generate', async (c) => {
         emails: request.emailTo,
         subject: `Report Generated: ${request.name}`,
         message: `Your ${request.type} report has been generated and is ready for download.`,
+        priority: 'MEDIUM',
         templateData: {
           reportName: request.name,
           reportType: request.type,
@@ -146,14 +147,15 @@ reportsRouter.get('/download/:reportId', async (c) => {
       return c.json({ error: 'Report file not found' }, 404);
     }
     
-    const contentType = report.format === 'PDF' ? 'application/pdf' : 
-                       report.format === 'EXCEL' ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' :
-                       report.format === 'CSV' ? 'text/csv' : 'application/octet-stream';
+    const format = String(report.format || 'PDF');
+    const contentType = format === 'PDF' ? 'application/pdf' : 
+                       format === 'EXCEL' ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' :
+                       format === 'CSV' ? 'text/csv' : 'application/octet-stream';
     
     return new Response(file.body, {
       headers: {
         'Content-Type': contentType,
-        'Content-Disposition': `attachment; filename="${report.name}.${report.format.toLowerCase()}"`,
+        'Content-Disposition': `attachment; filename="${report.name}.${format.toLowerCase()}"`,
         'Content-Length': report.file_size?.toString() || '0'
       }
     });
@@ -497,8 +499,8 @@ reportsRouter.get('/analytics', async (c) => {
         totalReports: overallResult?.total_reports || 0,
         completedReports: overallResult?.completed_reports || 0,
         failedReports: overallResult?.failed_reports || 0,
-        successRate: (overallResult?.total_reports || 0) > 0 ? 
-          (overallResult?.completed_reports || 0) / (overallResult?.total_reports || 0) : 0,
+        successRate: Number(overallResult?.total_reports || 0) > 0 ? 
+          Number(overallResult?.completed_reports || 0) / Number(overallResult?.total_reports || 0) : 0,
         averageFileSize: overallResult?.avg_file_size || 0,
         byType: (typeResult.results || []).reduce((acc: any, row: any) => {
           acc[row.type] = {

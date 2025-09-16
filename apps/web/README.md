@@ -214,13 +214,13 @@ pnpm test:e2e:bull-pen
 
 ## 🚀 Deployment
 
-### **Vercel Deployment**
+### **Cloudflare Pages Deployment**
 ```bash
-# Deploy to Vercel
-npx vercel --prod
+# Deploy to Cloudflare Pages
+npx wrangler pages deploy .next --project-name=humber-operations-web
 
-# Set environment variables
-vercel env add NEXT_PUBLIC_API_URL
+# Set environment variables in Cloudflare Pages dashboard
+# Navigate to Pages → Your Project → Settings → Environment Variables
 ```
 
 ### **Build Optimization**

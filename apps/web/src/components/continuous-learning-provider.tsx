@@ -14,6 +14,10 @@ export function ContinuousLearningProvider({ children }: ContinuousLearningProvi
   const pathname = usePathname();
 
   useEffect(() => {
+    // TEMPORARILY DISABLED - Continuous learning system
+    // This was causing too many console messages and intercepting fetch calls
+    return;
+    
     // Start learning when component mounts
     console.log('🚀 Initializing Continuous Learning System');
 
@@ -58,7 +62,8 @@ export function ContinuousLearningProvider({ children }: ContinuousLearningProvi
       }, 'interaction', { formData: data });
     };
 
-    // Capture API calls
+    // Capture API calls - DISABLED to avoid intercepting all fetches
+    /*
     const originalFetch = window.fetch;
     window.fetch = async (...args) => {
       const startTime = Date.now();
@@ -102,6 +107,7 @@ export function ContinuousLearningProvider({ children }: ContinuousLearningProvi
         throw error;
       }
     };
+    */
 
     // Capture document changes
     const observer = new MutationObserver((mutations) => {

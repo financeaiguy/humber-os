@@ -25,6 +25,10 @@ const ContinuousLearningProvider = dynamic(() => import('@/components/continuous
 
 const inter = Inter({ subsets: ['latin'] })
 
+// Force dynamic rendering since we need authentication
+export const runtime = 'nodejs'
+export const revalidate = 0
+
 export const metadata: Metadata = {
   title: 'Humber - Engineering Operations',
   description: 'Elegant engineering staffing automation designed for professionals',

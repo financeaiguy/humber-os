@@ -29,7 +29,7 @@ graph TB
     end
 
     subgraph "Application Infrastructure"
-        subgraph "Frontend (Vercel/Cloudflare Pages)"
+        subgraph "Frontend (Cloudflare Pages)"
             NEXT_PROD[Next.js Production<br/>Global Edge Deployment]
             NEXT_STAGE[Next.js Staging<br/>Preview Deployments]
             NEXT_DEV[Next.js Development<br/>localhost:3003]
@@ -145,7 +145,7 @@ graph TB
     subgraph "Cloud Development Services"
         GITHUB[GitHub Repository<br/>Source Control]
         GITHUB_ACTIONS[GitHub Actions<br/>CI/CD Pipeline]
-        VERCEL_PREVIEW[Vercel Preview<br/>PR Deployments]
+        CF_PREVIEW[Cloudflare Pages Preview<br/>PR Deployments]
         CF_STAGING[Cloudflare Staging<br/>Worker Testing]
     end
 
@@ -166,7 +166,7 @@ graph TB
     GITHUB --> GITHUB_ACTIONS
     GITHUB_ACTIONS --> JEST
     GITHUB_ACTIONS --> PLAYWRIGHT
-    GITHUB_ACTIONS --> VERCEL_PREVIEW
+    GITHUB_ACTIONS --> CF_PREVIEW
     GITHUB_ACTIONS --> CF_STAGING
 ```
 
@@ -623,7 +623,7 @@ graph TB
 ## 📊 Infrastructure Summary
 
 ### **Current Environment**
-- **Frontend:** Next.js on Vercel/Cloudflare Pages
+- **Frontend:** Next.js on Cloudflare Pages
 - **Backend:** Cloudflare Workers (Global Edge)
 - **Database:** Cloudflare D1 (Multi-tenant SQLite)
 - **Storage:** Cloudflare R2 (Object Storage)

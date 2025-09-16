@@ -435,7 +435,7 @@ graph TB
 
     %% Frontend Deployment
     subgraph "Frontend Hosting"
-        VERCEL[▲ Vercel]
+        CF_PAGES[☁️ Cloudflare Pages]
         PREVIEW[👁️ Preview Deployments]
     end
 
@@ -461,19 +461,19 @@ graph TB
     BUILD --> TEST
     TEST --> SECURITY
     SECURITY --> CF_WORKERS
-    SECURITY --> VERCEL
+    SECURITY --> CF_PAGES
 
     CF_EDGE --> CF_DNS
     CF_DNS --> CF_CDN
     CF_CDN --> CF_WORKERS
-    CF_CDN --> VERCEL
+    CF_CDN --> CF_PAGES
 
     CF_WORKERS --> CF_D1
     CF_WORKERS --> CF_KV
     CF_WORKERS --> CF_R2
     CF_WORKERS --> CF_QUEUES
 
-    VERCEL --> PREVIEW
+    CF_PAGES --> PREVIEW
 
     CF_WORKERS --> ANALYTICS
     CF_WORKERS --> LOGS
@@ -495,7 +495,7 @@ graph TB
     class DEV,GIT dev
     class GITHUB,BUILD,TEST,SECURITY cicd
     class CF_EDGE,CF_DNS,CF_CDN,CF_WORKERS,CF_D1,CF_KV,CF_R2,CF_QUEUES cloudflare
-    class VERCEL,PREVIEW frontend
+    class CF_PAGES,PREVIEW frontend
     class ANALYTICS,LOGS,ALERTS,METRICS monitoring
     class AUTH_PROVIDER,EMAIL_SVC,BACKUP external
 ```

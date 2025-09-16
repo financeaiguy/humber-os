@@ -373,8 +373,7 @@ export default function PrivacyPolicyPage() {
                 <div className="bg-slate-700/30 rounded-lg p-4">
                   <h3 className="font-semibold text-white mb-2">☁️ Infrastructure</h3>
                   <ul className="text-slate-300 text-sm space-y-1">
-                    <li>• <strong>Cloudflare:</strong> Hosting, security, data storage</li>
-                    <li>• <strong>Vercel:</strong> Frontend deployment and CDN</li>
+                    <li>• <strong>Cloudflare:</strong> Hosting, security, data storage, frontend deployment and CDN</li>
                   </ul>
                 </div>
                 

@@ -936,7 +936,7 @@ graph TB
     end
 
     subgraph "🏗️ Application Infrastructure"
-        NEXT_PROD[Next.js Production<br/>Vercel Global Edge]
+        NEXT_PROD[Next.js Production<br/>Cloudflare Pages]
         WORKER_PROD[Cloudflare Workers<br/>200+ Edge Locations]
         DB_CLUSTER[(D1 Database Cluster<br/>Multi-region Replication)]
         STORAGE_CLUSTER[(R2 Storage Cluster<br/>Global Distribution)]
@@ -1054,7 +1054,7 @@ npx wrangler deploy --env production
 3. **Deploy Frontend**
 ```bash
 cd apps/web
-vercel --prod
+npx wrangler pages deploy .next --project-name=humber-operations-web
 ```
 
 ### Environment Configuration

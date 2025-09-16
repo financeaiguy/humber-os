@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Humber Operations - Full Frontend</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const API_URL = 'https://humber-operations-worker-prod.evafiai.workers.dev';
+
+        function App() {
+            const [apiStatus, setApiStatus] = useState('Checking...');
+            const [activeTab, setActiveTab] = useState('dashboard');
+            const [engineers, setEngineers] = useState([]);
+            const [loading, setLoading] = useState(false);
+
+            useEffect(() => {
+                checkAPIStatus();
+                const interval = setInterval(checkAPIStatus, 30000);
+                return () => clearInterval(interval);
+            }, []);
+
+            async function checkAPIStatus() {
+                try {
+                    const response = await fetch(`${API_URL}/health`);
+                    const data = await response.json();
+                    setApiStatus(`✓ Connected - ${data.status}`);
+                } catch (error) {
+                    setApiStatus(`✗ Error - ${error.message}`);
+                }
+            }
+
+            async function loadEngineers() {
+                setLoading(true);
+                try {
+                    const response = await fetch(`${API_URL}/engineers`, {
+                        headers: {
+                            'X-Tenant-ID': 'tenant-001'
+                        }
+                    });
+                    const data = await response.json();
+                    if (data.engineers) {
+                        setEngineers(data.engineers);
+                    } else {
+                        console.log('Engineers response:', data);
+                    }
+                } catch (error) {
+                    console.error('Error loading engineers:', error);
+                } finally {
+                    setLoading(false);
+                }
+            }
+
+            async function testAllEndpoints() {
+                const endpoints = [
+                    { name: 'Health', path: '/health' },
+                    { name: 'Service Info', path: '/' },
+                    { name: 'Engineers', path: '/engineers', headers: { 'X-Tenant-ID': 'tenant-001' } },
+                    { name: 'Operations', path: '/operations', headers: { 'X-Tenant-ID': 'tenant-001' } },
+                    { name: 'Bull Pen', path: '/bull-pen', headers: { 'X-Tenant-ID': 'tenant-001' } }
+                ];
+
+                console.log('Testing all endpoints...');
+                
+                for (const endpoint of endpoints) {
+                    try {
+                        const response = await fetch(`${API_URL}${endpoint.path}`, {
+                            headers: endpoint.headers || {}
+                        });
+                        const data = await response.json();
+                        console.log(`${endpoint.name} (${response.status}):`, data);
+                    } catch (error) {
+                        console.error(`${endpoint.name} error:`, error);
+                    }
+                }
+                
+                alert('API tests completed. Check console for detailed results.');
+            }
+
+            return (
+                <div className="min-h-screen bg-gray-900">
+                    {/* Header */}
+                    <header className="bg-gray-800 border-b border-gray-700">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="flex justify-between items-center py-6">
+                                <div className="flex items-center">
+                                    <h1 className="text-2xl font-bold text-white">Humber Operations</h1>
+                                    <span className="ml-4 text-sm text-gray-400">Full Frontend</span>
+                                </div>
+                                <div className="flex items-center space-x-4">
+                                    <div className="text-sm">
+                                        <span className="text-gray-400">API Status: </span>
+                                        <span className={apiStatus.includes('✓') ? 'text-green-400' : 'text-red-400'}>
+                                            {apiStatus}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Navigation */}
+                    <nav className="bg-gray-800 border-b border-gray-700">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="flex space-x-8">
+                                {[
+                                    { id: 'dashboard', name: 'Dashboard' },
+                                    { id: 'engineers', name: 'Engineers' },
+                                    { id: 'operations', name: 'Operations' },
+                                    { id: 'bull-pen', name: 'Bull Pen' },
+                                    { id: 'reports', name: 'Reports' },
+                                    { id: 'api-test', name: 'API Test' }
+                                ].map(tab => (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setActiveTab(tab.id)}
+                                        className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                                            activeTab === tab.id
+                                                ? 'border-blue-500 text-blue-400'
+                                                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                                        }`}
+                                    >
+                                        {tab.name}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </nav>
+
+                    {/* Main Content */}
+                    <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+                        <div className="px-4 py-6 sm:px-0">
+                            {activeTab === 'dashboard' && (
+                                <div className="space-y-6">
+                                    <h2 className="text-3xl font-bold">Dashboard</h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                        <div className="bg-gray-800 p-6 rounded-lg">
+                                            <h3 className="text-lg font-semibold mb-2">Backend API</h3>
+                                            <p className={`text-2xl font-bold ${apiStatus.includes('✓') ? 'text-green-400' : 'text-red-400'}`}>
+                                                {apiStatus.includes('✓') ? 'Connected' : 'Disconnected'}
+                                            </p>
+                                        </div>
+                                        <div className="bg-gray-800 p-6 rounded-lg">
+                                            <h3 className="text-lg font-semibold mb-2">Engineers</h3>
+                                            <p className="text-2xl font-bold text-blue-400">{engineers.length}</p>
+                                        </div>
+                                        <div className="bg-gray-800 p-6 rounded-lg">
+                                            <h3 className="text-lg font-semibold mb-2">Operations</h3>
+                                            <p className="text-2xl font-bold text-yellow-400">Active</p>
+                                        </div>
+                                        <div className="bg-gray-800 p-6 rounded-lg">
+                                            <h3 className="text-lg font-semibold mb-2">Reports</h3>
+                                            <p className="text-2xl font-bold text-purple-400">Available</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'engineers' && (
+                                <div className="space-y-6">
+                                    <div className="flex justify-between items-center">
+                                        <h2 className="text-3xl font-bold">Engineers</h2>
+                                        <button
+                                            onClick={loadEngineers}
+                                            disabled={loading}
+                                            className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 px-4 py-2 rounded-lg transition"
+                                        >
+                                            {loading ? 'Loading...' : 'Load Engineers'}
+                                        </button>
+                                    </div>
+                                    <div className="bg-gray-800 rounded-lg p-6">
+                                        {engineers.length > 0 ? (
+                                            <div className="grid gap-4">
+                                                {engineers.map((engineer, index) => (
+                                                    <div key={index} className="bg-gray-700 p-4 rounded-lg">
+                                                        <h3 className="font-semibold">{engineer.name || `Engineer ${index + 1}`}</h3>
+                                                        <p className="text-gray-400">{engineer.role || 'Software Engineer'}</p>
+                                                        <p className="text-sm text-gray-500">{engineer.status || 'Active'}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <p className="text-gray-400">No engineers loaded. Click "Load Engineers" to fetch data.</p>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'operations' && (
+                                <div className="space-y-6">
+                                    <h2 className="text-3xl font-bold">Operations Pipeline</h2>
+                                    <div className="bg-gray-800 rounded-lg p-6">
+                                        <p className="text-gray-400">Operations management interface coming soon...</p>
+                                        <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div className="bg-gray-700 p-4 rounded-lg">
+                                                <h3 className="font-semibold">Recruiting</h3>
+                                                <p className="text-gray-400">Manage candidate pipeline</p>
+                                            </div>
+                                            <div className="bg-gray-700 p-4 rounded-lg">
+                                                <h3 className="font-semibold">Vetting</h3>
+                                                <p className="text-gray-400">Background checks & verification</p>
+                                            </div>
+                                            <div className="bg-gray-700 p-4 rounded-lg">
+                                                <h3 className="font-semibold">Deployment</h3>
+                                                <p className="text-gray-400">Engineer assignment & deployment</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'bull-pen' && (
+                                <div className="space-y-6">
+                                    <h2 className="text-3xl font-bold">Bull Pen Dashboard</h2>
+                                    <div className="bg-gray-800 rounded-lg p-6">
+                                        <p className="text-gray-400">Bull pen management interface coming soon...</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'reports' && (
+                                <div className="space-y-6">
+                                    <h2 className="text-3xl font-bold">Reports</h2>
+                                    <div className="bg-gray-800 rounded-lg p-6">
+                                        <p className="text-gray-400">Reporting system interface coming soon...</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'api-test' && (
+                                <div className="space-y-6">
+                                    <h2 className="text-3xl font-bold">API Testing</h2>
+                                    <div className="bg-gray-800 rounded-lg p-6 space-y-4">
+                                        <div className="flex justify-between items-center">
+                                            <h3 className="text-lg font-semibold">Backend Connection Test</h3>
+                                            <button
+                                                onClick={testAllEndpoints}
+                                                className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition"
+                                            >
+                                                Test All Endpoints
+                                            </button>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <p className="text-sm text-gray-400">Available Endpoints:</p>
+                                            <ul className="text-sm text-gray-300 space-y-1">
+                                                <li>• /health - Health check</li>
+                                                <li>• /engineers - Engineer management</li>
+                                                <li>• /operations - Operations pipeline</li>
+                                                <li>• /timesheets - Timesheet management</li>
+                                                <li>• /bull-pen - Bull pen dashboard</li>
+                                                <li>• /reports - Reporting system</li>
+                                            </ul>
+                                        </div>
+                                        <div className="bg-gray-700 p-4 rounded-lg">
+                                            <p className="text-sm text-gray-400">
+                                                Open browser console (F12) to see detailed API responses when testing endpoints.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </main>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

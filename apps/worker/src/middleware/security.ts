@@ -131,7 +131,13 @@ export async function corsMiddleware(c: Context, next: Next) {
     'http://127.0.0.1:3001',
     'https://humber-operations.com',
     'https://*.humber-operations.com',
-    'https://humber-operations-worker-dev.evafiai.workers.dev'
+    'https://humber-operations-worker-dev.evafiai.workers.dev',
+    'https://7c496b42.humber-web.pages.dev',
+    'https://d4db1e6a.humber-web.pages.dev',
+    'https://development.humber-web.pages.dev',
+    'https://humber-web-frontend-prod.evafiai.workers.dev',
+    'https://*.humber-web.pages.dev',
+    'https://*.evafiai.workers.dev'
   ];
   
   // Always set CORS headers for better compatibility
