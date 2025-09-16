@@ -51,7 +51,7 @@ export function LayoutClient({ children }: LayoutClientProps) {
   
   // Don't show sidebar or chat on auth pages
   if (isAuthPage) {
-    return <div className={platformClasses}>{children}</div>
+    return <>{children}</>
   }
   
   // Use Jobs layout if in Jobs mode
@@ -69,7 +69,7 @@ export function LayoutClient({ children }: LayoutClientProps) {
   const shouldShowSidebar = session && !isEmployee
 
   return (
-    <div className={`flex flex-col min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 ${platformClasses}`}>
+    <div className={`flex flex-col min-h-screen bg-slate-950 ${platformClasses}`}>
       <div className="flex flex-1">
         {shouldShowSidebar && <Sidebar />}
         <main className={`flex-1 flex flex-col ${shouldShowSidebar ? 'lg:ml-64' : ''}`}>

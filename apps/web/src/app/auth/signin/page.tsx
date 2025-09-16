@@ -68,7 +68,7 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-6">
+    <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-6 overflow-auto">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl w-full">
         {/* Left side - Branding */}
         <motion.div
