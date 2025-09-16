@@ -56,7 +56,40 @@ export function ChatWidget({ isOpen, onToggle, className = '' }: ChatWidgetProps
   const [selectedEngineer, setSelectedEngineer] = useState<Engineer | null>(null)
   const [showEngineerDropdown, setShowEngineerDropdown] = useState(false)
   const [chatMode, setChatMode] = useState<'documents' | 'engineer' | 'general'>('documents')
+  const [isConnected, setIsConnected] = useState(false)
+  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting')
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // Check AI connection status
+  useEffect(() => {
+    const checkConnection = async () => {
+      try {
+        setConnectionStatus('connecting')
+        const response = await fetch('http://localhost:8787/health', {
+          method: 'GET',
+          headers: { 'X-Tenant-ID': 'demo-tenant' }
+        })
+        
+        if (response.ok) {
+          setIsConnected(true)
+          setConnectionStatus('connected')
+        } else {
+          setIsConnected(false)
+          setConnectionStatus('disconnected')
+        }
+      } catch (error) {
+        console.error('AI connection check failed:', error)
+        setIsConnected(false)
+        setConnectionStatus('disconnected')
+      }
+    }
+
+    checkConnection()
+    
+    // Check connection every 30 seconds
+    const interval = setInterval(checkConnection, 30000)
+    return () => clearInterval(interval)
+  }, [])
 
   // Mock engineers data (would fetch from API)
   const engineers: Engineer[] = [
@@ -139,6 +172,11 @@ export function ChatWidget({ isOpen, onToggle, className = '' }: ChatWidgetProps
           contextMessage = `Context: I'm asking about ${selectedEngineer.name}, a ${selectedEngineer.category} engineer who is currently ${selectedEngineer.status}${selectedEngineer.currentProject ? ` on project: ${selectedEngineer.currentProject}` : ''}. Their skills include: ${selectedEngineer.skills?.join(', ')}. They are located in ${selectedEngineer.location} with an hourly rate of $${selectedEngineer.hourlyRate}.\n\nQuestion: ${input}`
         }
 
+        // Check if AI is connected before making the call
+        if (!isConnected) {
+          throw new Error('AI models are not connected')
+        }
+
         // Call the chat API
         const response = await fetch('http://localhost:8787/chat/message', {
           method: 'POST',
@@ -175,11 +213,15 @@ export function ChatWidget({ isOpen, onToggle, className = '' }: ChatWidgetProps
     } catch (error) {
       console.error('Chat error:', error)
       
-      // Fallback response
+      // Fallback response based on connection status
+      const errorContent = !isConnected 
+        ? 'AI models are currently offline. Please check your connection and try again. The system uses Llama 4 Scout and 120B parameter open-source models via Cloudflare Workers AI.'
+        : 'I apologize, but I encountered an error processing your request. Please try again or contact support if the issue persists.'
+      
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'I apologize, but I encountered an error processing your request. Please try again or contact support if the issue persists.',
+        content: errorContent,
         timestamp: Date.now()
       }
       
@@ -248,12 +290,23 @@ export function ChatWidget({ isOpen, onToggle, className = '' }: ChatWidgetProps
                 </div>
                 <div className="min-w-0 flex-1">
                   <h3 className="text-lg sm:text-xl font-semibold text-white truncate">Humber AI Assistant</h3>
-                  <p className="text-xs sm:text-sm text-slate-400 truncate">
-                    {chatMode === 'engineer' && selectedEngineer 
-                      ? `Chatting about ${selectedEngineer.name}`
-                      : chatMode === 'documents' 
-                      ? 'Powered by your knowledge base'
-                      : 'General assistance'}
+                  <p className="text-xs sm:text-sm text-slate-400 truncate flex items-center gap-2">
+                    <div className={`w-2 h-2 rounded-full ${
+                      connectionStatus === 'connected' ? 'bg-green-400 animate-pulse' :
+                      connectionStatus === 'connecting' ? 'bg-yellow-400 animate-pulse' :
+                      'bg-red-400'
+                    }`} />
+                    {connectionStatus === 'connected' ? (
+                      chatMode === 'engineer' && selectedEngineer 
+                        ? `Chatting about ${selectedEngineer.name}`
+                        : chatMode === 'documents' 
+                        ? 'Powered by Llama 4 Scout & 120B OSS'
+                        : 'Open-source AI models connected'
+                    ) : connectionStatus === 'connecting' ? (
+                      'Connecting to AI models...'
+                    ) : (
+                      'AI models offline'
+                    )}
                   </p>
                 </div>
               </div>

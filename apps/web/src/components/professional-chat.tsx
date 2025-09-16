@@ -35,7 +35,9 @@ import {
   HelpCircle,
   BookOpen,
   Play,
-  Pause
+  Pause,
+  Save,
+  MessageCircle
 } from 'lucide-react'
 
 interface ChatMessage {
@@ -1234,6 +1236,191 @@ export function ProfessionalChat({ isOpen, onToggle }: ProfessionalChatProps) {
         </motion.div>
       )}
       
+      {/* Settings Panel */}
+      {showSettings && !isMinimized && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-10"
+          onClick={() => setShowSettings(false)}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="bg-slate-800/95 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-6 max-w-md w-full mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-semibold text-white flex items-center">
+                <Settings className="h-5 w-5 mr-2" />
+                Chat Settings
+              </h3>
+              <button
+                onClick={() => setShowSettings(false)}
+                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              >
+                <X className="h-4 w-4 text-slate-400" />
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              {/* Chat Mode Settings */}
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-3">
+                  Default Chat Mode
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { id: 'documents', label: 'Documents', icon: FileText, desc: 'RAG-powered responses' },
+                    { id: 'engineer', label: 'Engineer', icon: User, desc: 'Engineer-specific help' },
+                    { id: 'general', label: 'General', icon: MessageCircle, desc: 'General assistance' },
+                    { id: 'help', label: 'Help', icon: HelpCircle, desc: 'System guidance' }
+                  ].map((mode) => (
+                    <button
+                      key={mode.id}
+                      onClick={() => setChatMode(mode.id as any)}
+                      className={`p-3 rounded-xl border transition-all ${
+                        chatMode === mode.id
+                          ? 'border-blue-500 bg-blue-500/10 text-blue-400'
+                          : 'border-slate-600 hover:border-slate-500 text-slate-400 hover:text-slate-300'
+                      }`}
+                    >
+                      <mode.icon className="h-5 w-5 mx-auto mb-1" />
+                      <div className="text-xs font-medium">{mode.label}</div>
+                      <div className="text-xs opacity-70">{mode.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* AI Settings */}
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-3">
+                  AI Response Settings
+                </label>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs text-slate-400 mb-2">Response Length</label>
+                    <select className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white text-sm">
+                      <option value="concise">Concise (Quick answers)</option>
+                      <option value="detailed" selected>Detailed (Comprehensive)</option>
+                      <option value="extensive">Extensive (Very thorough)</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs text-slate-400 mb-2">Technical Level</label>
+                    <select className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white text-sm">
+                      <option value="basic">Basic (Simple explanations)</option>
+                      <option value="intermediate" selected>Intermediate (Technical details)</option>
+                      <option value="expert">Expert (Advanced technical)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* RAG Settings */}
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-3">
+                  Knowledge Base Settings
+                </label>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-slate-300">Use RAG Knowledge Base</span>
+                    <button
+                      onClick={() => {/* Toggle RAG */}}
+                      className="relative inline-flex h-6 w-11 items-center rounded-full bg-blue-600 transition-colors"
+                    >
+                      <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6" />
+                    </button>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs text-slate-400 mb-2">Max Documents to Reference</label>
+                    <input
+                      type="range"
+                      min="1"
+                      max="10"
+                      defaultValue="5"
+                      className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer"
+                    />
+                    <div className="flex justify-between text-xs text-slate-500 mt-1">
+                      <span>1</span>
+                      <span>5 (current)</span>
+                      <span>10</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Notification Settings */}
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-3">
+                  Notification Preferences
+                </label>
+                <div className="space-y-3">
+                  {[
+                    { id: 'sound', label: 'Sound notifications', enabled: true },
+                    { id: 'desktop', label: 'Desktop notifications', enabled: false },
+                    { id: 'typing', label: 'Show typing indicators', enabled: true },
+                    { id: 'timestamps', label: 'Show message timestamps', enabled: true }
+                  ].map((setting) => (
+                    <div key={setting.id} className="flex items-center justify-between">
+                      <span className="text-sm text-slate-300">{setting.label}</span>
+                      <button
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                          setting.enabled ? 'bg-blue-600' : 'bg-slate-600'
+                        }`}
+                      >
+                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          setting.enabled ? 'translate-x-6' : 'translate-x-1'
+                        }`} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Data & Privacy */}
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-3">
+                  Data & Privacy
+                </label>
+                <div className="space-y-3">
+                  <button className="w-full text-left px-3 py-2 bg-slate-700/50 rounded-lg text-sm text-slate-300 hover:bg-slate-700 transition-colors">
+                    Export Chat History
+                  </button>
+                  <button className="w-full text-left px-3 py-2 bg-slate-700/50 rounded-lg text-sm text-slate-300 hover:bg-slate-700 transition-colors">
+                    Clear All Data
+                  </button>
+                  <button className="w-full text-left px-3 py-2 bg-red-500/10 border border-red-500/20 rounded-lg text-sm text-red-400 hover:bg-red-500/20 transition-colors">
+                    Delete Account Data
+                  </button>
+                </div>
+              </div>
+
+              {/* Save Button */}
+              <div className="pt-4 border-t border-slate-700">
+                <button
+                  onClick={() => {
+                    // Save settings
+                    setShowSettings(false)
+                    // Show success message
+                    console.log('Settings saved')
+                  }}
+                  className="w-full px-4 py-2.5 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all flex items-center justify-center space-x-2"
+                >
+                  <Save className="h-4 w-4" />
+                  <span>Save Settings</span>
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+
       {/* File Upload Modal */}
       {showFileUpload && !isMinimized && (
         <motion.div
