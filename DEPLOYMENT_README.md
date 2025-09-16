@@ -4,7 +4,7 @@
 
 This is a multi-tenant staffing automation system deployed on Cloudflare's edge infrastructure:
 
-- **Frontend**: Next.js 15 app deployed as Cloudflare Pages
+- **Frontend**: Next.js 15 app deployed as Cloudflare Workers (static site)
 - **Backend**: Cloudflare Workers with TypeScript
 - **Database**: Multiple Cloudflare D1 databases (multi-tenant)
 - **Storage**: R2 buckets for documents and assets
@@ -17,7 +17,7 @@ This is a multi-tenant staffing automation system deployed on Cloudflare's edge 
 ```
 humber-os-ai/
 ├── apps/
-│   ├── web/                 # Next.js frontend (Cloudflare Pages)
+│   ├── web/                 # Next.js frontend (Cloudflare Workers)
 │   └── worker/              # Cloudflare Worker backend
 ├── packages/
 │   ├── types/               # Shared TypeScript types
@@ -158,13 +158,13 @@ npx wrangler deploy --env production
 
 ### Frontend Deployment
 
-The frontend uses Cloudflare Pages with `@cloudflare/next-on-pages`:
+The frontend deploys as a Cloudflare Worker with static site support using `@cloudflare/next-on-pages`:
 
 ```bash
-# Build and deploy frontend
+# Build and deploy frontend as Worker
 cd apps/web
 npm run build:cf
-npx wrangler pages deploy .vercel/output/static --project-name=humber-web-complete
+npx wrangler deploy --env production
 ```
 
 Or use the combined command:
@@ -173,6 +173,10 @@ Or use the combined command:
 cd apps/web
 npm run deploy:worker
 ```
+
+The `wrangler.toml` is configured with:
+- `main = ".vercel/output/static/_worker.js/index.js"`
+- `[site] bucket = ".vercel/output/static"`
 
 ## Environment Variables
 
@@ -258,10 +262,10 @@ npx wrangler d1 execute humber_os_master --command="SELECT * FROM tenants;" --en
 ### Analytics
 
 Monitor performance in Cloudflare Dashboard:
-- Workers Analytics
+- Workers Analytics (both frontend and backend)
 - R2 Usage
 - D1 Metrics
-- Pages Analytics
+- Site Analytics
 
 ## Troubleshooting
 
