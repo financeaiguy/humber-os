@@ -53,7 +53,7 @@ export function OnboardingTrackerClient() {
   const isOperator = userRole === 'PARTNER_OPERATOR' || userRole === 'PARTNER_ADMIN'
   const isCustomer = userRole === 'CUSTOMER'
 
-  // Use real-time onboarding hook only on client
+  // Always call the hook, but configure it based on mounted state
   const {
     candidates = [],
     loading = true,
@@ -63,12 +63,12 @@ export function OnboardingTrackerClient() {
     statusCounts = {},
     updateCandidate,
     refresh
-  } = mounted ? useRealTimeOnboarding({
-    refreshInterval: 30000,
-    enableNotifications: true,
+  } = useRealTimeOnboarding({
+    refreshInterval: mounted ? 30000 : 0,
+    enableNotifications: mounted,
     statusFilter,
     searchTerm
-  }) : {}
+  })
 
   // Ensure component is mounted before showing dynamic content
   useEffect(() => {
@@ -109,7 +109,10 @@ export function OnboardingTrackerClient() {
   }
 
   const handleUpdateCandidate = async (candidateId: string, updates: Partial<OnboardingCandidate>) => {
-    if (!updateCandidate) return
+    if (!updateCandidate || typeof updateCandidate !== 'function') {
+      console.warn('updateCandidate is not available')
+      return
+    }
     try {
       await updateCandidate(candidateId, updates)
       
@@ -237,17 +240,21 @@ export function OnboardingTrackerClient() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {refresh && (
-            <span
+          {refresh && typeof refresh === 'function' && (
+            <button
               onClick={(e) => {
                 e.stopPropagation()
-                refresh()
+                e.preventDefault()
+                if (typeof refresh === 'function') {
+                  refresh()
+                }
               }}
-              className="p-1 text-slate-400 hover:text-white transition-colors cursor-pointer"
+              className="p-1 text-slate-400 hover:text-white transition-colors"
               title="Refresh data"
+              type="button"
             >
               <RefreshCw className="w-4 h-4" />
-            </span>
+            </button>
           )}
           <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </div>

@@ -16,10 +16,10 @@ import { getSession } from '@/lib/auth'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-  const recruitId = params.id
+  const { id: recruitId } = await params
   
   try {
     // 1. Authentication check

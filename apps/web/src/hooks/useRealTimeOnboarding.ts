@@ -317,8 +317,8 @@ export function useRealTimeOnboarding(options: UseRealTimeOnboardingOptions = {}
       lastUpdate: null,
       recentUpdates: [],
       statusCounts: {},
-      updateCandidate: async () => {},
-      addCandidate: async () => ({} as OnboardingCandidate),
+      updateCandidate: async () => Promise.resolve(),
+      addCandidate: async () => Promise.resolve({} as OnboardingCandidate),
       refresh: () => {},
       isRealTime: false
     }

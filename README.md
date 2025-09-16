@@ -265,7 +265,8 @@ stateDiagram-v2
 - **Cost Analysis**: Per-hire costs, automation savings, overtime tracking
 
 ### 🤖 **AI Integration**
-- **Professional Chat Interface**: Multi-model support (GPT-4, Claude)
+- **Professional Chat Interface**: Open-source models (Llama 4 Scout, 120B OSS)
+- **Cloudflare Workers AI**: 100% open-source AI infrastructure
 - **Engineer Matching**: AI-powered skill matching for projects
 - **Document Analysis**: Automated SOP and requirement parsing
 - **Predictive Analytics**: Deployment success prediction

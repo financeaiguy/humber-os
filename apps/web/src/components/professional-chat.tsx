@@ -357,7 +357,7 @@ export function ProfessionalChat({ isOpen, onToggle }: ProfessionalChatProps) {
       className={`fixed bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/10 shadow-2xl z-50 overflow-hidden transition-all duration-300 ${
         isMinimized 
           ? 'bottom-8 right-8 w-80 h-20 flex-row' 
-          : 'top-4 left-4 right-4 bottom-4 flex-col'
+          : 'inset-0 flex flex-col'
       }`}
       style={{ 
         background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%)',
@@ -643,20 +643,20 @@ export function ProfessionalChat({ isOpen, onToggle }: ProfessionalChatProps) {
             className="flex-1 flex flex-col min-h-0"
           >
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
+            <div className="flex-1 overflow-y-auto px-4 py-2 space-y-4">
               {messages.length === 0 ? (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="text-center py-16"
+                  className="text-center py-8"
                 >
-                  <div className="h-20 w-20 rounded-3xl bg-gradient-to-r from-purple-500 via-pink-500 to-purple-600 flex items-center justify-center mx-auto mb-6 shadow-2xl">
-                    <Sparkles className="h-10 w-10 text-white" />
+                  <div className="h-16 w-16 rounded-2xl bg-gradient-to-r from-purple-500 via-pink-500 to-purple-600 flex items-center justify-center mx-auto mb-4 shadow-2xl">
+                    <Sparkles className="h-8 w-8 text-white" />
                   </div>
-                  <h2 className="text-2xl font-bold text-white mb-3">
+                  <h2 className="text-xl font-bold text-white mb-2">
                     Hi! I'm your Humber AI Assistant
                   </h2>
-                  <p className="text-slate-400 text-lg mb-8 max-w-md mx-auto leading-relaxed">
+                  <p className="text-slate-400 text-sm mb-6 max-w-md mx-auto leading-relaxed">
                     {chatMode === 'engineer' && selectedEngineer 
                       ? `I'm ready to help you with questions about ${selectedEngineer.name}. Ask about their skills, availability, projects, or performance metrics.`
                       : chatMode === 'documents'
