@@ -12,14 +12,14 @@ export async function securityHeaders(c: Context, next: Next) {
   c.header('Referrer-Policy', 'strict-origin-when-cross-origin');
   c.header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   
-  // Content Security Policy
+  // Content Security Policy - Allow connections to localhost for API testing
   c.header('Content-Security-Policy', 
     "default-src 'self'; " +
     "script-src 'self' 'unsafe-inline'; " +
     "style-src 'self' 'unsafe-inline'; " +
     "img-src 'self' data: https:; " +
     "font-src 'self'; " +
-    "connect-src 'self'; " +
+    "connect-src 'self' http://localhost:3000 http://localhost:3001 http://127.0.0.1:3000 http://127.0.0.1:3001; " +
     "frame-ancestors 'none';"
   );
   
@@ -28,7 +28,7 @@ export async function securityHeaders(c: Context, next: Next) {
     c.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   }
   
-  await next();
+  return await next();
 }
 
 /**
@@ -105,16 +105,16 @@ export function sanitizeTenantId(tenantId: string): string | null {
  */
 export async function requestSizeLimit(c: Context, next: Next) {
   const contentLength = c.req.header('Content-Length');
-  const maxSize = 1048576; // 1MB default limit
+  const maxSize = 53687091200; // 50 GB limit (50 * 1024 * 1024 * 1024)
   
   if (contentLength && parseInt(contentLength) > maxSize) {
     return c.json({ 
       error: 'Payload too large',
-      message: 'Request body exceeds maximum allowed size'
+      message: `Request body exceeds maximum allowed size of 50 GB`
     }, 413);
   }
   
-  await next();
+  return await next();
 }
 
 /**
@@ -124,8 +124,11 @@ export async function corsMiddleware(c: Context, next: Next) {
   const origin = c.req.header('Origin');
   const allowedOrigins = [
     'http://localhost:3000',
+    'http://localhost:3001', // Next.js app port
     'https://localhost:3000', 
+    'https://localhost:3001',
     'http://127.0.0.1:3000',
+    'http://127.0.0.1:3001',
     'https://humber-operations.com',
     'https://*.humber-operations.com',
     'https://humber-operations-worker-dev.evafiai.workers.dev'
@@ -144,10 +147,10 @@ export async function corsMiddleware(c: Context, next: Next) {
     if (isAllowed) {
       c.header('Access-Control-Allow-Origin', origin);
     } else {
-      c.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+      c.header('Access-Control-Allow-Origin', 'http://localhost:3001');
     }
   } else {
-    c.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+    c.header('Access-Control-Allow-Origin', 'http://localhost:3001');
   }
   
   c.header('Access-Control-Allow-Credentials', 'true');
@@ -157,10 +160,10 @@ export async function corsMiddleware(c: Context, next: Next) {
   c.header('Vary', 'Origin');
   
   if (c.req.method === 'OPTIONS') {
-    return c.text('', 204);
+    return new Response('', { status: 204 });
   }
   
-  await next();
+  return await next();
 }
 
 /**

@@ -2,7 +2,7 @@ import { Env, ReportType, GenerateReportRequest, TimesheetSummaryData, EngineerP
 
 // PDF Generation using jsPDF (we'll use a CDN version for Cloudflare Workers)
 class PDFGenerator {
-  private async generateHTML(reportType: ReportType, data: any, template?: any): Promise<string> {
+  async generateHTML(reportType: ReportType, data: any): Promise<string> {
     const baseStyles = `
       <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; color: #333; }
@@ -416,30 +416,38 @@ class ReportDataService {
     const timesheets = await this.env.DB.prepare(`
       SELECT 
         c.id,
-        c.name,
-        c.category,
+        (c.first_name || ' ' || c.last_name) as name,
+        'ENGINEER' as category,
         SUM(t.hours_worked) as total_hours,
         COUNT(t.id) as timesheet_count,
         c.status
       FROM candidates c
       LEFT JOIN timesheets t ON c.id = t.candidate_id
-      WHERE t.created_at BETWEEN ? AND ?
+      WHERE t.created_at BETWEEN ? AND ? AND c.tenant_id = ?
       GROUP BY c.id
-    `).bind(dateRange.start.toISOString(), dateRange.end.toISOString()).all();
+    `).bind(
+      typeof dateRange.start === 'string' ? new Date(dateRange.start).getTime() : dateRange.start.getTime(), 
+      typeof dateRange.end === 'string' ? new Date(dateRange.end).getTime() : dateRange.end.getTime(),
+      tenantId
+    ).all();
 
     const discrepancies = await this.env.DB.prepare(`
       SELECT 
-        c.name as engineer_name,
-        t.date,
+        (c.first_name || ' ' || c.last_name) as engineer_name,
+        t.week_start_date as date,
         t.hours_worked as humber_hours,
-        t.client_hours,
-        (t.hours_worked - t.client_hours) as difference,
+        40.0 as client_hours,
+        (t.hours_worked - 40.0) as difference,
         t.status
       FROM timesheets t
       JOIN candidates c ON t.candidate_id = c.id
-      WHERE t.date BETWEEN ? AND ?
-      AND ABS(t.hours_worked - t.client_hours) > 0
-    `).bind(dateRange.start.toISOString(), dateRange.end.toISOString()).all();
+      WHERE t.week_start_date >= ? AND t.week_start_date <= ? AND c.tenant_id = ?
+      AND ABS(t.hours_worked - 40.0) > 0
+    `).bind(
+      typeof dateRange.start === 'string' ? new Date(dateRange.start).getTime() : dateRange.start.getTime(), 
+      typeof dateRange.end === 'string' ? new Date(dateRange.end).getTime() : dateRange.end.getTime(),
+      tenantId
+    ).all();
 
     const totalHours = (timesheets.results || []).reduce((sum: number, row: any) => sum + (row.total_hours || 0), 0);
     const totalEngineers = (timesheets.results || []).length;
@@ -619,8 +627,8 @@ export class PDFReportService {
         'COMPLETED',
         filePath,
         pdfContent.length,
-        request.dateRange.start.toISOString(),
-        request.dateRange.end.toISOString(),
+        typeof request.dateRange.start === 'string' ? request.dateRange.start : request.dateRange.start.toISOString(),
+        typeof request.dateRange.end === 'string' ? request.dateRange.end : request.dateRange.end.toISOString(),
         request.tenantId,
         'system',
         new Date().toISOString(),

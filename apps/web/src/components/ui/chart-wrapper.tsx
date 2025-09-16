@@ -77,8 +77,21 @@ export const ENHANCED_TOOLTIP_PROPS = {
 // Enhanced Legend props for consistent styling
 export const ENHANCED_LEGEND_PROPS = {
   wrapperStyle: { 
-    color: '#94a3b8',
+    color: '#E2E8F0', // Much brighter slate-200
     fontSize: '14px',
     paddingTop: '16px'
   }
+}
+
+// Chart axis style overrides
+export const AXIS_STYLE = {
+  stroke: '#E2E8F0', // Bright slate-200 for visibility
+  fontSize: 12,
+  fill: '#E2E8F0'
+}
+
+// Grid style overrides  
+export const GRID_STYLE = {
+  stroke: '#64748B', // slate-500 for better visibility
+  strokeDasharray: '3 3'
 }

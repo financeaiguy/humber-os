@@ -1,6 +1,6 @@
 export function formatDate(date: Date | string | number): string {
   const d = new Date(date);
-  return d.toISOString().split('T')[0];
+  return d.toISOString().split('T')[0] ?? '';
 }
 
 export function getWeekStartDate(date: Date = new Date()): Date {

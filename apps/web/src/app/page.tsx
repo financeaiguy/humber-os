@@ -33,7 +33,7 @@ import {
   Legend,
   ComposedChart
 } from 'recharts'
-import { ChartWrapper, ENHANCED_TOOLTIP_PROPS, ENHANCED_LEGEND_PROPS } from '@/components/ui/chart-wrapper'
+import { ChartWrapper, ENHANCED_TOOLTIP_PROPS, ENHANCED_LEGEND_PROPS, AXIS_STYLE, GRID_STYLE } from '@/components/ui/chart-wrapper'
 
 const stats = [
   {
@@ -335,10 +335,10 @@ export default function HomePage() {
             <h3 className="text-lg font-semibold text-white mb-4">Revenue & Project Volume</h3>
             <ChartWrapper width="100%" height={300}>
               <ComposedChart data={revenueData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
-                <XAxis dataKey="month" stroke="#CBD5E1" />
-                <YAxis yAxisId="left" stroke="#CBD5E1" />
-                <YAxis yAxisId="right" orientation="right" stroke="#CBD5E1" />
+                <CartesianGrid {...GRID_STYLE} />
+                <XAxis dataKey="month" {...AXIS_STYLE} />
+                <YAxis yAxisId="left" {...AXIS_STYLE} />
+                <YAxis yAxisId="right" orientation="right" {...AXIS_STYLE} />
                 <Tooltip 
                   {...ENHANCED_TOOLTIP_PROPS}
                   formatter={(value, name) => [
@@ -375,9 +375,9 @@ export default function HomePage() {
             <h3 className="text-lg font-semibold text-white mb-4">Engineer Utilization by Discipline</h3>
             <ChartWrapper width="100%" height={300}>
               <LineChart data={utilizationData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
-                <XAxis dataKey="day" stroke="#CBD5E1" />
-                <YAxis stroke="#CBD5E1" domain={[0, 100]} />
+                <CartesianGrid {...GRID_STYLE} />
+                <XAxis dataKey="day" {...AXIS_STYLE} />
+                <YAxis {...AXIS_STYLE} domain={[0, 100]} />
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: '#1F2937', 
@@ -394,7 +394,7 @@ export default function HomePage() {
                   }}
                   formatter={(value) => [`${value}%`, '']}
                 />
-                <Legend />
+                <Legend {...ENHANCED_LEGEND_PROPS} />
                 <Line type="monotone" dataKey="electrical" stroke="#3B82F6" strokeWidth={2} name="Electrical" />
                 <Line type="monotone" dataKey="mechanical" stroke="#10B981" strokeWidth={2} name="Mechanical" />
                 <Line type="monotone" dataKey="software" stroke="#F59E0B" strokeWidth={2} name="Software" />
@@ -439,7 +439,7 @@ export default function HomePage() {
                   }}
                   formatter={(value) => [`${value}%`, 'Revenue Share']}
                 />
-                <Legend />
+                <Legend {...ENHANCED_LEGEND_PROPS} />
               </PieChart>
             </ChartWrapper>
           </div>
@@ -448,9 +448,9 @@ export default function HomePage() {
             <h3 className="text-lg font-semibold text-white mb-4">Project Status Overview</h3>
             <ChartWrapper width="100%" height={300}>
               <BarChart data={projectStatusData} layout="horizontal">
-                <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
-                <XAxis type="number" stroke="#CBD5E1" />
-                <YAxis dataKey="status" type="category" stroke="#CBD5E1" width={80} />
+                <CartesianGrid {...GRID_STYLE} />
+                <XAxis type="number" {...AXIS_STYLE} />
+                <YAxis dataKey="status" type="category" {...AXIS_STYLE} width={80} />
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: '#1F2937', 

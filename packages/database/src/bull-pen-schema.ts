@@ -1,4 +1,5 @@
 import { sqliteTable, text, integer, real, index } from 'drizzle-orm/sqlite-core';
+import { sql } from 'drizzle-orm';
 
 // Engineers table with categories and status tracking
 export const engineers = sqliteTable('engineers', {
@@ -24,8 +25,8 @@ export const engineers = sqliteTable('engineers', {
   visaStatus: text('visa_status'),
   notActive: integer('not_active', { mode: 'boolean' }).notNull().default(false),
   
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(Date.now()),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(Date.now()),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 }, (table) => ({
   tenantIdx: index('idx_engineers_tenant').on(table.tenantId),
   categoryIdx: index('idx_engineers_category').on(table.category),
@@ -45,8 +46,8 @@ export const recruitingStep1 = sqliteTable('recruiting_step_1', {
   specialtyKeywords: text('specialty_keywords'), // Comma-separated keywords
   
   completedAt: integer('completed_at', { mode: 'timestamp' }),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(Date.now()),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(Date.now()),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 }, (table) => ({
   engineerIdx: index('idx_recruiting_step1_engineer').on(table.engineerId),
   tenantIdx: index('idx_recruiting_step1_tenant').on(table.tenantId),
@@ -76,8 +77,8 @@ export const hiringStep2 = sqliteTable('hiring_step_2', {
   
   allChecksPassed: integer('all_checks_passed', { mode: 'boolean' }).notNull().default(false),
   completedAt: integer('completed_at', { mode: 'timestamp' }),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(Date.now()),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(Date.now()),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 }, (table) => ({
   engineerIdx: index('idx_hiring_step2_engineer').on(table.engineerId),
   tenantIdx: index('idx_hiring_step2_tenant').on(table.tenantId),
@@ -119,8 +120,8 @@ export const timesheetsReconciliation = sqliteTable('timesheets_reconciliation',
   hourlyRate: real('hourly_rate'),
   totalAmount: real('total_amount'),
   
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(Date.now()),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(Date.now()),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 }, (table) => ({
   engineerIdx: index('idx_timesheets_recon_engineer').on(table.engineerId),
   tenantIdx: index('idx_timesheets_recon_tenant').on(table.tenantId),
@@ -153,8 +154,8 @@ export const deployments = sqliteTable('deployments', {
   performanceRating: real('performance_rating'),
   clientFeedback: text('client_feedback'),
   
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(Date.now()),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(Date.now()),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 }, (table) => ({
   engineerIdx: index('idx_deployments_engineer').on(table.engineerId),
   tenantIdx: index('idx_deployments_tenant').on(table.tenantId),
@@ -179,7 +180,7 @@ export const reconciliationAuditLog = sqliteTable('reconciliation_audit_log', {
   reason: text('reason'),
   details: text('details'), // JSON with additional context
   
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(Date.now()),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 }, (table) => ({
   timesheetIdx: index('idx_audit_timesheet').on(table.timesheetId),
   tenantIdx: index('idx_audit_tenant').on(table.tenantId),

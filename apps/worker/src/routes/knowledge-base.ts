@@ -99,7 +99,7 @@ app.post('/documents', async (c) => {
 
     // Generate embedding using Workers AI
     const embeddingResponse = await AI.run(
-      '@cf/baai/bge-base-en-v1.5',
+      '@cf/baai/bge-small-en-v1.5',
       {
         text: `${title}\n\n${content}`
       }
@@ -175,7 +175,7 @@ app.post('/search', async (c) => {
 
     // Generate embedding for the search query
     const embeddingResponse = await AI.run(
-      '@cf/baai/bge-base-en-v1.5',
+      '@cf/baai/bge-small-en-v1.5',
       {
         text: query
       }
@@ -352,7 +352,7 @@ app.post('/bulk-import', async (c) => {
 
       // Generate embedding
       const embeddingResponse = await AI.run(
-        '@cf/baai/bge-base-en-v1.5',
+        '@cf/baai/bge-small-en-v1.5',
         {
           text: `${title}\n\n${content}`
         }

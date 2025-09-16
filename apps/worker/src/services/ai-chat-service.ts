@@ -1,4 +1,4 @@
-import { Env } from '../types'
+import type { Env } from '@humber/types'
 
 /**
  * AI Chat Service using Cloudflare Workers AI
@@ -287,16 +287,16 @@ All powered by 100% open-source AI models through Cloudflare Workers AI.`,
     const lowercaseMessage = message.toLowerCase()
     
     if (lowercaseMessage.includes('hello') || lowercaseMessage.includes('hi')) {
-      return responses.greeting
+      return responses.greeting!
     } else if (lowercaseMessage.includes('help') || lowercaseMessage.includes('what can you do')) {
-      return responses.help
+      return responses.help!
     } else if (lowercaseMessage.includes('engineer')) {
-      return responses.engineers
+      return responses.engineers!
     } else if (lowercaseMessage.includes('document')) {
-      return responses.documents
+      return responses.documents!
     }
     
-    return responses.error
+    return responses.error!
   }
   
   // Additional helper methods
@@ -350,7 +350,7 @@ All powered by 100% open-source AI models through Cloudflare Workers AI.`,
     return this.parseEngineerMatchingResponse(response.content, availableEngineers)
   }
   
-  private parseEngineerMatchingResponse(content: string, engineers: any[]): any[] {
+  private parseEngineerMatchingResponse(_content: string, engineers: any[]): any[] {
     // Simple parsing logic - would be more sophisticated in production
     return engineers.map(eng => ({
       ...eng,

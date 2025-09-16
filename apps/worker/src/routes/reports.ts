@@ -9,8 +9,18 @@ const reportsRouter = new Hono<{ Bindings: Env }>();
 reportsRouter.post('/generate', async (c) => {
   try {
     const request = await c.req.json() as GenerateReportRequest;
-    const reportService = new PDFReportService(c.env);
     
+    // Convert string dates to Date objects if needed
+    if (request.dateRange) {
+      if (typeof request.dateRange.start === 'string') {
+        request.dateRange.start = new Date(request.dateRange.start);
+      }
+      if (typeof request.dateRange.end === 'string') {
+        request.dateRange.end = new Date(request.dateRange.end);
+      }
+    }
+    
+    const reportService = new PDFReportService(c.env);
     const result = await reportService.generateReport(request);
     
     // If email recipients specified, send notification

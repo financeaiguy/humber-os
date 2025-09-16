@@ -7,7 +7,7 @@ import {
   Camera, Fingerprint, WifiOff, Bell, Mail, MessageSquare,
   TrendingUp, AlertCircle, Activity, ChevronRight, Lock,
   Eye, EyeOff, Navigation, Signal, Battery, Zap, ExternalLink,
-  UserCheck, Calculator, X
+  UserCheck, Calculator, X, Calendar
 } from 'lucide-react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'

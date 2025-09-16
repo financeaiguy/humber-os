@@ -12,6 +12,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "@cloudflare/workers-types": "^4.20250109.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {

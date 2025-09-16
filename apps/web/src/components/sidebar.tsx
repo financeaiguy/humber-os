@@ -35,7 +35,7 @@ const navigation = [
   { name: 'Time Tracking', href: '/time', icon: Clock },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
   { name: 'Knowledge Base', href: '/knowledge', icon: BookOpen },
-  { name: 'Clients', href: '/clients', icon: UserCircle },
+  { name: 'Customers', href: '/clients', icon: UserCircle },
 ]
 
 export function Sidebar() {
@@ -98,13 +98,13 @@ export function Sidebar() {
                     "group flex items-center px-4 py-3 lg:px-3 lg:py-2.5 text-sm font-medium rounded-lg transition-all duration-200 touch-manipulation",
                     isActive
                       ? "bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-white border border-blue-500/30"
-                      : "text-slate-400 hover:text-white hover:bg-white/5 active:bg-white/10"
+                      : "text-slate-200 hover:text-white hover:bg-white/5 active:bg-white/10"
                   )}
                 >
                   <item.icon
                     className={cn(
                       "mr-3 h-5 w-5 flex-shrink-0 transition-colors",
-                      isActive ? "text-blue-400" : "text-slate-500 group-hover:text-slate-300"
+                      isActive ? "text-blue-400" : "text-slate-300 group-hover:text-white"
                     )}
                   />
                   {item.name}
@@ -126,7 +126,7 @@ export function Sidebar() {
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-white">{session.user.name}</p>
-                    <p className="text-xs text-slate-400">{session.user.partnerName}</p>
+                    <p className="text-xs text-slate-200">{session.user.partnerName}</p>
                     <p className="text-xs text-blue-400">{session.user.role.replace('_', ' ')}</p>
                   </div>
                   {/* Notification Icon */}
@@ -135,7 +135,7 @@ export function Sidebar() {
                     className="relative p-2 rounded-lg hover:bg-slate-700/50 transition-colors"
                     title="Notifications"
                   >
-                    <Bell className="h-5 w-5 text-slate-400 hover:text-white" />
+                    <Bell className="h-5 w-5 text-slate-200 hover:text-white" />
                     {unreadNotificationCount > 0 && (
                       <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse">
                         {unreadNotificationCount > 9 ? '9+' : unreadNotificationCount}
@@ -147,7 +147,7 @@ export function Sidebar() {
                   <Link 
                     href="/settings"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex w-full items-center px-4 py-3 lg:px-3 lg:py-2 text-sm text-slate-400 hover:text-white hover:bg-white/5 active:bg-white/10 rounded-lg transition-colors touch-manipulation"
+                    className="flex w-full items-center px-4 py-3 lg:px-3 lg:py-2 text-sm text-slate-200 hover:text-white hover:bg-white/5 active:bg-white/10 rounded-lg transition-colors touch-manipulation"
                   >
                     <Settings className="mr-3 h-4 w-4" />
                     Settings
@@ -157,7 +157,7 @@ export function Sidebar() {
                       setMobileMenuOpen(false)
                       handleSignOut()
                     }}
-                    className="flex w-full items-center px-4 py-3 lg:px-3 lg:py-2 text-sm text-slate-400 hover:text-white hover:bg-white/5 active:bg-white/10 rounded-lg transition-colors touch-manipulation"
+                    className="flex w-full items-center px-4 py-3 lg:px-3 lg:py-2 text-sm text-slate-200 hover:text-white hover:bg-white/5 active:bg-white/10 rounded-lg transition-colors touch-manipulation"
                   >
                     <LogOut className="mr-3 h-4 w-4" />
                     Sign out

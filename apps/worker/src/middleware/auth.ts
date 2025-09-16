@@ -340,7 +340,7 @@ export async function rateLimitMiddleware(c: Context, next: Next) {
     // Continue without rate limiting if there's an error
   }
 
-  await next();
+  return await next();
 }
 
 // Helper functions for enhanced authentication
@@ -482,7 +482,7 @@ export function requireRole(...allowedRoles: string[]) {
       }, 403);
     }
     
-    await next();
+    return await next();
   };
 }
 
@@ -518,7 +518,7 @@ export function requirePermission(...requiredPermissions: string[]) {
       }, 403);
     }
     
-    await next();
+    return await next();
   };
 }
 
@@ -557,7 +557,7 @@ export function requireOwnership(resourceUserIdPath: string) {
       }, 403);
     }
     
-    await next();
+    return await next();
   };
 }
 

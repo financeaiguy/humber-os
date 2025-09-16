@@ -186,20 +186,20 @@ export class MonitoringService {
       this.logger.error('Failed to get system health', error);
       return {
         status: 'unhealthy',
-        metrics: { error: error.message },
+        metrics: { error: error instanceof Error ? error.message : 'Unknown error' },
         timestamp: Date.now()
       };
     }
   }
 
   // Helper methods
-  private async getRecentErrors(since: number): Promise<ErrorEvent[]> {
+  private async getRecentErrors(_since: number): Promise<ErrorEvent[]> {
     // Implementation would query KV for recent errors
     // For now, return empty array
     return [];
   }
   
-  private async getAverageResponseTime(since: number): Promise<number> {
+  private async getAverageResponseTime(_since: number): Promise<number> {
     // Implementation would calculate average from recent metrics
     // For now, return a reasonable default
     return 150; // 150ms average
@@ -286,8 +286,8 @@ export function errorTrackingMiddleware() {
       const monitoring = new MonitoringService(c.env);
       await monitoring.trackError({
         id: crypto.randomUUID(),
-        message: error.message,
-        stack: error.stack,
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
         endpoint: c.req.path,
         method: c.req.method,
         tenantId: c.get('tenantId'),

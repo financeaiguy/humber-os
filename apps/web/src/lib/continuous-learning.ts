@@ -161,25 +161,30 @@ class ContinuousLearningSystem extends EventEmitter {
 
   // Main learning method - ingests any type of data
   async learn(data: any, type: LearningEvent['type'] = 'interaction', metadata?: any): Promise<void> {
-    const event: LearningEvent = {
-      id: this.generateId(),
-      timestamp: new Date(),
-      type,
-      source: this.detectSource(data),
-      data,
-      metadata,
-      confidence: this.calculateConfidence(data)
-    };
+    try {
+      const event: LearningEvent = {
+        id: this.generateId(),
+        timestamp: new Date(),
+        type,
+        source: this.detectSource(data),
+        data,
+        metadata,
+        confidence: this.calculateConfidence(data)
+      };
 
-    // Add to learning queue
-    this.learningQueue.push(event);
+      // Add to learning queue
+      this.learningQueue.push(event);
 
-    // Emit event for real-time processing
-    this.emit('learning', event);
+      // Emit event for real-time processing
+      this.emit('learning', event);
 
-    // Process immediately if queue is getting full
-    if (this.learningQueue.length >= this.config.batchSize) {
-      this.processLearningQueue();
+      // Process immediately if queue is getting full
+      if (this.learningQueue.length >= this.config.batchSize) {
+        this.processLearningQueue();
+      }
+    } catch (error) {
+      // Silently handle learning errors to prevent disrupting the app
+      console.debug('Learning error:', error);
     }
   }
 

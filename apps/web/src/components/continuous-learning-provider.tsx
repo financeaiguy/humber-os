@@ -68,38 +68,37 @@ export function ContinuousLearningProvider({ children }: ContinuousLearningProvi
         const response = await originalFetch(...args);
         const duration = Date.now() - startTime;
         
-        // Learn from API interactions
-        continuousLearning.learn({
-          type: 'api_call',
-          url: url.toString(),
-          method: options?.method || 'GET',
-          status: response.status,
-          duration,
-          timestamp: new Date().toISOString(),
-          userId: session?.user?.id
-        }, 'performance');
-
-        // Learn from slow API calls
-        if (duration > 1000) {
+        // Only learn from successful API interactions to avoid recursion
+        if (response.ok) {
           continuousLearning.learn({
-            type: 'slow_api',
+            type: 'api_call',
             url: url.toString(),
+            method: options?.method || 'GET',
+            status: response.status,
             duration,
-            threshold: 1000
-          }, 'performance', { slow: true });
+            timestamp: new Date().toISOString(),
+            userId: session?.user?.id
+          }, 'performance').catch(() => {
+            // Silently ignore learning errors to prevent recursion
+          });
+
+          // Learn from slow API calls
+          if (duration > 1000) {
+            continuousLearning.learn({
+              type: 'slow_api',
+              url: url.toString(),
+              duration,
+              threshold: 1000
+            }, 'performance', { slow: true }).catch(() => {
+              // Silently ignore learning errors
+            });
+          }
         }
 
         return response;
       } catch (error) {
-        // Learn from API errors
-        continuousLearning.learn({
-          type: 'api_error',
-          url: url.toString(),
-          error: error instanceof Error ? error.message : 'Unknown error',
-          timestamp: new Date().toISOString(),
-          userId: session?.user?.id
-        }, 'error');
-        
+        // Don't learn from errors to avoid fetch recursion issues
+        console.debug('Fetch error (not learning):', error);
         throw error;
       }
     };

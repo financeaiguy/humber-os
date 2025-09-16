@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { EngineerCategory } from './engineer';
 
 // Operations Flow Stages - 4 main stages as per requirements
 export const OperationStage = z.enum([

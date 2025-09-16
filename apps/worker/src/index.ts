@@ -16,6 +16,8 @@ import { secureTimeTrackingRouter } from './routes/secure-time-tracking';
 import { notificationsRouter } from './routes/notifications';
 import { reportsRouter } from './routes/reports';
 import knowledgeBaseRouter from './routes/knowledge-base';
+import mockTimesheetsRouter from './routes/mock-timesheets';
+// import mockRecruitingRouter from './routes/mock-recruiting'; // Removed - using real API
 
 // Define context variables used across the app
 interface AppVariables {
@@ -633,6 +635,11 @@ curl -X POST http://localhost:8787/documents/search \\
 // Interactive API Testing Interface (like Swagger)
 app.get('/api-test', (c) => {
   const baseUrl = new URL(c.req.url).origin;
+  
+  // Add cache-busting headers
+  c.header('Cache-Control', 'no-cache, no-store, must-revalidate');
+  c.header('Pragma', 'no-cache');
+  c.header('Expires', '0');
   
   const testingHtml = `
 <!DOCTYPE html>
@@ -1792,7 +1799,7 @@ app.get('/api-test', (c) => {
             // Use Next.js API for recruiting endpoints, Worker API for others
             let baseUrl = BASE_URL;
             if (endpoint.startsWith('/api/recruits')) {
-                baseUrl = 'http://localhost:3003'; // Next.js app
+                baseUrl = 'http://localhost:3000'; // Next.js app
             }
             
             const options = {
@@ -1803,6 +1810,11 @@ app.get('/api-test', (c) => {
                 }
             };
             
+            // Add Bearer token for Next.js API routes that require authentication
+            if (endpoint.startsWith('/api/recruits')) {
+                options.headers['Authorization'] = 'Bearer test-token-for-api-testing';
+            }
+            
             if (data && !isFormData) {
                 options.headers['Content-Type'] = 'application/json';
                 options.body = JSON.stringify(data);
@@ -1811,26 +1823,48 @@ app.get('/api-test', (c) => {
             }
             
             try {
+                console.log('🚀 Making request to:', baseUrl + endpoint);
+                console.log('📦 Request options:', JSON.stringify(options, null, 2));
+                
                 const response = await fetch(baseUrl + endpoint, options);
+                console.log('📡 Response received:', response.status, response.statusText);
+                
                 const responseData = await response.text();
+                console.log('📄 Response data length:', responseData.length);
                 
                 let formattedResponse;
                 try {
-                    formattedResponse = JSON.stringify(JSON.parse(responseData), null, 2);
-                } catch {
+                    const parsed = JSON.parse(responseData);
+                    formattedResponse = JSON.stringify(parsed, null, 2);
+                    console.log('✅ JSON parsed successfully');
+                } catch (parseError) {
+                    console.log('⚠️ JSON parse failed, using raw text');
                     formattedResponse = responseData;
                 }
                 
                 return {
                     status: response.status,
                     statusText: response.statusText,
-                    data: formattedResponse
+                    data: formattedResponse,
+                    url: baseUrl + endpoint,
+                    timestamp: new Date().toISOString()
                 };
             } catch (error) {
+                console.error('❌ Request failed:', error);
+                const errorMessage = error instanceof Error ? error.message : String(error);
+                const errorDetails = \`Error: \${errorMessage}
+URL: \${baseUrl + endpoint}
+Method: \${options.method}
+Headers: \${JSON.stringify(options.headers, null, 2)}
+Body: \${options.body || 'none'}
+Timestamp: \${new Date().toISOString()}\`;
+                
                 return {
                     status: 0,
                     statusText: 'Network Error',
-                    data: error.message
+                    data: errorDetails,
+                    error: errorMessage,
+                    url: baseUrl + endpoint
                 };
             }
         }
@@ -1840,7 +1874,15 @@ app.get('/api-test', (c) => {
             element.style.display = 'block';
             
             const statusClass = response.status >= 200 && response.status < 300 ? 'status-success' : 'status-error';
-            element.innerHTML = \`<div class="\${statusClass}">Status: \${response.status} \${response.statusText}</div>\\n\\n\${response.data}\`;
+            let debugInfo = '';
+            if (response.url) {
+                debugInfo = \`<div style="font-size: 12px; color: #666; margin-bottom: 10px;">URL: \${response.url}</div>\`;
+            }
+            if (response.error) {
+                debugInfo += \`<div style="font-size: 12px; color: #f56565; margin-bottom: 10px;">Error: \${response.error}</div>\`;
+            }
+            
+            element.innerHTML = \`\${debugInfo}<div class="\${statusClass}">Status: \${response.status} \${response.statusText}</div>\\n\\n\${response.data}\`;
         }
         
         async function executeUpload() {
@@ -2251,8 +2293,8 @@ app.route('/auth', authRouter);
 
 // Protected routes (require authentication)
 app.route('/operations', operationsRouter);
-app.route('/timesheets', mockTimesheetsRouter);
-app.route('/reconciliation', mockReconciliationRouter);
+app.route('/timesheets', timesheetsRouter);
+app.route('/reconciliation', reconciliationRouter);
 app.route('/bull-pen', bullPenRouter);
 app.route('/engineers', engineersRouter);
 app.route('/documents', realDocumentsRouter);
@@ -2261,6 +2303,8 @@ app.route('/time-tracking', secureTimeTrackingRouter);
 app.route('/notifications', notificationsRouter);
 app.route('/reports', reportsRouter);
 app.route('/knowledge-base', knowledgeBaseRouter);
+app.route('/mock-timesheets', mockTimesheetsRouter);
+// app.route('/api/recruits', mockRecruitingRouter); // Removed - using real Next.js API
 
 app.onError((err, c) => {
   // Log full error internally

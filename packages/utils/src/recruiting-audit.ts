@@ -408,12 +408,12 @@ export class RecruitingAuditLogger {
       }, {})
 
       return {
-        totalEvents: statsResult?.total_events || 0,
+        totalEvents: (statsResult as any)?.total_events || 0,
         eventsByType,
-        sensitiveDataAccess: statsResult?.sensitive_access || 0,
-        consentEvents: statsResult?.consent_events || 0,
-        dataExports: statsResult?.data_exports || 0,
-        securityEvents: securityEventsResult?.security_events || 0,
+        sensitiveDataAccess: (statsResult as any)?.sensitive_access || 0,
+        consentEvents: (statsResult as any)?.consent_events || 0,
+        dataExports: (statsResult as any)?.data_exports || 0,
+        securityEvents: (securityEventsResult as any)?.security_events || 0,
         piiProcessingActivities: (piiActivitiesResult.results || []).map((row: any) => ({
           purpose: row.processing_purpose,
           legalBasis: row.legal_basis,

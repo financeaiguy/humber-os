@@ -26,13 +26,13 @@ interface MockAIResponse {
 }
 
 export class MockAIService {
-  private env: Env
+  private _env: Env
   
   constructor(env: Env) {
-    this.env = env
+    this._env = env
   }
   
-  async run(model: string, request: MockAIRequest): Promise<MockAIResponse> {
+  async run(_model: string, request: MockAIRequest): Promise<MockAIResponse> {
     const userMessage = request.messages.find(m => m.role === 'user')?.content || ''
     const systemPrompt = request.messages.find(m => m.role === 'system')?.content || ''
     
@@ -49,7 +49,7 @@ export class MockAIService {
     }
   }
   
-  private generateIntelligentResponse(userMessage: string, systemPrompt: string): string {
+  private generateIntelligentResponse(userMessage: string, _systemPrompt: string): string {
     const message = userMessage.toLowerCase()
     
     // Engineering scaling and business growth questions

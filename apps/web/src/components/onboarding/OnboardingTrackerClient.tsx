@@ -241,7 +241,7 @@ export function OnboardingTrackerClient() {
         </div>
         <div className="flex items-center gap-2">
           {refresh && typeof refresh === 'function' && (
-            <button
+            <div
               onClick={(e) => {
                 e.stopPropagation()
                 e.preventDefault()
@@ -249,12 +249,22 @@ export function OnboardingTrackerClient() {
                   refresh()
                 }
               }}
-              className="p-1 text-slate-400 hover:text-white transition-colors"
+              className="p-1 text-slate-400 hover:text-white transition-colors cursor-pointer"
               title="Refresh data"
-              type="button"
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.stopPropagation()
+                  e.preventDefault()
+                  if (typeof refresh === 'function') {
+                    refresh()
+                  }
+                }
+              }}
             >
               <RefreshCw className="w-4 h-4" />
-            </button>
+            </div>
           )}
           <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </div>

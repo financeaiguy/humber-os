@@ -139,10 +139,10 @@ export default function ClientsPage() {
       {/* Header */}
       <div>
         <h1 className="text-4xl font-bold text-white mb-2">
-          Client Management
+          Customer Management
         </h1>
         <p className="text-slate-400">
-          Manage client relationships and track project performance.
+          Manage customer relationships and track project performance.
         </p>
       </div>
 

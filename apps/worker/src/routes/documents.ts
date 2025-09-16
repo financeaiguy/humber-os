@@ -11,33 +11,7 @@ interface DocumentsVariables {
 
 const documentsRouter = new Hono<{ Bindings: Env; Variables: DocumentsVariables }>();
 
-// Document database schema (simplified for now)
-const documents = {
-  id: 'TEXT PRIMARY KEY',
-  tenantId: 'TEXT NOT NULL',
-  fileName: 'TEXT NOT NULL',
-  originalName: 'TEXT NOT NULL', 
-  fileType: 'TEXT NOT NULL',
-  fileSize: 'INTEGER NOT NULL',
-  title: 'TEXT NOT NULL',
-  description: 'TEXT',
-  category: 'TEXT NOT NULL',
-  tags: 'TEXT', // JSON array
-  extractedText: 'TEXT',
-  summary: 'TEXT',
-  isVectorized: 'BOOLEAN DEFAULT FALSE',
-  vectorId: 'TEXT',
-  chunkCount: 'INTEGER DEFAULT 0',
-  storageKey: 'TEXT NOT NULL',
-  status: 'TEXT NOT NULL DEFAULT "UPLOADING"',
-  processingError: 'TEXT',
-  processingProgress: 'INTEGER DEFAULT 0',
-  isPublic: 'BOOLEAN DEFAULT FALSE',
-  downloadCount: 'INTEGER DEFAULT 0',
-  uploadedBy: 'TEXT NOT NULL',
-  uploadedAt: 'INTEGER NOT NULL',
-  updatedAt: 'INTEGER NOT NULL'
-};
+// Document database schema would be defined here when implemented
 
 // Upload Document
 documentsRouter.post('/upload', async (c) => {
@@ -65,9 +39,9 @@ documentsRouter.post('/upload', async (c) => {
       }, 400);
     }
     
-    // Validate file size (max 50MB)
-    if (file.size > 50 * 1024 * 1024) {
-      return c.json({ error: 'File too large. Maximum size is 50MB.' }, 400);
+    // Validate file size (max 50GB)
+    if (file.size > 50 * 1024 * 1024 * 1024) {
+      return c.json({ error: 'File too large. Maximum size is 50GB.' }, 400);
     }
     
     const documentId = generateDocumentId();
@@ -141,7 +115,6 @@ documentsRouter.post('/upload', async (c) => {
 // Get Documents (with search and filtering)
 documentsRouter.get('/', async (c) => {
   const logger = new Logger('documents-list');
-  const tenantId = c.get('tenantId') as string || 'demo-tenant';
   
   try {
     // Get query parameters
@@ -344,7 +317,7 @@ documentsRouter.post('/search', async (c) => {
     }
     
     // For now, return mock search results
-    // In production, this would use Vectorize for semantic search
+    // In production, this would use Vectorize for semantic search with maxResults and threshold
     const mockResults = [
       {
         documentId: 'doc_001',
@@ -378,11 +351,15 @@ documentsRouter.post('/search', async (c) => {
       tenantId 
     });
     
+    // Apply maxResults limit and threshold filtering in production
+    const filteredResults = mockResults.filter(r => r.score >= threshold).slice(0, maxResults);
+    
     return c.json({
       success: true,
       query,
-      results: mockResults,
-      totalResults: mockResults.length
+      results: filteredResults,
+      totalResults: filteredResults.length,
+      searchParams: { maxResults, threshold }
     });
     
   } catch (error) {

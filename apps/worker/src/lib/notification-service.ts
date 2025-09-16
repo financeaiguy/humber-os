@@ -1,4 +1,4 @@
-import { Env, Notification, NotificationTemplate, SendNotificationRequest, NotificationType, NotificationChannel } from '@humber/types';
+import { Env, SendNotificationRequest, NotificationType, NotificationChannel } from '@humber/types';
 
 // SendGrid Email Service
 class EmailService {
@@ -361,7 +361,8 @@ export class NotificationService {
         endDate: new Date().toLocaleDateString(),
         dashboardUrl: 'https://app.humber-operations.com/timesheets'
       },
-      tenantId: 'default'
+      tenantId: 'default',
+      priority: 'MEDIUM'
     });
   }
 
@@ -381,7 +382,8 @@ export class NotificationService {
         clientHours: 8 - difference,
         dashboardUrl: 'https://app.humber-operations.com/discrepancies'
       },
-      tenantId: 'default'
+      tenantId: 'default',
+      priority: 'MEDIUM'
     });
   }
 

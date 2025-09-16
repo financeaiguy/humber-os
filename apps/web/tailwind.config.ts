@@ -9,6 +9,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Override default gray and slate colors to be brighter
+        gray: {
+          300: '#E2E8F0',
+          400: '#CBD5E1',
+          500: '#94A3B8',
+        },
+        slate: {
+          300: '#CBD5E1',
+          400: '#94A3B8',
+          500: '#64748B',
+        },
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {

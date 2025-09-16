@@ -89,7 +89,7 @@ export class JWTManager {
     }
   ): Promise<JWTPayload | null> {
     try {
-      const { payload, protectedHeader } = await jwtVerify(token, this.secret, {
+      const { payload } = await jwtVerify(token, this.secret, {
         issuer: this.issuer,
         audience: this.audience,
         clockTolerance: 30, // 30 seconds clock skew tolerance
@@ -143,7 +143,7 @@ export class JWTManager {
   extractTenantIdUnsafe(token: string): string | null {
     try {
       const parts = token.split('.');
-      if (parts.length !== 3) return null;
+      if (parts.length !== 3 || !parts[1]) return null;
       
       const payload = JSON.parse(atob(parts[1]));
       return payload.tenantId || null;
@@ -202,7 +202,10 @@ export class JWTManager {
     crypto.getRandomValues(randomArray);
     
     for (let i = 0; i < length; i++) {
-      result += chars.charAt(randomArray[i] % chars.length);
+      const randomValue = randomArray[i];
+      if (randomValue !== undefined) {
+        result += chars.charAt(randomValue % chars.length);
+      }
     }
     
     return result;

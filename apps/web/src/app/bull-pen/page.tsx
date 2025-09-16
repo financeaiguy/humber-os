@@ -37,11 +37,23 @@ import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import dynamic from 'next/dynamic'
 
-// Lazy load heavy modals
-const EngineerAllocationModal = dynamic(() => import('@/components/bull-pen/EngineerAllocationModal'), { ssr: false })
-const FlightBookingModal = dynamic(() => import('@/components/bull-pen/FlightBookingModal'), { ssr: false })
-const ExpenseTrackingModal = dynamic(() => import('@/components/bull-pen/ExpenseTrackingModal'), { ssr: false })
-const EngineerProfileModal = dynamic(() => import('@/components/bull-pen/EngineerProfileModal'), { ssr: false })
+// Dynamically import modals with proper configuration
+const EngineerAllocationModal = dynamic(() => import('@/components/bull-pen/EngineerAllocationModal').then((mod) => ({ default: mod.default })), { 
+  ssr: false,
+  loading: () => <div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div></div>
+})
+const FlightBookingModal = dynamic(() => import('@/components/bull-pen/FlightBookingModal').then((mod) => ({ default: mod.default })), { 
+  ssr: false,
+  loading: () => <div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div></div>
+})
+const ExpenseTrackingModal = dynamic(() => import('@/components/bull-pen/ExpenseTrackingModal').then((mod) => ({ default: mod.default })), { 
+  ssr: false,
+  loading: () => <div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div></div>
+})
+const EngineerProfileModal = dynamic(() => import('@/components/bull-pen/EngineerProfileModal').then((mod) => ({ default: mod.default })), { 
+  ssr: false,
+  loading: () => <div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div></div>
+})
 
 // Engineer categories with icons and colors
 const categories = [
