@@ -6,7 +6,7 @@ const nextConfig = {
   // Fix for Next.js 15.5.3 clientReferenceManifest bug
   experimental: {
     // Disable problematic optimizations that cause the bug
-    optimizePackageImports: false,
+    optimizePackageImports: [],
     // Removed serverComponentsExternalPackages to avoid conflict with transpilePackages
   },
   

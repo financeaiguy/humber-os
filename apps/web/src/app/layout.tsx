@@ -11,22 +11,18 @@ import dynamic from 'next/dynamic'
 
 // Dynamically import heavy components to fix clientReferenceManifest issue
 const GlobalLoadingIndicator = dynamic(() => import('@/components/global-loading').then(mod => ({ default: mod.GlobalLoadingIndicator })), {
-  ssr: false,
   loading: () => null
 })
 
 const PageLoadingIndicator = dynamic(() => import('@/components/global-loading').then(mod => ({ default: mod.PageLoadingIndicator })), {
-  ssr: false,
   loading: () => null
 })
 
 const LoadingProvider = dynamic(() => import('@/components/route-loading').then(mod => ({ default: mod.LoadingProvider })), {
-  ssr: false,
   loading: ({ children }: { children: React.ReactNode }) => <>{children}</>
 })
 
 const ContinuousLearningProvider = dynamic(() => import('@/components/continuous-learning-provider').then(mod => ({ default: mod.ContinuousLearningProvider })), {
-  ssr: false,
   loading: ({ children }: { children: React.ReactNode }) => <>{children}</>
 })
 

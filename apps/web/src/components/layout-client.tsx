@@ -8,7 +8,6 @@ import dynamic from 'next/dynamic'
 
 // Lazy load heavy components
 const ProfessionalChat = dynamic(() => import('@/components/professional-chat').then(mod => ({ default: mod.ProfessionalChat })), {
-  ssr: false,
   loading: () => null
 })
 // import { GlobalHelpTrigger } from '@/components/help-center'

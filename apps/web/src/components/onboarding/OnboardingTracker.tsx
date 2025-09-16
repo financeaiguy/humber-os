@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, User, Clock, FileText, Shield, Globe, CheckCircle, AlertCircle, Loader2, Search, Filter, RefreshCw, Bell } from 'lucide-react'
 import { useSession } from '@/components/session-context'
 import { CandidateDetailsModal } from './CandidateDetailsModal'
+import { useRealTimeOnboarding } from '@/hooks/useRealTimeOnboarding'
 import dynamic from 'next/dynamic'
 
 interface OnboardingCandidate {
