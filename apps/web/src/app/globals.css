@@ -56,18 +56,31 @@
     padding: 0;
   }
   
-  html {
-    background-color: rgb(2 6 23) !important; /* slate-950 */
+  /* Auth pages override */
+  .auth-page {
+    background: none !important;
   }
   
-  /* Force dark background on all main containers */
+  .auth-page * {
+    background-color: transparent !important;
+  }
+  
+  .auth-page .signin-container {
+    background: linear-gradient(135deg, rgb(15 23 42), rgb(30 58 138), rgb(15 23 42)) !important;
+  }
+  
+  /* Default dark background for non-auth pages */
+  html {
+    background-color: rgb(2 6 23); /* slate-950 */
+  }
+  
+  /* Force dark background on main app containers */
   main, 
   #__next,
   [data-design-mode="jobs"],
-  .jobs-layout,
-  div[class*="min-h-screen"] {
-    background-color: rgb(2 6 23) !important; /* slate-950 */
-    color: rgb(248 250 252) !important; /* slate-50 */
+  .jobs-layout {
+    background-color: rgb(2 6 23); /* slate-950 */
+    color: rgb(248 250 252); /* slate-50 */
   }
   
   /* Fix SVG backgrounds in Recharts */

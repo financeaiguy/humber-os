@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, User, Clock, FileText, Shield, Globe, CheckCircle, AlertCircle, Loader2, Search, Filter } from 'lucide-react'
 import { useSession } from '@/components/session-context'
+import { CandidateDetailsModal } from './CandidateDetailsModal'
 
 interface OnboardingCandidate {
   id: string
@@ -44,6 +45,8 @@ export function OnboardingTracker() {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list')
+  const [selectedCandidate, setSelectedCandidate] = useState<OnboardingCandidate | null>(null)
+  const [showDetailsModal, setShowDetailsModal] = useState(false)
 
   // Determine user role and permissions
   const userRole = session?.user?.role
