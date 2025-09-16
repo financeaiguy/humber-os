@@ -152,6 +152,12 @@ bucket_name = "humber-documents"
 binding = "VECTORIZE_INDEX"
 index_name = "humber-knowledge-base"
 
+# Enable local development for Vectorize
+[dev]
+ip = "localhost"
+port = 8787
+local_protocol = "http"
+
 # Cloudflare Workers AI for open-source models
 [ai]
 binding = "AI"

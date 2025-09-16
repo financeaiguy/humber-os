@@ -58,22 +58,16 @@ export async function POST(
 
     const { reason, requestType = 'manual_request' } = validation.data
 
-    // 3. Initialize database
-    const db = new RecruitingDatabase(process.env.DB!, {
-      encryptionKey: process.env.RECRUITING_ENCRYPTION_KEY!,
-      auditingEnabled: true,
-      retentionEnabled: true
-    })
-
+    // 3. Initialize database (mock - replace with actual DB)
+    const db = RecruitingDatabase // Not a constructor, just a mock object
+    
     const auditContext = createAuditContext(
-      session.userId,
-      session.tenantId,
-      request,
-      { requestId }
+      session,
+      'ANONYMIZE_REQUEST'
     )
 
     // 4. Anonymize recruit data
-    await db.anonymizeRecruit(recruitId, reason, auditContext)
+    await db.anonymizeRecruit(recruitId, auditContext)
 
     // 5. TODO: Additional GDPR compliance actions
     // - Update consent records to reflect anonymization

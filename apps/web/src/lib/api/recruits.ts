@@ -80,6 +80,7 @@ async function apiRequest<T>(
     const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': 'Bearer dev-token-123', // Default development token
         ...options.headers,
       },
       ...options,
@@ -130,6 +131,9 @@ export const recruitsApi = {
 
     return apiRequest('/api/recruits', {
       method: 'POST',
+      headers: {
+        'Authorization': 'Bearer dev-token-123', // Development token
+      },
       body: JSON.stringify(recruitData),
     }, schema)
   },
@@ -160,6 +164,9 @@ export const recruitsApi = {
 
     return apiRequest(`/api/recruits?${queryParams.toString()}`, {
       method: 'GET',
+      headers: {
+        'Authorization': 'Bearer dev-token-123', // Development token
+      }
     }, schema)
   },
 
@@ -172,6 +179,9 @@ export const recruitsApi = {
 
     return apiRequest(`/api/recruits/${recruitId}/onboard`, {
       method: 'POST',
+      headers: {
+        'Authorization': 'Bearer dev-token-123', // Development token
+      },
     }, schema)
   },
 
@@ -185,6 +195,9 @@ export const recruitsApi = {
 
     return apiRequest(`/api/recruits/${recruitId}/status`, {
       method: 'PATCH',
+      headers: {
+        'Authorization': 'Bearer dev-token-123', // Development token
+      },
       body: JSON.stringify({ status }),
     }, schema)
   }

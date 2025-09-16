@@ -41,6 +41,7 @@ import dynamic from 'next/dynamic'
 const EngineerAllocationModal = dynamic(() => import('@/components/bull-pen/EngineerAllocationModal'), { ssr: false })
 const FlightBookingModal = dynamic(() => import('@/components/bull-pen/FlightBookingModal'), { ssr: false })
 const ExpenseTrackingModal = dynamic(() => import('@/components/bull-pen/ExpenseTrackingModal'), { ssr: false })
+const EngineerProfileModal = dynamic(() => import('@/components/bull-pen/EngineerProfileModal'), { ssr: false })
 
 // Engineer categories with icons and colors
 const categories = [
@@ -319,6 +320,7 @@ export default function BullPenDashboard() {
   const [showAllocationModal, setShowAllocationModal] = useState(false)
   const [showFlightModal, setShowFlightModal] = useState(false)
   const [showExpenseModal, setShowExpenseModal] = useState(false)
+  const [showProfileModal, setShowProfileModal] = useState(false)
   const [engineerActive, setEngineerActive] = useState(true)
 
   const filteredEngineers = availableEngineers.filter(engineer => {
@@ -476,7 +478,13 @@ export default function BullPenDashboard() {
                   transition={{ delay: index * 0.1 }}
                   className="group"
                 >
-                  <Card className="bg-slate-800/50 border-slate-700 hover:border-blue-500/50 transition-all duration-300 cursor-pointer h-full">
+                  <Card 
+                    className="bg-slate-800/50 border-slate-700 hover:border-blue-500/50 transition-all duration-300 cursor-pointer h-full"
+                    onClick={() => {
+                      setSelectedEngineer(engineer)
+                      setShowProfileModal(true)
+                    }}
+                  >
                     <CardHeader className="pb-4">
                       <div className="flex items-start justify-between">
                         <div className="flex items-center space-x-3">
@@ -546,7 +554,8 @@ export default function BullPenDashboard() {
                         <Button
                           size="sm"
                           className="flex-1 bg-blue-500 hover:bg-blue-600"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation()
                             setSelectedEngineer(engineer)
                             setShowAllocationModal(true)
                           }}
@@ -557,7 +566,11 @@ export default function BullPenDashboard() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => setSelectedEngineer(engineer)}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setSelectedEngineer(engineer)
+                            setShowProfileModal(true)
+                          }}
                         >
                           <FileText className="h-4 w-4" />
                         </Button>
@@ -805,6 +818,28 @@ export default function BullPenDashboard() {
         onClose={() => setShowExpenseModal(false)}
         selectedEngineer={selectedEngineer}
         selectedProject={selectedProject}
+      />
+
+      <EngineerProfileModal
+        isOpen={showProfileModal}
+        onClose={() => {
+          setShowProfileModal(false)
+          setSelectedEngineer(null)
+        }}
+        engineer={selectedEngineer}
+        onAssignToProject={(engineer) => {
+          setShowProfileModal(false)
+          setSelectedEngineer(engineer)
+          setShowAllocationModal(true)
+        }}
+        onMessage={(engineer) => {
+          // Handle message functionality
+          console.log('Message engineer:', engineer.name)
+        }}
+        onVideoCall={(engineer) => {
+          // Handle video call functionality
+          console.log('Video call engineer:', engineer.name)
+        }}
       />
     </div>
   )

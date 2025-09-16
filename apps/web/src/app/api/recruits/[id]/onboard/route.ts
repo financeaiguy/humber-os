@@ -24,10 +24,23 @@ const RecruitingSecurity = class {
   static validateOnboardingData(data: any) {
     return { valid: true }
   }
+  
+  static generateRateLimitKey(clientIP: string, tenantId: string, action: string) {
+    return `rate_limit:${tenantId}:${action}:${clientIP}`
+  }
+  
+  static generateSecureRecruitId() {
+    return `rec_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  }
 }
 
 const RECRUITING_RATE_LIMITS = {
-  onboard: { points: 10, duration: 60 }
+  onboard: { points: 10, duration: 60 },
+  MOVE_TO_ONBOARDING: { 
+    windowMs: 60000, // 60 seconds
+    maxRequests: 5,
+    message: 'Too many onboarding requests. Please wait before trying again.'
+  }
 }
 import { rateLimitCheck } from '@/lib/rate-limiting'
 import { getSession } from '@/lib/auth'

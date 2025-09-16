@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Building2, User, Mail, Lock, Eye, EyeOff, Users } from 'lucide-react'
 import Link from 'next/link'
@@ -43,6 +44,7 @@ const demoAccounts = [
 ]
 
 export default function SignUpPage() {
+  const router = useRouter()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -68,12 +70,26 @@ export default function SignUpPage() {
     }
 
     try {
-      // Here you would typically call your signup API
+      // TODO: Implement actual signup API call
       console.log('Sign up data:', formData)
-      // For demo purposes, just show success
-      alert('Account created successfully! Please sign in.')
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      // Store email in sessionStorage for prefilling signin
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('prefillEmail', formData.email)
+      }
+      
+      // Show success message and redirect
+      alert(`Account created successfully for ${formData.name}! Redirecting to sign in with your email prefilled...`)
+      
+      // Redirect to signin page
+      router.push('/auth/signin')
+      
     } catch (error) {
-      setError('Something went wrong')
+      console.error('Signup error:', error)
+      setError(error instanceof Error ? error.message : 'Something went wrong')
     } finally {
       setLoading(false)
     }

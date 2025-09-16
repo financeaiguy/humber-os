@@ -14,6 +14,13 @@ const TenantConfigSchema = z.object({
 
 type TenantConfig = z.infer<typeof TenantConfigSchema>
 
+// Context variables for tenant middleware
+interface TenantVariables {
+  tenantDB: D1Database;
+  tenantId: string;
+  engineerId: string;
+}
+
 // Environment with multiple D1 databases
 interface TenantEnv {
   // Master database that tracks tenant assignments
@@ -56,7 +63,7 @@ const DB_BINDINGS: Record<string, keyof TenantEnv> = {
  * Multi-tenant middleware for routing requests to correct tenant database
  * Implements zero-trust approach with complete tenant isolation
  */
-export async function tenantMiddleware(c: Context<{ Bindings: TenantEnv }>, next: Next) {
+export async function tenantMiddleware(c: Context<{ Bindings: TenantEnv; Variables: TenantVariables }>, next: Next) {
   try {
     // Extract tenant identifier from various sources
     const rawTenantId = await extractTenantId(c)

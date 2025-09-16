@@ -1,5 +1,4 @@
 import { Hono } from 'hono';
-import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import type { Env } from '@humber/types';
 import { multiTenantMiddleware } from './middleware/multi-tenant';
@@ -16,8 +15,18 @@ import { authRouter } from './routes/auth';
 import { secureTimeTrackingRouter } from './routes/secure-time-tracking';
 import { notificationsRouter } from './routes/notifications';
 import { reportsRouter } from './routes/reports';
+import knowledgeBaseRouter from './routes/knowledge-base';
 
-const app = new Hono<{ Bindings: Env }>();
+// Define context variables used across the app
+interface AppVariables {
+  requestId?: string;
+  tenantId?: string;
+  userId?: string;
+  role?: string;
+  authenticated?: boolean;
+}
+
+const app = new Hono<{ Bindings: Env; Variables: AppVariables }>();
 
 // Apply security middleware globally
 app.use('*', logger());
@@ -2251,6 +2260,7 @@ app.route('/chat', realChatRouter);
 app.route('/time-tracking', secureTimeTrackingRouter);
 app.route('/notifications', notificationsRouter);
 app.route('/reports', reportsRouter);
+app.route('/knowledge-base', knowledgeBaseRouter);
 
 app.onError((err, c) => {
   // Log full error internally
@@ -2260,7 +2270,7 @@ app.onError((err, c) => {
   const sanitized = {
     error: 'Internal Server Error',
     message: 'An error occurred processing your request',
-    requestId: c.get('requestId') || crypto.randomUUID()
+    requestId: (c.get('requestId') as string) || crypto.randomUUID()
   };
   
   return c.json(sanitized, 500);
@@ -2272,7 +2282,7 @@ app.notFound((c) => {
 
 export default {
   fetch: app.fetch,
-  async queue(batch: MessageBatch<any>, env: Env): Promise<void> {
+  async queue(batch: MessageBatch<any>, _env: Env): Promise<void> {
     for (const message of batch.messages) {
       try {
         console.log('Processing queue message:', message.body);

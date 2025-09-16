@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Building2, Lock, Mail, Eye, EyeOff } from 'lucide-react'
@@ -23,6 +23,24 @@ export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
+
+  // Check for prefilled email from signup
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const prefillEmail = sessionStorage.getItem('prefillEmail')
+      if (prefillEmail) {
+        setEmail(prefillEmail)
+        sessionStorage.removeItem('prefillEmail')
+        // Focus password field if email is prefilled
+        setTimeout(() => {
+          const passwordInput = document.querySelector('input[type="password"]') as HTMLInputElement
+          if (passwordInput) {
+            passwordInput.focus()
+          }
+        }, 100)
+      }
+    }
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

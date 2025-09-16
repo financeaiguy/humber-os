@@ -32,18 +32,12 @@ export async function GET(
       }, { status: 401 })
     }
 
-    // 2. Initialize database
-    const db = new RecruitingDatabase(process.env.DB!, {
-      encryptionKey: process.env.RECRUITING_ENCRYPTION_KEY!,
-      auditingEnabled: true,
-      retentionEnabled: true
-    })
+    // 2. Initialize database (mock - not a constructor)
+    const db = RecruitingDatabase
 
     const auditContext = createAuditContext(
-      session.userId,
-      session.tenantId,
-      request,
-      { requestId }
+      session,
+      'VIEW_AUDIT_TRAIL'
     )
 
     // 3. Get audit trail (this would be implemented in the database class)

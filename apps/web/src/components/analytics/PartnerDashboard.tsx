@@ -2,23 +2,19 @@
 
 import { useSession } from 'next-auth/react'
 import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
   PieChart,
   Pie,
   Cell,
   AreaChart,
   Area,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
-  ResponsiveContainer
+  Legend
 } from 'recharts'
-import { ChartWrapper, ENHANCED_TOOLTIP_PROPS, ENHANCED_LEGEND_PROPS } from '@/components/ui/chart-wrapper'
+import { ChartWrapper } from '@/components/ui/chart-wrapper'
 import { motion } from 'framer-motion'
 import { 
   TrendingUp, 
@@ -32,7 +28,7 @@ import {
 } from 'lucide-react'
 
 // Mock data based on partner organization
-const getPartnerData = (partnerId: string, partnerName: string) => {
+const getPartnerData = (partnerId: string, _partnerName: string) => {
   const baseData = {
     'partner-gm': {
       revenue: { current: 2100000, previous: 1850000, growth: 13.5 },
@@ -86,7 +82,7 @@ const engineerSpecialties = [
   { name: 'Systems', value: 15, color: '#F59E0B' }
 ]
 
-const COLORS = ['#3B82F6', '#10B981', '#8B5CF6', '#F59E0B']
+// const COLORS = ['#3B82F6', '#10B981', '#8B5CF6', '#F59E0B']
 
 interface MetricCardProps {
   title: string

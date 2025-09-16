@@ -87,11 +87,11 @@ async function storeImmutableEntry(entry: any) {
     const auditKey = `audit_${entry.hash}`
     
     // Check if running in Cloudflare Workers environment
-    const isCloudflareWorkers = typeof globalThis.TIME_TRACKING_KV !== 'undefined'
+    const isCloudflareWorkers = typeof (globalThis as any).TIME_TRACKING_KV !== 'undefined'
     
     if (isCloudflareWorkers) {
       // Primary storage in Cloudflare KV
-      await globalThis.TIME_TRACKING_KV.put(entryKey, JSON.stringify(entry), {
+      await (globalThis as any).TIME_TRACKING_KV.put(entryKey, JSON.stringify(entry), {
         metadata: {
           employeeId: entry.metadata.employeeId,
           type: entry.type,
@@ -102,7 +102,7 @@ async function storeImmutableEntry(entry: any) {
       })
       
       // Audit trail storage
-      await globalThis.AUDIT_LOGS_KV.put(auditKey, JSON.stringify({
+      await (globalThis as any).AUDIT_LOGS_KV.put(auditKey, JSON.stringify({
         action: 'time_entry_created',
         timestamp: entry.serverTimestamp,
         hash: entry.hash,
@@ -425,9 +425,9 @@ export async function POST(request: NextRequest) {
     
     // Multiple rate limit layers
     const rateLimits = {
-      perMinute: { maxRequests: 5, windowMs: 60000 },      // 5 per minute
-      perHour: { maxRequests: 50, windowMs: 3600000 },     // 50 per hour  
-      perDay: { maxRequests: 200, windowMs: 86400000 }     // 200 per day
+      perMinute: { maxRequests: 5, windowMs: 60000, message: 'Too many requests per minute' },
+      perHour: { maxRequests: 50, windowMs: 3600000, message: 'Too many requests per hour' },
+      perDay: { maxRequests: 200, windowMs: 86400000, message: 'Too many requests per day' }
     }
     
     // Check all rate limits
@@ -642,7 +642,7 @@ async function checkRecentEntries(
   const cutoffTime = new Date(Date.now() - timeWindow * 60 * 1000)
   
   try {
-    const isCloudflareWorkers = typeof globalThis.TIME_TRACKING_KV !== 'undefined'
+    const isCloudflareWorkers = typeof (globalThis as any).TIME_TRACKING_KV !== 'undefined'
     
     if (isCloudflareWorkers) {
       // Query recent entries from Cloudflare KV
@@ -651,10 +651,10 @@ async function checkRecentEntries(
         limit: 10
       }
       
-      const kvList = await globalThis.TIME_TRACKING_KV.list(listOptions)
+      const kvList = await (globalThis as any).TIME_TRACKING_KV.list(listOptions)
       
       for (const key of kvList.keys) {
-        const entryData = await globalThis.TIME_TRACKING_KV.get(key.name)
+        const entryData = await (globalThis as any).TIME_TRACKING_KV.get(key.name)
         if (entryData) {
           const entry = JSON.parse(entryData)
           const entryTime = new Date(entry.timestamp)
@@ -688,7 +688,7 @@ async function checkRecentEntries(
 // Helper function to get previous entry hash for blockchain linking
 async function getPreviousEntryHash(employeeId: string): Promise<string | undefined> {
   try {
-    const isCloudflareWorkers = typeof globalThis.TIME_TRACKING_KV !== 'undefined'
+    const isCloudflareWorkers = typeof (globalThis as any).TIME_TRACKING_KV !== 'undefined'
     
     if (isCloudflareWorkers) {
       // Query the latest entry for this employee
@@ -697,11 +697,11 @@ async function getPreviousEntryHash(employeeId: string): Promise<string | undefi
         limit: 1
       }
       
-      const kvList = await globalThis.TIME_TRACKING_KV.list(listOptions)
+      const kvList = await (globalThis as any).TIME_TRACKING_KV.list(listOptions)
       
       if (kvList.keys.length > 0) {
         const latestKey = kvList.keys[0]
-        const entryData = await globalThis.TIME_TRACKING_KV.get(latestKey.name)
+        const entryData = await (globalThis as any).TIME_TRACKING_KV.get(latestKey.name)
         
         if (entryData) {
           const entry = JSON.parse(entryData)

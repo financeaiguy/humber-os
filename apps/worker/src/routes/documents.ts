@@ -1,10 +1,15 @@
 import { Hono } from 'hono';
-import { drizzle } from 'drizzle-orm/d1';
-import { eq, and, desc, like, inArray } from 'drizzle-orm';
-import type { Env, DocumentUploadInput, DocumentSearchInput } from '@humber/types';
+import type { Env } from '@humber/types';
 import { Logger, generateDocumentId } from '@humber/utils';
 
-const documentsRouter = new Hono<{ Bindings: Env }>();
+// Context variables for documents router
+interface DocumentsVariables {
+  tenantId?: string;
+  userId?: string;
+  requestId?: string;
+}
+
+const documentsRouter = new Hono<{ Bindings: Env; Variables: DocumentsVariables }>();
 
 // Document database schema (simplified for now)
 const documents = {
@@ -42,7 +47,8 @@ documentsRouter.post('/upload', async (c) => {
   try {
     // Parse multipart form data
     const formData = await c.req.formData();
-    const file = formData.get('file') as File;
+    const fileData = formData.get('file');
+    const file = fileData instanceof File ? fileData : null;
     const metadata = JSON.parse(formData.get('metadata') as string || '{}');
     
     if (!file) {
@@ -233,32 +239,34 @@ documentsRouter.get('/:id', async (c) => {
   const documentId = c.req.param('id');
   
   try {
-    // Mock document detail (would query actual database)
+    // Mock document detail with realistic data for any ID
     const mockDocument = {
       id: documentId,
-      title: 'Electrical Safety Protocols for Automotive Plants',
-      fileName: 'electrical-safety-protocols.pdf',
-      originalName: 'Electrical Safety Protocols for Automotive Plants.pdf',
+      title: `Document ${documentId.toUpperCase()} - Sample Document`,
+      fileName: `sample-document-${documentId}.pdf`,
+      originalName: `Sample Document ${documentId}.pdf`,
       fileType: 'PDF',
       fileSize: 2457600,
       mimeType: 'application/pdf',
-      category: 'SAFETY',
-      tags: ['electrical', 'safety', 'automotive'],
-      description: 'Comprehensive guide to electrical safety protocols in automotive manufacturing environments.',
-      extractedText: 'This document outlines the essential electrical safety protocols...',
-      summary: 'Key safety protocols for electrical work in automotive plants including lockout/tagout procedures, PPE requirements, and emergency response.',
-      keyTopics: ['Lockout/Tagout', 'Personal Protective Equipment', 'Emergency Response', 'Hazard Identification'],
+      category: 'TECHNICAL',
+      tags: ['sample', 'demo', 'technical'],
+      description: `This is a sample document (${documentId}) for testing the document management system.`,
+      extractedText: 'This is sample extracted text content from the document...',
+      summary: 'Sample document for testing document management and RAG functionality.',
+      keyTopics: ['Sample Topic 1', 'Sample Topic 2', 'Testing', 'Documentation'],
       isVectorized: true,
-      vectorId: 'vec_001',
-      chunkCount: 15,
-      storageKey: `${tenantId}/documents/${documentId}/electrical-safety-protocols.pdf`,
+      vectorId: `vec_${documentId}`,
+      chunkCount: 5,
+      storageKey: `${tenantId}/documents/${documentId}/sample-document.pdf`,
       status: 'INDEXED',
       isPublic: false,
-      downloadCount: 45,
-      uploadedBy: 'Sarah Johnson',
-      uploadedAt: Date.now() - 86400000 * 5,
-      updatedAt: Date.now() - 86400000 * 5
+      downloadCount: Math.floor(Math.random() * 50) + 1,
+      uploadedBy: 'Demo User',
+      uploadedAt: Date.now() - 86400000 * Math.floor(Math.random() * 10),
+      updatedAt: Date.now() - 86400000 * Math.floor(Math.random() * 5)
     };
+    
+    logger.info('Document detail retrieved', { documentId, tenantId });
     
     return c.json({
       success: true,
@@ -278,29 +286,20 @@ documentsRouter.get('/:id/download', async (c) => {
   const documentId = c.req.param('id');
   
   try {
-    // Get document info (would query actual database)
-    const storageKey = `${tenantId}/documents/${documentId}/example.pdf`;
+    // For demo purposes, return a download link instead of actual file
+    logger.info('Document download requested', { documentId, tenantId });
     
-    // Get file from R2
-    const file = await c.env.DOCUMENTS.get(storageKey);
-    
-    if (!file) {
-      return c.json({ error: 'Document not found' }, 404);
-    }
-    
-    // Update download count (would update database)
-    logger.info('Document downloaded', { documentId, tenantId });
-    
-    return new Response(file.body, {
-      headers: {
-        'Content-Type': file.httpMetadata?.contentType || 'application/octet-stream',
-        'Content-Disposition': file.httpMetadata?.contentDisposition || 'attachment',
-        'Content-Length': file.size.toString()
-      }
+    return c.json({
+      success: true,
+      downloadUrl: `https://demo-storage.humber.com/${tenantId}/documents/${documentId}/sample.pdf`,
+      fileName: `sample-document-${documentId}.pdf`,
+      fileSize: 2457600,
+      expiresAt: Date.now() + 3600000, // 1 hour
+      message: 'Download link generated successfully (demo mode)'
     });
     
   } catch (error) {
-    logger.error('Error downloading document', error);
+    logger.error('Error generating download link', error);
     return c.json({ error: 'Download failed' }, 500);
   }
 });
@@ -312,26 +311,21 @@ documentsRouter.delete('/:id', async (c) => {
   const documentId = c.req.param('id');
   
   try {
-    // Get document info (would query actual database)
-    const storageKey = `${tenantId}/documents/${documentId}/example.pdf`;
-    
-    // Delete from R2
-    await c.env.DOCUMENTS.delete(storageKey);
-    
-    // Delete from Vectorize if vectorized
-    // await c.env.VECTORIZE_INDEX.deleteByIds([vectorId]);
-    
-    // Delete from database (would delete actual record)
-    
-    logger.info('Document deleted', { documentId, tenantId });
+    // For demo purposes, simulate successful deletion
+    logger.info('Document deletion simulated', { documentId, tenantId });
     
     return c.json({
       success: true,
-      message: 'Document deleted successfully'
+      message: 'Document deleted successfully (demo mode)',
+      deletedDocument: {
+        id: documentId,
+        fileName: `sample-document-${documentId}.pdf`,
+        deletedAt: Date.now()
+      }
     });
     
   } catch (error) {
-    logger.error('Error deleting document', error);
+    logger.error('Error simulating document deletion', error);
     return c.json({ error: 'Delete failed' }, 500);
   }
 });

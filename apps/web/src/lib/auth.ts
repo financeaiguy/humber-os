@@ -4,6 +4,7 @@ interface Session {
   userId: string
   tenantId: string
   userRole: string
+  role?: string // Alias for userRole for backward compatibility
   email: string
 }
 

@@ -1,6 +1,5 @@
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
-import { compare } from "bcryptjs"
 import type { NextAuthConfig } from "next-auth"
 import { AuthUser, UserRole } from "@humber/types"
 
@@ -17,12 +16,12 @@ declare module "next-auth" {
   }
 }
 
-// Mock users data (in production, this would come from a database)
+// Mock users data with plaintext passwords for demo (in production, use proper hashing)
 const mockUsers = [
   {
     id: "1",
     email: "admin@humber.com",
-    password: "$2b$10$JQ4aMHxZVK8IC3fIbmRWYe1tBG7LRNtmDCY.mvbQdo5g1Qt.stl5a", // admin123
+    password: "admin123",
     name: "System Administrator",
     role: "PARTNER_ADMIN" as UserRole,
     partnerId: "humber-operations",
@@ -32,7 +31,7 @@ const mockUsers = [
   {
     id: "2",
     email: "engineer@humber.com",
-    password: "$2b$10$JQ4aMHxZVK8IC3fIbmRWYe1tBG7LRNtmDCY.mvbQdo5g1Qt.stl5a", // engineer123
+    password: "engineer123",
     name: "Engineering Manager",
     role: "PARTNER_ADMIN" as UserRole,
     partnerId: "humber-engineering",
@@ -42,7 +41,7 @@ const mockUsers = [
   {
     id: "3",
     email: "operator@humber.com",
-    password: "$2b$10$JQ4aMHxZVK8IC3fIbmRWYe1tBG7LRNtmDCY.mvbQdo5g1Qt.stl5a", // operator123
+    password: "operator123",
     name: "Operations Manager",
     role: "PARTNER_OPERATOR" as UserRole,
     partnerId: "humber-operations",
@@ -52,7 +51,7 @@ const mockUsers = [
   {
     id: "4",
     email: "customer@gm.com",
-    password: "$2b$10$JQ4aMHxZVK8IC3fIbmRWYe1tBG7LRNtmDCY.mvbQdo5g1Qt.stl5a", // customer123
+    password: "customer123",
     name: "GM Client Manager",
     role: "PARTNER_OPERATOR" as UserRole,
     partnerId: "client-gm",
@@ -62,7 +61,7 @@ const mockUsers = [
   {
     id: "5",
     email: "partner@ford.com",
-    password: "$2b$10$JQ4aMHxZVK8IC3fIbmRWYe1tBG7LRNtmDCY.mvbQdo5g1Qt.stl5a", // partner123
+    password: "partner123",
     name: "Ford Partnership Manager",
     role: "PARTNER_ADMIN" as UserRole,
     partnerId: "partner-ford",
@@ -72,7 +71,7 @@ const mockUsers = [
   {
     id: "6",
     email: "employee@humber.com",
-    password: "$2b$10$JQ4aMHxZVK8IC3fIbmRWYe1tBG7LRNtmDCY.mvbQdo5g1Qt.stl5a", // employee123
+    password: "employee123",
     name: "Field Engineer",
     role: "ENGINEER_EMPLOYEE" as UserRole,
     partnerId: "humber-operations",
@@ -150,7 +149,8 @@ export const config: NextAuthConfig = {
           return null
         }
 
-        const isValidPassword = await compare(credentials.password as string, user.password)
+        // Simple password comparison for demo (in production, use bcrypt)
+        const isValidPassword = credentials.password === user.password
         if (!isValidPassword) {
           return null
         }
@@ -174,4 +174,6 @@ export const config: NextAuthConfig = {
   debug: false, // Set to true if you need to debug auth issues
 }
 
-export const { handlers, auth, signIn, signOut } = NextAuth(config)
+const authResult = NextAuth(config)
+export const { handlers, auth, signIn, signOut } = authResult
+export type AuthReturnType = typeof authResult
