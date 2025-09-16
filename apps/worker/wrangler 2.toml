@@ -1,0 +1,34 @@
+name = "humber-operations-worker"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+[env.production]
+name = "humber-operations-worker-prod"
+vars = { ENVIRONMENT = "production" }
+
+[env.staging]
+name = "humber-operations-worker-staging"
+vars = { ENVIRONMENT = "staging" }
+
+[[d1_databases]]
+binding = "DB"
+database_name = "humber-operations-db"
+database_id = "YOUR_DATABASE_ID"
+
+[[kv_namespaces]]
+binding = "KV_CACHE"
+id = "YOUR_KV_NAMESPACE_ID"
+
+[[queues.producers]]
+queue = "operations-queue"
+binding = "OPERATIONS_QUEUE"
+
+[[queues.consumers]]
+queue = "operations-queue"
+max_batch_size = 10
+max_batch_timeout = 30
+
+[[r2_buckets]]
+binding = "DOCUMENTS"
+bucket_name = "humber-documents"

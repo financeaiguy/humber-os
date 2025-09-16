@@ -1,0 +1,77 @@
+name = "humber-operations-api"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[env.production]
+name = "humber-operations-api-production"
+routes = ["api.humber-operations.com/*"]
+
+# KV Namespaces
+[[env.production.kv_namespaces]]
+binding = "KV_CACHE"
+id = "your-kv-cache-id"
+
+[[env.production.kv_namespaces]]
+binding = "KV_TENANT_CACHE"
+id = "your-kv-tenant-cache-id"
+
+[[env.production.kv_namespaces]]
+binding = "KV_SESSIONS"
+id = "your-kv-sessions-id"
+
+# D1 Databases
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "humber-operations"
+database_id = "your-d1-database-id"
+
+[[env.production.d1_databases]]
+binding = "DB_MASTER"
+database_name = "humber-operations-master"
+database_id = "your-d1-master-id"
+
+# R2 Storage
+[[env.production.r2_buckets]]
+binding = "DOCUMENTS"
+bucket_name = "humber-documents-production"
+
+# Queues
+[[env.production.queues.producers]]
+binding = "OPERATIONS_QUEUE"
+queue = "operations-production"
+
+[[env.production.queues.consumers]]
+queue = "operations-production"
+max_batch_size = 100
+max_batch_timeout = 30
+
+[[env.production.queues.producers]]
+binding = "RECONCILIATION_QUEUE"
+queue = "reconciliation-production"
+
+[[env.production.queues.consumers]]
+queue = "reconciliation-production"
+max_batch_size = 50
+max_batch_timeout = 60
+
+# Vectorize
+[[env.production.vectorize]]
+binding = "VECTORIZE_INDEX"
+index_name = "humber-documents-embeddings"
+
+# Environment Variables
+[env.production.vars]
+ENVIRONMENT = "production"
+API_VERSION = "v1"
+LOG_LEVEL = "info"
+CORS_ORIGIN = "https://humber-operations.vercel.app"
+JWT_SECRET = "" # Set via wrangler secret
+RATE_LIMIT_REQUESTS = "100"
+RATE_LIMIT_WINDOW = "60000"
+
+# Secrets (set via wrangler secret put)
+# JWT_SECRET
+# DATABASE_URL
+# ENCRYPTION_KEY
+# OAUTH_CLIENT_SECRET

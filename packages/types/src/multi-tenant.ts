@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { EngineerCategory } from './engineer';
 
 // Tenant Configuration Types
 export const TenantTier = z.enum([

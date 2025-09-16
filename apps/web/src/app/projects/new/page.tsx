@@ -3,12 +3,6 @@
 import { motion } from 'framer-motion'
 import { 
   ArrowLeft,
-  Building2,
-  Calendar,
-  DollarSign,
-  MapPin,
-  Users,
-  FileText,
   Save
 } from 'lucide-react'
 import Link from 'next/link'

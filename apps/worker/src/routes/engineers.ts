@@ -33,7 +33,7 @@ engineersRouter.get('/', async (c) => {
       createdAt: engineer.createdAt,
       updatedAt: engineer.updatedAt
     }));
-    
+
     return c.json({
       success: true,
       engineers: formattedEngineers,
@@ -61,13 +61,13 @@ engineersRouter.get('/:id', async (c) => {
         eq(candidates.tenantId, tenantId)
       ))
       .limit(1);
-    
+
     if (!engineer.length) {
       return c.json({ error: 'Engineer not found' }, 404);
     }
     
     const engineerData = engineer[0];
-    
+
     return c.json({
       success: true,
       engineer: {

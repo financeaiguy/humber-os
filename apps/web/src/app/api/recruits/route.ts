@@ -1,0 +1,228 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { RecruitingDatabase } from '@humber/worker/lib/recruiting-database'
+import { createAuditContext } from '@humber/utils/recruiting-audit'
+import { RecruitDataSchema, type RecruitData, type RecruitSearchParams } from '@humber/utils/recruiting-types'
+import { RecruitingSecurity, RECRUITING_RATE_LIMITS } from '@humber/utils/recruiting-security'
+import { rateLimitCheck } from '@/lib/rate-limiting'
+import { getSession } from '@/lib/auth'
+
+export async function POST(request: NextRequest) {
+  const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  
+  try {
+    // 1. Authentication check
+    const session = await getSession(request)
+    if (!session) {
+      return NextResponse.json({
+        success: false,
+        error: 'Authentication required',
+        requestId
+      }, { status: 401 })
+    }
+
+    // 2. Rate limiting check
+    const clientIP = request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For') || 'unknown'
+    const rateLimitKey = RecruitingSecurity.generateRateLimitKey(clientIP, session.tenantId, 'create_recruit')
+    
+    const rateLimitResult = await rateLimitCheck(
+      rateLimitKey,
+      RECRUITING_RATE_LIMITS.CREATE_RECRUIT
+    )
+    
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json({
+        success: false,
+        error: 'Rate limit exceeded',
+        message: RECRUITING_RATE_LIMITS.CREATE_RECRUIT.message,
+        retryAfter: rateLimitResult.retryAfter,
+        requestId
+      }, { 
+        status: 429,
+        headers: {
+          'Retry-After': rateLimitResult.retryAfter?.toString() || '60'
+        }
+      })
+    }
+
+    // 3. Parse and validate request body
+    const body = await request.json()
+    
+    const validation = RecruitDataSchema.safeParse(body)
+    if (!validation.success) {
+      return NextResponse.json({
+        success: false,
+        error: 'Validation failed',
+        details: validation.error.issues.map((issue: any) => ({
+          field: issue.path.join('.'),
+          message: issue.message
+        })),
+        requestId
+      }, { status: 400 })
+    }
+
+    const recruitData: RecruitData = validation.data
+
+    // 4. Security validation
+    const securityCheck = RecruitingSecurity.validateSecureInput(recruitData)
+    if (!securityCheck.isValid) {
+      return NextResponse.json({
+        success: false,
+        error: 'Security validation failed',
+        details: securityCheck.errors.map(error => ({ field: 'security', message: error })),
+        requestId
+      }, { status: 400 })
+    }
+
+    // 5. Initialize database and audit context
+    const db = new RecruitingDatabase(process.env.DB!, {
+      encryptionKey: process.env.RECRUITING_ENCRYPTION_KEY!,
+      auditingEnabled: true,
+      retentionEnabled: true
+    })
+
+    const auditContext = createAuditContext(
+      session.userId,
+      session.tenantId,
+      request,
+      { requestId }
+    )
+
+    // 6. Create recruit in database
+    const result = await db.createRecruit(recruitData, auditContext)
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        recruitId: result.recruitId,
+        status: result.status,
+        message: 'Recruit added successfully to the pipeline'
+      },
+      requestId
+    })
+
+  } catch (error: any) {
+    console.error('Error processing recruit submission:', error)
+    
+    // Handle known recruiting errors
+    if (error.name === 'RecruitingError') {
+      return NextResponse.json({
+        success: false,
+        error: error.code,
+        message: error.message,
+        details: error.details,
+        requestId
+      }, { status: error.statusCode })
+    }
+
+    // Handle unexpected errors
+    return NextResponse.json({
+      success: false,
+      error: 'Internal server error',
+      message: 'Failed to process recruit submission. Please try again.',
+      requestId
+    }, { status: 500 })
+  }
+}
+
+export async function GET(request: NextRequest) {
+  const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  
+  try {
+    // 1. Authentication check
+    const session = await getSession(request)
+    if (!session) {
+      return NextResponse.json({
+        success: false,
+        error: 'Authentication required',
+        requestId
+      }, { status: 401 })
+    }
+
+    // 2. Rate limiting check
+    const clientIP = request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For') || 'unknown'
+    const rateLimitKey = RecruitingSecurity.generateRateLimitKey(clientIP, session.tenantId, 'view_recruits')
+    
+    const rateLimitResult = await rateLimitCheck(
+      rateLimitKey,
+      RECRUITING_RATE_LIMITS.VIEW_RECRUITS
+    )
+    
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json({
+        success: false,
+        error: 'Rate limit exceeded',
+        message: RECRUITING_RATE_LIMITS.VIEW_RECRUITS.message,
+        retryAfter: rateLimitResult.retryAfter,
+        requestId
+      }, { status: 429 })
+    }
+
+    // 3. Parse search parameters
+    const { searchParams } = new URL(request.url)
+    const searchParams_: RecruitSearchParams = {
+      page: parseInt(searchParams.get('page') || '1'),
+      limit: Math.min(parseInt(searchParams.get('limit') || '10'), 100), // Max 100
+      query: searchParams.get('search') || undefined,
+      status: searchParams.get('status')?.split(',') as any,
+      skills: searchParams.get('skills')?.split(','),
+      workAuthorization: searchParams.get('workAuthorization')?.split(','),
+      location: searchParams.get('location') || undefined,
+      experienceMin: searchParams.get('experienceMin') ? parseInt(searchParams.get('experienceMin')!) : undefined,
+      experienceMax: searchParams.get('experienceMax') ? parseInt(searchParams.get('experienceMax')!) : undefined,
+      source: searchParams.get('source')?.split(','),
+      sortBy: (searchParams.get('sortBy') as any) || 'created_at',
+      sortOrder: (searchParams.get('sortOrder') as any) || 'desc'
+    }
+
+    // 4. Initialize database
+    const db = new RecruitingDatabase(process.env.DB!, {
+      encryptionKey: process.env.RECRUITING_ENCRYPTION_KEY!,
+      auditingEnabled: true,
+      retentionEnabled: true
+    })
+
+    const auditContext = createAuditContext(
+      session.userId,
+      session.tenantId,
+      request,
+      { requestId }
+    )
+
+    // 5. Get recruits from database
+    const result = await db.getRecruits(searchParams_, auditContext)
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        recruits: result.recruits,
+        pagination: {
+          page: searchParams_.page!,
+          limit: searchParams_.limit!,
+          total: result.total,
+          totalPages: Math.ceil(result.total / searchParams_.limit!)
+        }
+      },
+      requestId
+    })
+
+  } catch (error: any) {
+    console.error('Error fetching recruits:', error)
+    
+    // Handle known recruiting errors
+    if (error.name === 'RecruitingError') {
+      return NextResponse.json({
+        success: false,
+        error: error.code,
+        message: error.message,
+        requestId
+      }, { status: error.statusCode })
+    }
+
+    return NextResponse.json({
+      success: false,
+      error: 'Internal server error',
+      message: 'Failed to fetch recruits. Please try again.',
+      requestId
+    }, { status: 500 })
+  }
+}

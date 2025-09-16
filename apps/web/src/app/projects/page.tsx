@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import { 
   Briefcase, 
-  Calendar, 
+  Calendar,
   MapPin, 
   Users,
   DollarSign,
@@ -206,7 +206,7 @@ export default function ProjectsPage() {
               <p className="text-2xl font-bold text-white mt-1">${(totalBudget / 1000000).toFixed(1)}M</p>
             </div>
             <DollarSign className="h-8 w-8 text-green-400" />
-          </div>
+        </div>
         </motion.div>
 
         <motion.div
@@ -221,7 +221,7 @@ export default function ProjectsPage() {
               <p className="text-2xl font-bold text-white mt-1">{Math.round((totalSpent / totalBudget) * 100)}%</p>
             </div>
             <Target className="h-8 w-8 text-purple-400" />
-          </div>
+        </div>
         </motion.div>
       </div>
 
@@ -277,10 +277,10 @@ export default function ProjectsPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div className="bg-slate-900/50 rounded-lg p-3">
                 <div className="flex items-center space-x-2 mb-2">
-                  <Calendar className="h-4 w-4 text-slate-400" />
+                <Calendar className="h-4 w-4 text-slate-400" />
                   <span className="text-sm text-slate-400">Timeline</span>
                 </div>
-                <p className="text-sm text-white">{project.startDate} - {project.endDate}</p>
+                  <p className="text-sm text-white">{project.startDate} - {project.endDate}</p>
               </div>
               
               <div className="bg-slate-900/50 rounded-lg p-3">
@@ -318,7 +318,7 @@ export default function ProjectsPage() {
                       <p className="text-sm text-white">{engineer.name}</p>
                       <p className="text-xs text-slate-400">{engineer.role}</p>
                     </div>
-                  </div>
+                </div>
                 ))}
               </div>
             </div>

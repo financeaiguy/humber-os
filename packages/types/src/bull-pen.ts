@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { EngineerCategory, EngineerStatus, RequiredChecks } from './engineer';
+import { EngineerCategory, EngineerStatus } from './engineer';
 
 // Re-export for backward compatibility
 export { EngineerCategory, EngineerStatus } from './engineer';
@@ -91,7 +91,7 @@ export const CustomerTimesheetSchema = z.object({
 });
 export type CustomerTimesheet = z.infer<typeof CustomerTimesheetSchema>;
 
-export const TimesheetReconciliationSchema = z.object({
+export const BullPenTimesheetReconciliationSchema = z.object({
   tenantId: z.string(),
   timesheetId: z.string().optional(),
   engineerId: z.string(),
@@ -104,7 +104,7 @@ export const TimesheetReconciliationSchema = z.object({
   hourlyRate: z.number().positive().optional(),
   forceReconcile: z.boolean().optional().default(false),
 });
-export type TimesheetReconciliation = z.infer<typeof TimesheetReconciliationSchema>;
+export type BullPenTimesheetReconciliation = z.infer<typeof BullPenTimesheetReconciliationSchema>;
 
 export const SpreadsheetUploadSchema = z.object({
   tenantId: z.string(),

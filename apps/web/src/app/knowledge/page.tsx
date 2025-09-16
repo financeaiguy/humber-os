@@ -10,13 +10,14 @@ import {
   Clock,
   User,
   Upload,
-  Plus,
   MessageSquare,
   X,
   Send,
   Paperclip
 } from 'lucide-react'
 import { useState, useRef } from 'react'
+import { ContinuousLearningPanel } from '@/components/knowledge-base/continuous-learning-panel'
+import { continuousLearning } from '@/lib/continuous-learning'
 
 const knowledgeArticles = [
   {
@@ -111,6 +112,53 @@ export default function KnowledgeBasePage() {
     return matchesSearch && matchesCategory && matchesType
   })
 
+  // Learn from search interactions
+  const handleSearch = (value: string) => {
+    setSearchTerm(value)
+    if (value) {
+      continuousLearning.learn({
+        type: 'knowledge_search',
+        query: value,
+        resultsCount: filteredArticles.length,
+        timestamp: new Date().toISOString()
+      }, 'interaction')
+    }
+  }
+
+  // Learn from category selection
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category)
+    continuousLearning.learn({
+      type: 'knowledge_filter',
+      filterType: 'category',
+      value: category,
+      timestamp: new Date().toISOString()
+    }, 'interaction')
+  }
+
+  // Learn from type selection
+  const handleTypeChange = (type: string) => {
+    setSelectedType(type)
+    continuousLearning.learn({
+      type: 'knowledge_filter',
+      filterType: 'type',
+      value: type,
+      timestamp: new Date().toISOString()
+    }, 'interaction')
+  }
+
+  // Learn from article views
+  const handleArticleClick = (article: any) => {
+    continuousLearning.learn({
+      type: 'article_view',
+      articleId: article.id,
+      title: article.title,
+      category: article.category,
+      tags: article.tags,
+      timestamp: new Date().toISOString()
+    }, 'document')
+  }
+
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
@@ -129,6 +177,16 @@ export default function KnowledgeBasePage() {
 
       // Mock upload (would call actual API)
       await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      // Learn from document upload
+      continuousLearning.learn({
+        type: 'document_upload',
+        fileName: file.name,
+        fileType: file.type,
+        fileSize: file.size,
+        category: 'REFERENCE',
+        timestamp: new Date().toISOString()
+      }, 'document')
       
       // Reset form
       setShowUploadModal(false)
@@ -158,20 +216,37 @@ export default function KnowledgeBasePage() {
     }
 
     setChatMessages(prev => [...prev, userMessage])
+    const query = chatInput
     setChatInput('')
+
+    // Learn from the chat query
+    continuousLearning.learn({
+      type: 'chat_query',
+      query: query,
+      timestamp: new Date().toISOString()
+    }, 'interaction')
 
     // Mock AI response (would call actual chat API)
     setTimeout(() => {
       const aiResponse = {
         id: (Date.now() + 1).toString(),
         role: 'assistant' as const,
-        content: `Based on the knowledge base, I can help you with that. Here's what I found relevant to "${chatInput}":\n\n• Electrical safety protocols require proper lockout/tagout procedures\n• PLC programming standards emphasize safety interlocks\n• Project management templates are available for timeline planning\n\nWould you like me to elaborate on any of these topics?`,
+        content: `Based on the knowledge base, I can help you with that. Here's what I found relevant to "${query}":\n\n• Electrical safety protocols require proper lockout/tagout procedures\n• PLC programming standards emphasize safety interlocks\n• Project management templates are available for timeline planning\n\nWould you like me to elaborate on any of these topics?`,
         sources: [
           { title: 'Electrical Safety Protocols', relevance: 0.89 },
           { title: 'PLC Programming Standards', relevance: 0.82 }
         ]
       }
       setChatMessages(prev => [...prev, aiResponse])
+
+      // Learn from the AI response
+      continuousLearning.learn({
+        type: 'chat_response',
+        query: query,
+        response: aiResponse.content,
+        sources: aiResponse.sources,
+        timestamp: new Date().toISOString()
+      }, 'interaction')
     }, 1500)
   }
 
@@ -237,7 +312,7 @@ export default function KnowledgeBasePage() {
               type="text"
               placeholder="Search articles, guides, and documentation..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => handleSearch(e.target.value)}
               className="w-full pl-10 pr-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-500"
             />
           </div>
@@ -245,7 +320,7 @@ export default function KnowledgeBasePage() {
           {/* Category Filter */}
           <select
             value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
+            onChange={(e) => handleCategoryChange(e.target.value)}
             className="px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
           >
             {categories.map(category => (
@@ -256,7 +331,7 @@ export default function KnowledgeBasePage() {
           {/* Type Filter */}
           <select
             value={selectedType}
-            onChange={(e) => setSelectedType(e.target.value)}
+            onChange={(e) => handleTypeChange(e.target.value)}
             className="px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
           >
             {types.map(type => (
@@ -266,6 +341,9 @@ export default function KnowledgeBasePage() {
         </div>
       </motion.div>
 
+      {/* Continuous Learning Panel */}
+      <ContinuousLearningPanel />
+
       {/* Articles Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {filteredArticles.map((article, index) => (
@@ -274,6 +352,7 @@ export default function KnowledgeBasePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 * index }}
+            onClick={() => handleArticleClick(article)}
             className="rounded-2xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-6 hover:border-slate-600 transition-all duration-300 cursor-pointer group"
           >
             {/* Article Header */}
