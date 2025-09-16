@@ -142,7 +142,7 @@ export default function HomePage() {
         >
           Sign In
         </a>
-        <div className="mt-6 text-sm text-slate-400">
+        <div className="mt-6 text-sm text-slate-200">
           <p>Development credentials:</p>
           <ul className="mt-2 space-y-1">
             <li>• Partner Admin: partner@ford.com / partner123</li>
@@ -166,10 +166,10 @@ export default function HomePage() {
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">
           Welcome back, {session.user.name?.split(' ')[0]}
         </h1>
-        <p className="text-sm sm:text-base text-slate-400">
+        <p className="text-sm sm:text-base text-slate-200">
           {session.user.partnerName} - {session.user.role.replace('_', ' ')}
         </p>
-        <p className="text-sm sm:text-base text-slate-400 mt-1">
+        <p className="text-sm sm:text-base text-slate-200 mt-1">
           Here's what's happening with your automation projects today.
         </p>
       </div>
@@ -186,9 +186,9 @@ export default function HomePage() {
           >
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm text-slate-400 truncate">{stat.name}</p>
+                <p className="text-xs sm:text-sm text-slate-200 truncate">{stat.name}</p>
                 <p className="text-xl sm:text-2xl font-bold text-white mt-1">{stat.value}</p>
-                <p className="text-xs text-slate-500 mt-1 truncate">{stat.change}</p>
+                <p className="text-xs text-slate-300 mt-1 truncate">{stat.change}</p>
               </div>
               <div className={`p-2 sm:p-3 rounded-lg sm:rounded-xl bg-gradient-to-r ${stat.color} flex-shrink-0`}>
                 <stat.icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
@@ -220,7 +220,7 @@ export default function HomePage() {
                 <div className="flex items-start sm:items-center justify-between mb-2 gap-2">
                   <div className="min-w-0 flex-1">
                     <h3 className="font-medium text-white text-sm sm:text-base truncate">{project.name}</h3>
-                    <p className="text-xs sm:text-sm text-slate-400 truncate">{project.client}</p>
+                    <p className="text-xs sm:text-sm text-slate-200 truncate">{project.client}</p>
                   </div>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                     project.status === 'In Progress' 
@@ -231,7 +231,7 @@ export default function HomePage() {
                   </span>
                 </div>
                 <div className="mt-3">
-                  <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
+                  <div className="flex items-center justify-between text-xs text-slate-200 mb-1">
                     <span>Progress</span>
                     <span>{project.completion}%</span>
                   </div>
@@ -256,7 +256,7 @@ export default function HomePage() {
         >
           <div className="flex items-center justify-between mb-4 sm:mb-6">
             <h2 className="text-lg sm:text-xl font-semibold text-white">Upcoming Deadlines</h2>
-            <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-slate-400" />
+            <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-slate-200" />
           </div>
           <div className="space-y-2 sm:space-y-3">
             {upcomingDeadlines.map((deadline) => (
@@ -270,7 +270,7 @@ export default function HomePage() {
                 }`} />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs sm:text-sm font-medium text-white truncate">{deadline.task}</p>
-                  <p className="text-xs text-slate-400">{deadline.date}</p>
+                  <p className="text-xs text-slate-200">{deadline.date}</p>
                 </div>
                 {deadline.priority === 'high' && (
                   <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 text-red-400 flex-shrink-0" />
@@ -477,19 +477,19 @@ export default function HomePage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center p-4 bg-slate-900/50 rounded-lg">
               <div className="text-2xl font-bold text-blue-400">87%</div>
-              <div className="text-sm text-slate-400">Overall Utilization</div>
+              <div className="text-sm text-slate-200">Overall Utilization</div>
             </div>
             <div className="text-center p-4 bg-slate-900/50 rounded-lg">
               <div className="text-2xl font-bold text-green-400">$6.2M</div>
-              <div className="text-sm text-slate-400">YTD Revenue</div>
+              <div className="text-sm text-slate-200">YTD Revenue</div>
             </div>
             <div className="text-center p-4 bg-slate-900/50 rounded-lg">
               <div className="text-2xl font-bold text-purple-400">30</div>
-              <div className="text-sm text-slate-400">Active Projects</div>
+              <div className="text-sm text-slate-200">Active Projects</div>
             </div>
             <div className="text-center p-4 bg-slate-900/50 rounded-lg">
               <div className="text-2xl font-bold text-orange-400">95%</div>
-              <div className="text-sm text-slate-400">Client Satisfaction</div>
+              <div className="text-sm text-slate-200">Client Satisfaction</div>
             </div>
           </div>
         </div>

@@ -23,7 +23,7 @@ realDocumentsRouter.post('/upload', async (c) => {
     // Parse multipart form data
     const formData = await c.req.formData();
     const fileData = formData.get('file');
-    const file = fileData instanceof File ? fileData : null;
+    const file = (fileData && typeof fileData === 'object' && 'stream' in fileData) ? fileData as File : null;
     const metadata = JSON.parse(formData.get('metadata') as string || '{}');
     
     if (!file) {
@@ -449,7 +449,7 @@ realDocumentsRouter.delete('/:id', async (c) => {
       return c.json({ error: 'Document not found' }, 404);
     }
     
-    const doc = docs[0];
+    const doc = docs[0]!; // We've already verified docs has at least one element
     
     // Delete from R2
     if (doc.storageKey) {

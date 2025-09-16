@@ -39,7 +39,7 @@ export async function authMiddleware(c: Context<{ Bindings: AuthEnv; Variables: 
     const requestId = crypto.randomUUID();
     c.set('requestId', requestId);
     
-    // Skip auth for health check and public endpoints (for testing)
+    // Skip auth for testing endpoints (in development)
     const publicEndpoints = [
       '/health',
       '/docs', 
@@ -53,23 +53,46 @@ export async function authMiddleware(c: Context<{ Bindings: AuthEnv; Variables: 
       '/time-tracking/active-sessions',
       '/time-tracking/work-sites',
       '/time-tracking/verify-location',
+      '/time-tracking/clock-action',
       '/documents',
       '/documents/search',
       '/chat/sessions',
       '/chat/message',
       '/notifications/history',
       '/notifications/analytics',
+      '/notifications/send',
+      '/notifications/timesheet-submitted',
+      '/notifications/discrepancy-detected',
+      '/notifications/compliance-violation',
       '/reports/history',
-      '/reports/scheduled'
+      '/reports/scheduled',
+      '/reports/generate',
+      '/reports/timesheet-summary',
+      '/reports/financial-summary',
+      '/timesheets/reconcile',
+      '/timesheets/batch-reconcile',
+      '/timesheets/period',
+      '/reconciliation/submit',
+      '/reconciliation/customer-hours',
+      '/reconciliation/upload-spreadsheet',
+      '/reconciliation/human-review',
+      '/reconciliation/needs-review',
+      '/reconciliation/stats',
+      '/operations/recruiting-step-1',
+      '/operations/hiring-vetting-step-2',
+      '/operations/background-checks',
+      '/operations/offer-letter-visa',
+      '/operations/deployment'
     ];
     
-    // Also allow document detail, download, and delete for testing
+    // Also allow document operations and candidate timesheets for testing
     const documentEndpointPattern = /^\/documents\/[^\/]+(?:\/download)?$/;
-    const deleteDocumentPattern = /^\/documents\/[^\/]+$/;
+    const timesheetCandidatePattern = /^\/timesheets\/candidate\/[^\/]+$/;
     
     if (publicEndpoints.includes(c.req.path) || 
         documentEndpointPattern.test(c.req.path) ||
-        (c.req.method === 'DELETE' && deleteDocumentPattern.test(c.req.path))) {
+        timesheetCandidatePattern.test(c.req.path) ||
+        (c.req.method === 'DELETE' && /^\/documents\/[^\/]+$/.test(c.req.path))) {
       return next();
     }
 
