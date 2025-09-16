@@ -438,13 +438,7 @@ export default function HomePage() {
                     border: '1px solid #374151',
                     borderRadius: '8px',
                     color: '#F9FAFB',
-                    zIndex: 9999,
-                    position: 'relative',
                     boxShadow: '0 10px 25px rgba(0, 0, 0, 0.5)'
-                  }}
-                  wrapperStyle={{
-                    zIndex: 9999,
-                    position: 'relative'
                   }}
                   formatter={(value) => [value, 'Projects']}
                 />

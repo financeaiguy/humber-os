@@ -359,36 +359,61 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
     return devices.includes(fingerprint)
   }
   
-  // Verify location is within geofence (mock - replace with actual coordinates)
+  // Verify location is within geofence (replace with actual coordinates)
   const verifyGeofence = async (location: { lat: number; lng: number; accuracy: number }): Promise<boolean> => {
-    // Development mode - bypass location check if running on localhost
-    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-      console.log('Development mode: Bypassing geofence verification')
-      return true
+    // SECURITY: No development bypasses - always verify location
+    // Environment-specific configuration should be handled server-side
+    
+    // Get work sites from environment configuration (server-side)
+    // In production, this would come from your API/database
+    const workSites = [
+      {
+        name: 'GM Assembly Plant',
+        lat: 42.3149,  // Example latitude
+        lng: -83.0364, // Example longitude
+        radius: 500    // 500 meters radius
+      },
+      {
+        name: 'Ford Dearborn Plant',
+        lat: 42.3223,
+        lng: -83.1963,
+        radius: 300
+      }
+      // Add more authorized work locations as needed
+    ]
+    
+    // Check if current location is within any authorized work site
+    for (const workSite of workSites) {
+      const distance = calculateDistance(location, workSite)
+      
+      // Check if within radius (accounting for GPS accuracy)
+      if (distance <= (workSite.radius + location.accuracy)) {
+        console.log(`Location verified at ${workSite.name}: ${distance.toFixed(0)}m away`)
+        return true
+      }
     }
     
-    // Example: GM Assembly Plant coordinates (replace with actual work site)
-    const workSite = {
-      lat: 42.3149,  // Example latitude
-      lng: -83.0364, // Example longitude
-      radius: 500    // 500 meters radius
-    }
-    
-    // Calculate distance between current location and work site
+    console.warn('Location verification failed: Not at any authorized work site')
+    return false
+  }
+
+  // Helper function to calculate distance between two points (Haversine formula)
+  const calculateDistance = (
+    point1: { lat: number; lng: number }, 
+    point2: { lat: number; lng: number }
+  ): number => {
     const R = 6371e3 // Earth's radius in meters
-    const φ1 = location.lat * Math.PI / 180
-    const φ2 = workSite.lat * Math.PI / 180
-    const Δφ = (workSite.lat - location.lat) * Math.PI / 180
-    const Δλ = (workSite.lng - location.lng) * Math.PI / 180
+    const φ1 = point1.lat * Math.PI / 180
+    const φ2 = point2.lat * Math.PI / 180
+    const Δφ = (point2.lat - point1.lat) * Math.PI / 180
+    const Δλ = (point2.lng - point1.lng) * Math.PI / 180
     
     const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
               Math.cos(φ1) * Math.cos(φ2) *
               Math.sin(Δλ/2) * Math.sin(Δλ/2)
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
-    const distance = R * c
     
-    // Check if within radius (accounting for GPS accuracy)
-    return distance <= (workSite.radius + location.accuracy)
+    return R * c
   }
 
   // Handle camera capture and submit to secure API

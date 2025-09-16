@@ -216,7 +216,7 @@ export default function TimeTrackingCalendar({ userRole, employeeId, isReadOnly 
   }
 
   const handleSaveEntry = () => {
-    if (!editingEntry) return
+    if (!editingEntry) return;
     
     // In production, save to database via API
     if (editingEntry.id) {
@@ -361,7 +361,7 @@ export default function TimeTrackingCalendar({ userRole, employeeId, isReadOnly 
                 <option value="all">All Scores</option>
                 <option value="high">High (90%+)</option>
                 <option value="medium">Medium (75-89%)</option>
-                <option value="low">Low (<75%)</option>
+                <option value="low">Low (&lt; 75%)</option>
               </select>
             </div>
           </div>

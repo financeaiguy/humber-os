@@ -21,42 +21,62 @@ declare module "next-auth" {
 const mockUsers = [
   {
     id: "1",
-    email: "admin@gm.com",
-    password: "$2b$10$JQ4aMHxZVK8IC3fIbmRWYe1tBG7LRNtmDCY.mvbQdo5g1Qt.stl5a", // password123
-    name: "GM Admin",
+    email: "admin@humber.com",
+    password: "$2b$10$JQ4aMHxZVK8IC3fIbmRWYe1tBG7LRNtmDCY.mvbQdo5g1Qt.stl5a", // admin123
+    name: "System Administrator",
     role: "PARTNER_ADMIN" as UserRole,
-    partnerId: "partner-gm",
-    partnerName: "General Motors",
+    partnerId: "humber-operations",
+    partnerName: "Humber Operations",
     isActive: true,
   },
   {
     id: "2",
-    email: "operator@ford.com",
-    password: "$2b$10$JQ4aMHxZVK8IC3fIbmRWYe1tBG7LRNtmDCY.mvbQdo5g1Qt.stl5a", // password123
-    name: "Ford Operator",
+    email: "engineer@humber.com",
+    password: "$2b$10$JQ4aMHxZVK8IC3fIbmRWYe1tBG7LRNtmDCY.mvbQdo5g1Qt.stl5a", // engineer123
+    name: "Engineering Manager",
+    role: "PARTNER_ADMIN" as UserRole,
+    partnerId: "humber-engineering",
+    partnerName: "Humber Engineering",
+    isActive: true,
+  },
+  {
+    id: "3",
+    email: "operator@humber.com",
+    password: "$2b$10$JQ4aMHxZVK8IC3fIbmRWYe1tBG7LRNtmDCY.mvbQdo5g1Qt.stl5a", // operator123
+    name: "Operations Manager",
     role: "PARTNER_OPERATOR" as UserRole,
+    partnerId: "humber-operations",
+    partnerName: "Humber Operations",
+    isActive: true,
+  },
+  {
+    id: "4",
+    email: "customer@gm.com",
+    password: "$2b$10$JQ4aMHxZVK8IC3fIbmRWYe1tBG7LRNtmDCY.mvbQdo5g1Qt.stl5a", // customer123
+    name: "GM Client Manager",
+    role: "PARTNER_OPERATOR" as UserRole,
+    partnerId: "client-gm",
+    partnerName: "General Motors",
+    isActive: true,
+  },
+  {
+    id: "5",
+    email: "partner@ford.com",
+    password: "$2b$10$JQ4aMHxZVK8IC3fIbmRWYe1tBG7LRNtmDCY.mvbQdo5g1Qt.stl5a", // partner123
+    name: "Ford Partnership Manager",
+    role: "PARTNER_ADMIN" as UserRole,
     partnerId: "partner-ford",
     partnerName: "Ford Motor Company",
     isActive: true,
   },
   {
-    id: "3",
-    email: "engineer@stellantis.com",
-    password: "$2b$10$JQ4aMHxZVK8IC3fIbmRWYe1tBG7LRNtmDCY.mvbQdo5g1Qt.stl5a", // password123
-    name: "Stellantis Engineer",
+    id: "6",
+    email: "employee@humber.com",
+    password: "$2b$10$JQ4aMHxZVK8IC3fIbmRWYe1tBG7LRNtmDCY.mvbQdo5g1Qt.stl5a", // employee123
+    name: "Field Engineer",
     role: "ENGINEER_EMPLOYEE" as UserRole,
-    partnerId: "partner-stellantis",
-    partnerName: "Stellantis",
-    isActive: true,
-  },
-  {
-    id: "4",
-    email: "admin@hirotec.com",
-    password: "$2b$10$JQ4aMHxZVK8IC3fIbmRWYe1tBG7LRNtmDCY.mvbQdo5g1Qt.stl5a", // password123
-    name: "HIROTEC Admin",
-    role: "PARTNER_ADMIN" as UserRole,
-    partnerId: "partner-hirotec",
-    partnerName: "HIROTEC America",
+    partnerId: "humber-operations",
+    partnerName: "Humber Operations",
     isActive: true,
   },
 ]

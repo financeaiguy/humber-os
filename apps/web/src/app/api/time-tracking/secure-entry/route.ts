@@ -85,38 +85,60 @@ async function storeImmutableEntry(entry: any) {
     const entryKey = `time_entry_${entry.metadata.employeeId}_${entry.blockIndex}`
     const auditKey = `audit_${entry.hash}`
     
-    // Primary storage
-    // await TIME_TRACKING_KV.put(entryKey, JSON.stringify(entry), {
-    //   metadata: {
-    //     employeeId: entry.metadata.employeeId,
-    //     type: entry.type,
-    //     timestamp: entry.timestamp,
-    //     hash: entry.hash
-    //   }
-    // })
+    // Check if running in Cloudflare Workers environment
+    const isCloudflareWorkers = typeof globalThis.TIME_TRACKING_KV !== 'undefined'
     
-    // Audit trail storage
-    // await AUDIT_LOGS_KV.put(auditKey, JSON.stringify({
-    //   action: 'time_entry_created',
-    //   timestamp: entry.serverTimestamp,
-    //   hash: entry.hash,
-    //   employeeId: entry.metadata.employeeId,
-    //   verified: true
-    // }))
-    
-    // For development, use localStorage simulation
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(entryKey, JSON.stringify(entry))
-      localStorage.setItem(auditKey, JSON.stringify({
+    if (isCloudflareWorkers) {
+      // Primary storage in Cloudflare KV
+      await globalThis.TIME_TRACKING_KV.put(entryKey, JSON.stringify(entry), {
+        metadata: {
+          employeeId: entry.metadata.employeeId,
+          type: entry.type,
+          timestamp: entry.timestamp,
+          hash: entry.hash,
+          blockIndex: entry.blockIndex.toString()
+        }
+      })
+      
+      // Audit trail storage
+      await globalThis.AUDIT_LOGS_KV.put(auditKey, JSON.stringify({
         action: 'time_entry_created',
         timestamp: entry.serverTimestamp,
         hash: entry.hash,
         employeeId: entry.metadata.employeeId,
-        verified: true
+        verified: true,
+        blockIndex: entry.blockIndex
       }))
+      
+      console.log('Stored immutable entry in Cloudflare KV:', { entryKey, hash: entry.hash })
+    } else {
+      // Fallback for development - use file system or database
+      // In production, this should throw an error instead of falling back
+      console.warn('SECURITY WARNING: Cloudflare KV not available, using fallback storage')
+      
+      // Store in a more secure way than localStorage for development
+      // This would typically be your primary database in a non-Cloudflare environment
+      const storageEntry = {
+        key: entryKey,
+        value: JSON.stringify(entry),
+        metadata: {
+          employeeId: entry.metadata.employeeId,
+          type: entry.type,
+          timestamp: entry.timestamp,
+          hash: entry.hash,
+          blockIndex: entry.blockIndex.toString()
+        },
+        storedAt: new Date().toISOString()
+      }
+      
+      // In a real application, this would be your database
+      console.log('DEV STORAGE:', storageEntry)
+      
+      // For actual development, you might want to store in Redis, PostgreSQL, etc.
+      // await redis.set(entryKey, JSON.stringify(entry))
+      // await db.timeEntries.create({ data: storageEntry })
     }
     
-    console.log('Stored immutable entry:', { entryKey, hash: entry.hash })
     return true
   } catch (error) {
     console.error('Error storing immutable entry:', error)
@@ -347,8 +369,36 @@ async function checkRecentEntries(
   const cutoffTime = new Date(Date.now() - timeWindow * 60 * 1000)
   
   try {
-    // In production, query Cloudflare KV
-    // For now, simulate check
+    const isCloudflareWorkers = typeof globalThis.TIME_TRACKING_KV !== 'undefined'
+    
+    if (isCloudflareWorkers) {
+      // Query recent entries from Cloudflare KV
+      const listOptions = {
+        prefix: `time_entry_${employeeId}_`,
+        limit: 10
+      }
+      
+      const kvList = await globalThis.TIME_TRACKING_KV.list(listOptions)
+      
+      for (const key of kvList.keys) {
+        const entryData = await globalThis.TIME_TRACKING_KV.get(key.name)
+        if (entryData) {
+          const entry = JSON.parse(entryData)
+          const entryTime = new Date(entry.timestamp)
+          
+          // Check if this is a recent entry of the same type
+          if (entry.type === type && entryTime > cutoffTime) {
+            return {
+              isDuplicate: true,
+              timeWindow
+            }
+          }
+        }
+      }
+    } else {
+      console.warn('SECURITY WARNING: Cannot check duplicates without KV storage')
+    }
+    
     return {
       isDuplicate: false,
       timeWindow
@@ -365,9 +415,31 @@ async function checkRecentEntries(
 // Helper function to get previous entry hash for blockchain linking
 async function getPreviousEntryHash(employeeId: string): Promise<string | undefined> {
   try {
-    // In production, query Cloudflare KV for the latest entry
-    // For now, return undefined (genesis block)
-    return undefined
+    const isCloudflareWorkers = typeof globalThis.TIME_TRACKING_KV !== 'undefined'
+    
+    if (isCloudflareWorkers) {
+      // Query the latest entry for this employee
+      const listOptions = {
+        prefix: `time_entry_${employeeId}_`,
+        limit: 1
+      }
+      
+      const kvList = await globalThis.TIME_TRACKING_KV.list(listOptions)
+      
+      if (kvList.keys.length > 0) {
+        const latestKey = kvList.keys[0]
+        const entryData = await globalThis.TIME_TRACKING_KV.get(latestKey.name)
+        
+        if (entryData) {
+          const entry = JSON.parse(entryData)
+          return entry.hash
+        }
+      }
+    } else {
+      console.warn('SECURITY WARNING: Cannot get previous hash without KV storage')
+    }
+    
+    return undefined // Genesis block
   } catch (error) {
     console.error('Error getting previous entry hash:', error)
     return undefined

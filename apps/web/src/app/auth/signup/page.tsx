@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { UserRole } from '@humber/types'
 
 const partners = [
+  { id: 'humber-operations', name: 'Humber Operations' },
   { id: 'partner-gm', name: 'General Motors' },
   { id: 'partner-ford', name: 'Ford Motor Company' },
   { id: 'partner-stellantis', name: 'Stellantis' },
@@ -16,19 +17,29 @@ const partners = [
 const roles: { value: UserRole; label: string; description: string }[] = [
   {
     value: 'PARTNER_ADMIN',
-    label: 'Partner Admin',
-    description: 'Full access to partner operations, user management, and analytics'
+    label: 'System Admin / Partner',
+    description: 'Full system access, user management, all features'
   },
   {
     value: 'PARTNER_OPERATOR',
-    label: 'Partner Operator', 
-    description: 'Operational access to projects, team management, and analytics'
+    label: 'Engineer / Operator / Customer',
+    description: 'Operations control, project management, compliance monitoring'
   },
   {
     value: 'ENGINEER_EMPLOYEE',
-    label: 'Engineer Employee',
-    description: 'Limited access to time tracking and knowledge base'
+    label: 'Employee (Self-Service)',
+    description: 'Personal time tracking, calendar access, limited features'
   }
+]
+
+// Demo accounts for quick testing
+const demoAccounts = [
+  { email: 'admin@humber.com', password: 'admin123', role: 'System Admin', access: 'Full system access' },
+  { email: 'engineer@humber.com', password: 'engineer123', role: 'Engineer', access: 'Team management, approvals' },
+  { email: 'operator@humber.com', password: 'operator123', role: 'Operator', access: 'Operations control' },
+  { email: 'customer@gm.com', password: 'customer123', role: 'Customer (GM)', access: 'Client portal access' },
+  { email: 'partner@ford.com', password: 'partner123', role: 'Partner (Ford)', access: 'Strategic management' },
+  { email: 'employee@humber.com', password: 'employee123', role: 'Employee', access: 'Self-service portal' },
 ]
 
 export default function SignUpPage() {
@@ -269,6 +280,36 @@ export default function SignUpPage() {
                   {loading ? 'Creating Account...' : 'Create Account'}
                 </button>
               </form>
+
+              {/* Demo Accounts Section */}
+              <div className="mt-8 pt-6 border-t border-slate-700">
+                <h3 className="text-lg font-semibold text-blue-400 mb-4">🧪 Demo Accounts Available</h3>
+                <p className="text-sm text-slate-400 mb-4">
+                  Skip signup and test with pre-configured demo accounts
+                </p>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {demoAccounts.map((account, index) => (
+                    <motion.div
+                      key={account.email}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 * index }}
+                      className="p-3 rounded-lg bg-slate-800/30 border border-slate-700/50"
+                    >
+                      <div className="text-sm font-medium text-white">{account.role}</div>
+                      <div className="text-xs text-slate-400 mb-1">{account.email}</div>
+                      <div className="text-xs text-slate-500">{account.access}</div>
+                    </motion.div>
+                  ))}
+                </div>
+                
+                <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                  <p className="text-xs text-blue-400">
+                    💡 <strong>Quick Test:</strong> Go to <Link href="/auth/signin" className="underline hover:text-blue-300">Sign In</Link> and click any demo account to instantly test different roles and permissions.
+                  </p>
+                </div>
+              </div>
 
               <div className="mt-6 text-center">
                 <p className="text-slate-400 text-sm">

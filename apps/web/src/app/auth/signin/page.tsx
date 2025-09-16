@@ -8,10 +8,12 @@ import Link from 'next/link'
 import { signIn } from '@/lib/auth-client'
 
 const mockCredentials = [
-  { email: 'admin@gm.com', password: 'password123', role: 'GM Admin' },
-  { email: 'operator@ford.com', password: 'password123', role: 'Ford Operator' },
-  { email: 'engineer@stellantis.com', password: 'password123', role: 'Stellantis Engineer' },
-  { email: 'admin@hirotec.com', password: 'password123', role: 'HIROTEC Admin' },
+  { email: 'admin@humber.com', password: 'admin123', role: 'System Admin', description: 'Full system access' },
+  { email: 'engineer@humber.com', password: 'engineer123', role: 'Engineer', description: 'Engineering management' },
+  { email: 'operator@humber.com', password: 'operator123', role: 'Operator', description: 'Operations control' },
+  { email: 'customer@gm.com', password: 'customer123', role: 'Customer (GM)', description: 'Client portal access' },
+  { email: 'partner@ford.com', password: 'partner123', role: 'Partner (Ford)', description: 'Partner management' },
+  { email: 'employee@humber.com', password: 'employee123', role: 'Employee', description: 'Self-service portal' },
 ]
 
 export default function SignInPage() {
@@ -95,8 +97,11 @@ export default function SignInPage() {
 
           {/* Demo Credentials */}
           <div className="space-y-4">
-            <h3 className="text-xl font-semibold text-blue-400">Demo Accounts</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <h3 className="text-xl font-semibold text-blue-400">Demo Accounts - Click to Login</h3>
+            <p className="text-sm text-slate-400 mb-4">
+              Test different user roles and permissions in the system
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {mockCredentials.map((cred, index) => (
                 <motion.button
                   key={cred.email}
@@ -105,14 +110,27 @@ export default function SignInPage() {
                   transition={{ delay: 0.1 * index }}
                   onClick={() => handleDemoLogin(cred)}
                   disabled={loading}
-                  className="text-left p-3 rounded-lg bg-slate-800/50 border border-slate-700 hover:border-blue-500 transition-all duration-200 group"
+                  className="text-left p-4 rounded-lg bg-slate-800/50 border border-slate-700 hover:border-blue-500 transition-all duration-200 group hover:bg-slate-800/70"
                 >
                   <div className="text-sm font-medium text-white group-hover:text-blue-400">
                     {cred.role}
                   </div>
-                  <div className="text-xs text-slate-400">{cred.email}</div>
+                  <div className="text-xs text-slate-400 mb-1">{cred.email}</div>
+                  <div className="text-xs text-slate-500">{cred.description}</div>
                 </motion.button>
               ))}
+            </div>
+            
+            <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+              <h4 className="text-sm font-medium text-blue-400 mb-2">🎯 Role Capabilities:</h4>
+              <div className="text-xs text-slate-400 space-y-1">
+                <div><strong>System Admin:</strong> Full system access, user management, all features</div>
+                <div><strong>Engineer:</strong> Team management, time approval, bull pen access</div>
+                <div><strong>Operator:</strong> Project management, compliance monitoring</div>
+                <div><strong>Customer:</strong> View assigned engineers, approve timesheets</div>
+                <div><strong>Partner:</strong> Strategic oversight, client relations, analytics</div>
+                <div><strong>Employee:</strong> Self-service time tracking, personal calendar</div>
+              </div>
             </div>
           </div>
         </motion.div>
