@@ -4,7 +4,13 @@
 
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js_15-000000?style=for-the-badge&logo=next.js&logoColor=white)
-![Cloudflare](https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)
+![Cloudflare Workers](https://img.shields.io/badge/Cloudflare_Workers-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)
+![Durable Objects](https://img.shields.io/badge/Durable_Objects-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)
+![D1 Database](https://img.shields.io/badge/D1_Database-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)
+![R2 Storage](https://img.shields.io/badge/R2_Storage-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)
+![Vectorize](https://img.shields.io/badge/Vectorize_AI-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)
+![KV Storage](https://img.shields.io/badge/KV_Storage-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)
+![Queues](https://img.shields.io/badge/Cloudflare_Queues-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
 ![Security](https://img.shields.io/badge/3--Layer_Trust-FF6B6B?style=for-the-badge&logo=shield&logoColor=white)
@@ -51,6 +57,8 @@ graph TB
         KV_CACHE[(⚡ Cache Store<br/>KV)]
         R2_DOCS[(📁 Document Storage<br/>R2)]
         VECTOR[(🧠 Vector Search<br/>Vectorize)]
+        DO_REALTIME[(🔄 Real-time State<br/>Durable Objects)]
+        DO_PRESENCE[(👥 User Presence<br/>Durable Objects)]
     end
 
     subgraph "🔄 Message Queues"

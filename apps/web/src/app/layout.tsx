@@ -6,11 +6,29 @@ import { LayoutClient } from '@/components/layout-client'
 import { SessionProvider } from '@/components/session-context'
 import { auth } from '@/auth'
 import { ErrorBoundary } from '@/components/error-boundary'
-import { GlobalLoadingIndicator } from '@/components/global-loading'
-import { LoadingProvider } from '@/components/route-loading'
 import { Suspense } from 'react'
-import { PageLoadingIndicator } from '@/components/global-loading'
-import { ContinuousLearningProvider } from '@/components/continuous-learning-provider'
+import dynamic from 'next/dynamic'
+
+// Dynamically import heavy components to fix clientReferenceManifest issue
+const GlobalLoadingIndicator = dynamic(() => import('@/components/global-loading').then(mod => ({ default: mod.GlobalLoadingIndicator })), {
+  ssr: false,
+  loading: () => null
+})
+
+const PageLoadingIndicator = dynamic(() => import('@/components/global-loading').then(mod => ({ default: mod.PageLoadingIndicator })), {
+  ssr: false,
+  loading: () => null
+})
+
+const LoadingProvider = dynamic(() => import('@/components/route-loading').then(mod => ({ default: mod.LoadingProvider })), {
+  ssr: false,
+  loading: ({ children }: { children: React.ReactNode }) => <>{children}</>
+})
+
+const ContinuousLearningProvider = dynamic(() => import('@/components/continuous-learning-provider').then(mod => ({ default: mod.ContinuousLearningProvider })), {
+  ssr: false,
+  loading: ({ children }: { children: React.ReactNode }) => <>{children}</>
+})
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -56,7 +74,7 @@ export default async function RootLayout({
             <ContinuousLearningProvider>
               <LoadingProvider>
                 <LayoutClient>
-                  <Suspense fallback={<PageLoadingIndicator />}>
+                  <Suspense fallback={<div>Loading...</div>}>
                     <GlobalLoadingIndicator />
                     {children}
                   </Suspense>

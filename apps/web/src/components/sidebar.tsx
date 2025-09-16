@@ -18,11 +18,13 @@ import {
   LogOut,
   Menu,
   X,
-  Target
+  Target,
+  Bell
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
 import { canAccessRoute } from '@/lib/permissions'
+import { NotificationManager } from '@/components/notification-manager'
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
@@ -40,7 +42,11 @@ export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [notificationOpen, setNotificationOpen] = useState(false)
   const { data: session } = useSession()
+  
+  // Mock unread notification count - in production this would come from an API
+  const unreadNotificationCount = 3
   
   const handleSignOut = async () => {
     await signOut({ callbackUrl: '/auth/signin' })
@@ -123,6 +129,19 @@ export function Sidebar() {
                     <p className="text-xs text-slate-400">{session.user.partnerName}</p>
                     <p className="text-xs text-blue-400">{session.user.role.replace('_', ' ')}</p>
                   </div>
+                  {/* Notification Icon */}
+                  <button
+                    onClick={() => setNotificationOpen(true)}
+                    className="relative p-2 rounded-lg hover:bg-slate-700/50 transition-colors"
+                    title="Notifications"
+                  >
+                    <Bell className="h-5 w-5 text-slate-400 hover:text-white" />
+                    {unreadNotificationCount > 0 && (
+                      <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse">
+                        {unreadNotificationCount > 9 ? '9+' : unreadNotificationCount}
+                      </span>
+                    )}
+                  </button>
                 </div>
                 <div className="space-y-1">
                   <Link 
@@ -157,6 +176,13 @@ export function Sidebar() {
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
+      
+      {/* Notification Manager */}
+      <NotificationManager
+        isOpen={notificationOpen}
+        onClose={() => setNotificationOpen(false)}
+        position="left"
+      />
     </>
   )
 }

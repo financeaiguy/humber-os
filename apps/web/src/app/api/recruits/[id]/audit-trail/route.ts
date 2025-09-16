@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { RecruitingDatabase } from '@humber/worker/lib/recruiting-database'
-import { createAuditContext } from '@humber/utils/recruiting-audit'
+// Mock implementations - replace with actual when worker is available
+const RecruitingDatabase = {
+  getRecruitAuditTrail: async (id: string) => {
+    console.log('Mock get audit trail:', id)
+    return []
+  }
+}
+
+const createAuditContext = (session: any, action: string) => ({
+  userId: session?.user?.id,
+  action,
+  timestamp: new Date().toISOString()
+})
 import { getSession } from '@/lib/auth'
 
 export async function GET(

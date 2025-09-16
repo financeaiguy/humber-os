@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, User, Clock, FileText, Shield, Globe, CheckCircle, AlertCircle, Loader2, Search, Filter, RefreshCw, Bell } from 'lucide-react'
 import { useSession } from '@/components/session-context'
 import { CandidateDetailsModal } from './CandidateDetailsModal'
-import dynamic from 'next/dynamic'
+import { useRealTimeOnboarding } from '@/hooks/useRealTimeOnboarding'
 
 interface OnboardingCandidate {
   id: string
@@ -37,7 +37,7 @@ const statusConfig = {
   completed: { label: 'Completed', icon: CheckCircle, color: 'text-emerald-400', bg: 'bg-emerald-400/10' }
 }
 
-export function OnboardingTracker() {
+export function OnboardingTrackerClient() {
   const { data: session } = useSession()
   const [isOpen, setIsOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
@@ -45,7 +45,7 @@ export function OnboardingTracker() {
   const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list')
   const [selectedCandidate, setSelectedCandidate] = useState<OnboardingCandidate | null>(null)
   const [showDetailsModal, setShowDetailsModal] = useState(false)
-  const [filteredCandidates, setFilteredCandidates] = useState<OnboardingCandidate[]>([])
+  const [mounted, setMounted] = useState(false)
 
   // Determine user role and permissions
   const userRole = session?.user?.role
@@ -53,26 +53,32 @@ export function OnboardingTracker() {
   const isOperator = userRole === 'PARTNER_OPERATOR' || userRole === 'PARTNER_ADMIN'
   const isCustomer = userRole === 'CUSTOMER'
 
-  // Use real-time onboarding hook
+  // Use real-time onboarding hook only on client
   const {
-    candidates,
-    loading,
+    candidates = [],
+    loading = true,
     error,
     lastUpdate,
-    recentUpdates,
-    statusCounts,
+    recentUpdates = [],
+    statusCounts = {},
     updateCandidate,
-    refresh,
-    isRealTime
-  } = useRealTimeOnboarding({
-    refreshInterval: 30000, // 30 seconds
+    refresh
+  } = mounted ? useRealTimeOnboarding({
+    refreshInterval: 30000,
     enableNotifications: true,
     statusFilter,
     searchTerm
-  })
+  }) : {}
+
+  // Ensure component is mounted before showing dynamic content
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Filter candidates based on role and search
-  useEffect(() => {
+  const filteredCandidates = useMemo(() => {
+    if (!mounted) return []
+    
     let filtered = [...candidates]
     
     if (searchTerm) {
@@ -89,15 +95,13 @@ export function OnboardingTracker() {
     
     // Role-based filtering
     if (isEngineer) {
-      // Engineers only see their own onboarding
       filtered = filtered.filter(c => c.email === session?.user?.email)
     } else if (isCustomer) {
-      // Customers see engineers assigned to them
       filtered = filtered.filter(c => c.assignedTo === session?.user?.organizationId)
     }
     
-    setFilteredCandidates(filtered)
-  }, [candidates, searchTerm, statusFilter, session, isEngineer, isCustomer])
+    return filtered
+  }, [candidates, searchTerm, statusFilter, session, isEngineer, isCustomer, mounted])
 
   const handleViewCandidate = (candidate: OnboardingCandidate) => {
     setSelectedCandidate(candidate)
@@ -105,10 +109,10 @@ export function OnboardingTracker() {
   }
 
   const handleUpdateCandidate = async (candidateId: string, updates: Partial<OnboardingCandidate>) => {
+    if (!updateCandidate) return
     try {
       await updateCandidate(candidateId, updates)
       
-      // Update selected candidate if it's the one being viewed
       if (selectedCandidate?.id === candidateId) {
         setSelectedCandidate(prev => prev ? { ...prev, ...updates } : null)
       }
@@ -116,6 +120,18 @@ export function OnboardingTracker() {
       console.error('Failed to update candidate:', error)
       throw error
     }
+  }
+
+  // Show loading state during SSR
+  if (!mounted) {
+    return (
+      <div className="relative">
+        <div className="w-full px-4 py-3 bg-slate-800/50 backdrop-blur-xl rounded-xl border border-slate-700/50 flex items-center justify-center">
+          <Loader2 className="w-5 h-5 text-blue-400 animate-spin mr-2" />
+          <span className="text-white">Loading onboarding pipeline...</span>
+        </div>
+      </div>
+    )
   }
 
   if (isEngineer && filteredCandidates.length > 0) {
@@ -195,22 +211,22 @@ export function OnboardingTracker() {
   return (
     <div className="relative">
       {/* Dropdown Trigger */}
-      <div className="w-full px-4 py-3 bg-slate-800/50 backdrop-blur-xl rounded-xl border border-slate-700/50 hover:bg-slate-700/50 transition-all flex items-center justify-between group">
-        <div 
-          onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-3 flex-1 cursor-pointer"
-        >
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full px-4 py-3 bg-slate-800/50 backdrop-blur-xl rounded-xl border border-slate-700/50 hover:bg-slate-700/50 transition-all flex items-center justify-between group"
+      >
+        <div className="flex items-center gap-3">
           <div className="relative">
             <User className="w-5 h-5 text-blue-400" />
-            {isRealTime && (
+            {candidates.length > 0 && (
               <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 rounded-full animate-pulse" />
             )}
           </div>
           <span className="text-white font-medium">Onboarding Pipeline</span>
           <div className="flex items-center gap-2">
             {Object.entries(statusCounts).slice(0, 3).map(([status, count]) => (
-              <span key={status} className={`px-2 py-1 rounded-full text-xs ${statusConfig[status as keyof typeof statusConfig].bg} ${statusConfig[status as keyof typeof statusConfig].color}`}>
-                {count} {statusConfig[status as keyof typeof statusConfig].label}
+              <span key={status} className={`px-2 py-1 rounded-full text-xs ${statusConfig[status as keyof typeof statusConfig]?.bg || 'bg-slate-700/50'} ${statusConfig[status as keyof typeof statusConfig]?.color || 'text-slate-400'}`}>
+                {count} {statusConfig[status as keyof typeof statusConfig]?.label || status}
               </span>
             ))}
             {recentUpdates.length > 0 && (
@@ -221,27 +237,21 @@ export function OnboardingTracker() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              refresh()
-            }}
-            className="p-1 text-slate-400 hover:text-white transition-colors"
-            title="Refresh data"
-            type="button"
-          >
-            <RefreshCw className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="p-1 text-slate-400 hover:text-white transition-colors"
-            type="button"
-            aria-label="Toggle dropdown"
-          >
-            <ChevronDown className={`w-5 h-5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-          </button>
+          {refresh && (
+            <span
+              onClick={(e) => {
+                e.stopPropagation()
+                refresh()
+              }}
+              className="p-1 text-slate-400 hover:text-white transition-colors cursor-pointer"
+              title="Refresh data"
+            >
+              <RefreshCw className="w-4 h-4" />
+            </span>
+          )}
+          <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </div>
-      </div>
+      </button>
 
       {/* Dropdown Content */}
       <AnimatePresence>
@@ -299,22 +309,24 @@ export function OnboardingTracker() {
                     onClick={() => setStatusFilter(status)}
                     className={`px-3 py-1 rounded-full text-xs transition-all ${
                       statusFilter === status 
-                        ? `${statusConfig[status as keyof typeof statusConfig].bg} ${statusConfig[status as keyof typeof statusConfig].color} ring-2 ring-offset-2 ring-offset-slate-800 ring-${status}-500`
+                        ? `${statusConfig[status as keyof typeof statusConfig]?.bg || 'bg-slate-700/50'} ${statusConfig[status as keyof typeof statusConfig]?.color || 'text-slate-400'} ring-2 ring-offset-2 ring-offset-slate-800`
                         : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700'
                     }`}
                   >
-                    {count} {statusConfig[status as keyof typeof statusConfig].label}
+                    {count} {statusConfig[status as keyof typeof statusConfig]?.label || status}
                   </button>
                 ))}
               </div>
 
               {/* Real-time Activity Feed */}
-              {recentUpdates.length > 0 && (
+              {recentUpdates.length > 0 && lastUpdate && (
                 <div className="bg-slate-700/30 rounded-lg p-3 mb-3">
                   <div className="flex items-center gap-2 mb-2">
                     <Bell className="w-4 h-4 text-blue-400" />
                     <span className="text-sm font-medium text-white">Recent Activity</span>
-                    <span className="text-xs text-slate-500">Last updated: {lastUpdate.toLocaleTimeString()}</span>
+                    <span className="text-xs text-slate-500">
+                      Last updated: {typeof lastUpdate === 'string' ? lastUpdate : new Date(lastUpdate).toLocaleTimeString()}
+                    </span>
                   </div>
                   <div className="space-y-1 max-h-24 overflow-y-auto">
                     {recentUpdates.slice(0, 3).map((update, index) => (

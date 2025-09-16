@@ -13,7 +13,7 @@ import dynamic from 'next/dynamic'
 // Lazy load heavy modals
 const NewOnboardingModal = dynamic(() => import('@/components/onboarding/NewOnboardingModal'), { ssr: false })
 const RoleBasedOnboardingModal = dynamic(() => import('@/components/onboarding/RoleBasedOnboardingModal'), { ssr: false })
-import { OnboardingTracker } from '@/components/onboarding/OnboardingTracker'
+import { OnboardingTracker } from '@/components/onboarding/OnboardingTrackerWrapper'
 
 const onboardingQueue = [
   {
