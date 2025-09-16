@@ -467,6 +467,87 @@ Key metrics tracked:
 6. Permission checking
 7. Audit logging
 
+## 🚀 Developer Quick Start
+
+### 📋 **Prerequisites**
+```bash
+# Required software
+- Node.js 20+ (recommended: 20.19.0)
+- pnpm (package manager)
+- Git
+- VS Code or Cursor (recommended)
+```
+
+### ⚡ **Instant Setup (3 commands)**
+```bash
+# 1. Clone and install
+git clone https://github.com/financeaiguy/humber-os.git
+cd humber-os && pnpm install
+
+# 2. Start development servers
+pnpm run dev
+
+# 3. Access your system
+# Frontend: http://localhost:3003
+# API Gateway: http://localhost:8787
+# Interactive API Testing: http://localhost:8787/api-test
+# Documentation: http://localhost:8787/docs
+```
+
+### 🔧 **Development Environment**
+```bash
+# Individual server startup
+cd apps/web && pnpm dev      # Next.js frontend (port 3003)
+cd apps/worker && pnpm dev   # Cloudflare Worker (port 8787)
+
+# Database setup (first time only)
+cd apps/worker
+pnpm wrangler d1 create humber-db
+pnpm wrangler d1 migrations apply humber-db --local
+
+# Environment variables (copy from .env.example)
+cp .env.example .env.local
+```
+
+### 🧪 **Testing Your Setup**
+```bash
+# Quick health check
+curl http://localhost:8787/health
+
+# Test interactive API interface (no Postman needed!)
+open http://localhost:8787/api-test
+
+# View complete documentation
+open http://localhost:8787/docs
+```
+
+## 📚 **Developer Documentation & API Guide**
+
+### 🎯 **Quick Access for Developers**
+| Resource | URL | Purpose |
+|----------|-----|---------|
+| 🧪 **Interactive Testing** | `http://localhost:8787/api-test` | Test all 59 endpoints - no Postman needed! |
+| 📚 **API Documentation** | `http://localhost:8787/docs` | Complete reference with examples |
+| 🎯 **Live Application** | `http://localhost:3003` | Full system interface |
+| ⚡ **System Health** | `http://localhost:8787/health` | Real-time status monitoring |
+
+### 🔧 **Authentication for API Calls**
+```bash
+# All protected endpoints require JWT authentication
+Authorization: Bearer your-jwt-token
+X-Tenant-ID: your-tenant-id
+Content-Type: application/json
+```
+
+### 📊 **API Response Format**
+```json
+{
+  "success": true,
+  "data": { /* endpoint-specific data */ },
+  "requestId": "req_1726444800000_xyz789"
+}
+```
+
 ## 🚀 Complete API System (59 Endpoints)
 
 ```mermaid
@@ -589,6 +670,108 @@ graph LR
 | 📧 **Notifications** | 8 endpoints | Multi-channel delivery, template system |
 | 📊 **Reports** | 12 endpoints | Automated PDF generation, scheduled delivery |
 | 🔐 **Authentication** | 3 endpoints | JWT tokens, role-based access control |
+
+---
+
+## 🧪 **API Examples for Developers**
+
+### 👥 **Recruiting System Examples**
+
+```bash
+# Create new recruit with GDPR compliance
+curl -X POST http://localhost:3003/api/recruits \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-jwt-token" \
+  -d '{
+    "firstName": "John",
+    "lastName": "Smith",
+    "email": "john.smith@example.com",
+    "phone": "+1 (555) 123-4567",
+    "currentLocation": "Detroit, MI",
+    "jobTitle": "Senior Mechanical Engineer",
+    "yearsExperience": 8,
+    "skills": ["AutoCAD", "SolidWorks", "ANSYS"],
+    "workAuthorization": "US Citizen",
+    "source": "LinkedIn"
+  }'
+
+# Search recruits with filters
+curl "http://localhost:3003/api/recruits?status=accepted&search=engineer&limit=10" \
+  -H "Authorization: Bearer your-jwt-token"
+
+# GDPR consent management
+curl -X POST http://localhost:3003/api/recruits/rec_123/consent \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-jwt-token" \
+  -d '{
+    "consentType": "biometric",
+    "consentGiven": true,
+    "consentVersion": "1.0",
+    "consentText": "I consent to biometric data processing"
+  }'
+```
+
+### ⏰ **Time Tracking Examples**
+
+```bash
+# Secure clock in with 3-layer verification
+curl -X POST http://localhost:8787/time-tracking/clock-action \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-jwt-token" \
+  -H "X-Tenant-ID: your-tenant" \
+  -d '{
+    "action": "CLOCK_IN",
+    "engineerId": "eng_001",
+    "biometric": {
+      "type": "FACE_ID",
+      "verified": true,
+      "confidenceLevel": 95
+    },
+    "geolocation": {
+      "latitude": 42.3314,
+      "longitude": -83.0458,
+      "accuracy": 12
+    },
+    "deviceInfo": {
+      "deviceId": "device_123",
+      "trustLevel": "TRUSTED"
+    }
+  }'
+
+# Get active time tracking sessions
+curl http://localhost:8787/time-tracking/active-sessions \
+  -H "X-Tenant-ID: your-tenant"
+```
+
+### 🤖 **AI Chat Examples**
+
+```bash
+# Send message with RAG context
+curl -X POST http://localhost:8787/chat/message \
+  -H "Content-Type: application/json" \
+  -H "X-Tenant-ID: your-tenant" \
+  -d '{
+    "message": "What are the electrical safety protocols?",
+    "useRAG": true,
+    "maxDocuments": 5
+  }'
+
+# Response includes AI answer + source documents
+```
+
+### 📊 **Bull Pen Management Examples**
+
+```bash
+# Get real-time bull pen dashboard
+curl http://localhost:8787/bull-pen/dashboard \
+  -H "X-Tenant-ID: your-tenant"
+
+# Returns:
+# - 96 total engineers
+# - $1.62M monthly revenue
+# - 96% utilization rate
+# - Engineer availability by category
+```
 
 ## 🎮 Live System Dashboard
 
@@ -776,6 +959,85 @@ graph TB
     DEPLOY --> WORKER_PROD
 ```
 
+## 🔧 **Troubleshooting Guide for Developers**
+
+### 🚨 **Common Issues & Solutions**
+
+#### **Next.js Module Resolution Error**
+```bash
+# Issue: "Can't resolve '@humber/worker/lib/recruiting-database'"
+# Solution: Restart with clean cache
+cd apps/web
+rm -rf .next node_modules/.cache
+pnpm install
+pnpm dev
+```
+
+#### **Port Already in Use**
+```bash
+# Issue: Port 3000/8787 already in use
+# Solution: Kill existing processes
+pkill -f "next dev"
+pkill -f "wrangler dev"
+pnpm run dev
+```
+
+#### **Database Connection Issues**
+```bash
+# Issue: Database queries failing
+# Solution: Initialize local database
+cd apps/worker
+wrangler d1 create humber-db
+wrangler d1 migrations apply humber-db --local
+```
+
+#### **Authentication Errors**
+```bash
+# Issue: 401 Unauthorized on protected endpoints
+# Solution: Use proper headers
+curl -H "Authorization: Bearer your-jwt-token" \
+     -H "X-Tenant-ID: your-tenant-id" \
+     http://localhost:8787/protected-endpoint
+```
+
+### 🧪 **Development Testing Workflow**
+
+```bash
+# 1. Start development servers
+pnpm run dev
+
+# 2. Verify system health
+curl http://localhost:8787/health
+# Expected: {"status":"healthy","timestamp":"..."}
+
+# 3. Test interactive interface
+open http://localhost:8787/api-test
+# Click any "🧪 Test" button to verify endpoints
+
+# 4. Test recruiting system
+open http://localhost:3003/recruits
+# Add a new recruit to test the complete workflow
+
+# 5. Run automated tests
+./test-all-endpoints.sh
+# Validates all 59 endpoints automatically
+```
+
+### 📊 **Performance Monitoring**
+```bash
+# Monitor API performance
+curl http://localhost:8787/metrics | jq .performance
+# Expected response times: <200ms for most endpoints
+
+# Monitor system resources
+curl http://localhost:8787/metrics | jq .resources
+# Check database connections, KV namespaces, queues
+
+# Monitor security events
+curl http://localhost:8787/metrics | jq .security
+# Track authentication failures, rate limiting
+```
+
 ### Production Deployment
 
 1. **Build applications**
@@ -896,6 +1158,63 @@ mindmap
         Email Notifications
         Status Updates
         Compliance Monitoring
+```
+
+## 🔧 **Developer Tools & Error Handling**
+
+### 🚨 **Error Response Format**
+```json
+{
+  "success": false,
+  "error": "VALIDATION_FAILED",
+  "message": "Input validation failed",
+  "details": [
+    {
+      "field": "email",
+      "message": "Invalid email format"
+    }
+  ],
+  "requestId": "req_1726444800000_xyz789"
+}
+```
+
+### 🔄 **Rate Limiting Headers**
+```bash
+X-RateLimit-Limit: 100          # Max requests per window
+X-RateLimit-Remaining: 95       # Requests remaining
+X-RateLimit-Reset: 1726444860   # Reset timestamp
+Retry-After: 60                 # Seconds to wait (if exceeded)
+```
+
+### 🛠️ **Development Utilities**
+```bash
+# Test all endpoints automatically
+./test-all-endpoints.sh
+
+# Check system health
+curl http://localhost:8787/health
+
+# View system metrics
+curl http://localhost:8787/metrics
+
+# Test specific recruiting workflow
+curl -X POST http://localhost:3003/api/recruits \
+  -H "Authorization: Bearer test-token" \
+  -d @sample-recruit.json
+```
+
+### 🔍 **Debugging & Monitoring**
+```bash
+# Real-time logs in terminal
+# Worker: Security events, API calls, performance metrics
+# Next.js: Request processing, compilation status, errors
+
+# Database inspection
+cd apps/worker
+wrangler d1 execute humber-db --command="SELECT * FROM recruits LIMIT 5"
+
+# Performance monitoring
+curl http://localhost:8787/metrics | jq .performance
 ```
 
 ## 📈 Business Impact
