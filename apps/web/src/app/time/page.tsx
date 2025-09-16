@@ -15,6 +15,7 @@ import dynamic from 'next/dynamic'
 // Lazy load heavy components
 const EmployeeDetailModal = dynamic(() => import('@/components/time-tracking/EmployeeDetailModal'), { ssr: false })
 const TimeReconciliation = dynamic(() => import('@/components/time-tracking/TimeReconciliation'), { ssr: false })
+const EmployeeClockView = dynamic(() => import('@/components/time-tracking/EmployeeClockView'), { ssr: false })
 import { ClientTimeDisplay } from '@/components/client-time-display'
 
 // Mock data for time entries with trust layers
@@ -179,6 +180,7 @@ export default function TimeTrackingPage() {
   const [liveTracking, setLiveTracking] = useState(true)
   const [showEmployeeModal, setShowEmployeeModal] = useState(false)
   const [activeView, setActiveView] = useState<'entries' | 'reconciliation'>('entries')
+  const [showClockModal, setShowClockModal] = useState(false)
 
   return (
     <div className="space-y-8 bg-slate-950 min-h-screen">
@@ -273,12 +275,18 @@ export default function TimeTrackingPage() {
 
         {/* Quick Clock In/Out */}
         <div className="grid grid-cols-2 gap-4">
-          <button className="py-4 px-6 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-semibold hover:from-green-600 hover:to-emerald-600 transition-all duration-300 flex items-center justify-center space-x-3">
+          <button 
+            onClick={() => setShowClockModal(true)}
+            className="py-4 px-6 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-semibold hover:from-green-600 hover:to-emerald-600 transition-all duration-300 flex items-center justify-center space-x-3"
+          >
             <Smartphone className="h-6 w-6" />
             <span>Clock In</span>
             <ChevronRight className="h-5 w-5" />
           </button>
-          <button className="py-4 px-6 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-xl font-semibold hover:from-red-600 hover:to-orange-600 transition-all duration-300 flex items-center justify-center space-x-3">
+          <button 
+            onClick={() => setShowClockModal(true)}
+            className="py-4 px-6 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-xl font-semibold hover:from-red-600 hover:to-orange-600 transition-all duration-300 flex items-center justify-center space-x-3"
+          >
             <Smartphone className="h-6 w-6" />
             <span>Clock Out</span>
             <ChevronRight className="h-5 w-5" />
@@ -614,6 +622,13 @@ export default function TimeTrackingPage() {
           setSelectedEntry(null)
         }}
       />
+      
+      {/* Clock In/Out Modal */}
+      {showClockModal && (
+        <EmployeeClockView 
+          onClose={() => setShowClockModal(false)}
+        />
+      )}
     </div>
   )
 }

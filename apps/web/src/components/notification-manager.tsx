@@ -403,8 +403,17 @@ export function NotificationManager({ isOpen, onClose, position = 'left' }: Noti
 
             {/* Footer */}
             <div className="p-4 border-t border-slate-700/50">
-              <button className="w-full py-2 rounded-lg bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white transition-colors text-sm">
-                View All Notifications
+              <button 
+                onClick={() => {
+                  // Show all notifications including archived ones
+                  setFilter('all')
+                  setSearchQuery('')
+                  // In production, this would fetch archived notifications from the API
+                  // For now, we'll just ensure all current notifications are visible
+                }}
+                className="w-full py-2 rounded-lg bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white transition-colors text-sm"
+              >
+                View All Notifications ({notifications.length})
               </button>
             </div>
           </motion.div>

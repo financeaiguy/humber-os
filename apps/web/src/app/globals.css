@@ -380,13 +380,39 @@ div[style*="background-color: rgb(255"],
 div[style*="background: white"],
 div[style*="background-color: white"],
 div[style*="background: #fff"],
-div[style*="background-color: #fff"] {
+div[style*="background-color: #fff"],
+div[style*="background: rgba(255"],
+div[style*="background-color: rgba(255"],
+div[style*="background-color:#fff"],
+div[style*="background:#fff"],
+div[style*="background-color: #ffffff"],
+div[style*="background: #ffffff"] {
   background-color: #1e293b !important;
   background: #1e293b !important;
 }
 
 /* Specifically target Recharts tooltips with light backgrounds */
 .recharts-tooltip-wrapper div[style*="background"] {
+  background: #1e293b !important;
+  color: #F9FAFB !important;
+  border: 1px solid #334155 !important;
+}
+
+/* NUCLEAR OPTION: Target any div with light grey/white background */
+div[style*="rgb(240, 240, 240)"],
+div[style*="rgb(248, 249, 250)"], 
+div[style*="rgb(255, 255, 255)"],
+div[style*="rgba(255, 255, 255"],
+div[style*="#f0f0f0"],
+div[style*="#f8f9fa"],
+div[style*="#ffffff"],
+div[style*="background-color: #f0f0f0"],
+div[style*="background-color: #f8f9fa"],
+div[style*="background-color: #ffffff"],
+div[style*="background-color: white"],
+div[style*="background: rgb(255, 255, 255)"],
+div[style*="background: rgba(255, 255, 255"] {
+  background-color: #1e293b !important;
   background: #1e293b !important;
   color: #F9FAFB !important;
   border: 1px solid #334155 !important;

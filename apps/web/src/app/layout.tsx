@@ -19,11 +19,11 @@ const PageLoadingIndicator = dynamic(() => import('@/components/global-loading')
 })
 
 const LoadingProvider = dynamic(() => import('@/components/route-loading').then(mod => ({ default: mod.LoadingProvider })), {
-  loading: ({ children }: { children: React.ReactNode }) => <>{children}</>
+  loading: () => null
 })
 
 const ContinuousLearningProvider = dynamic(() => import('@/components/continuous-learning-provider').then(mod => ({ default: mod.ContinuousLearningProvider })), {
-  loading: ({ children }: { children: React.ReactNode }) => <>{children}</>
+  loading: () => null
 })
 
 const inter = Inter({ subsets: ['latin'] })

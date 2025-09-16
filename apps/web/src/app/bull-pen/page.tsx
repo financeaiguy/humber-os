@@ -519,15 +519,22 @@ export default function BullPenDashboard() {
                       </div>
 
                       <div>
-                        <p className="text-xs text-slate-500 mb-2">Key Skills:</p>
-                        <div className="flex flex-wrap gap-1">
+                        <p className="text-xs text-slate-400 font-medium mb-2">Key Skills:</p>
+                        <div className="flex flex-wrap gap-1.5">
                           {engineer.skills.slice(0, 3).map((skill, i) => (
-                            <Badge key={i} variant="outline" className="text-xs">
+                            <Badge 
+                              key={i} 
+                              variant="outline" 
+                              className="text-xs text-slate-200 bg-slate-700/50 border-slate-600 hover:bg-slate-700 transition-colors"
+                            >
                               {skill}
                             </Badge>
                           ))}
                           {engineer.skills.length > 3 && (
-                            <Badge variant="outline" className="text-xs">
+                            <Badge 
+                              variant="outline" 
+                              className="text-xs text-slate-200 bg-slate-700/50 border-slate-600 hover:bg-slate-700 transition-colors"
+                            >
                               +{engineer.skills.length - 3} more
                             </Badge>
                           )}
