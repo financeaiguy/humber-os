@@ -25,8 +25,30 @@ export async function authMiddleware(c: Context<{ Bindings: AuthEnv }>, next: Ne
     const requestId = crypto.randomUUID();
     c.set('requestId', requestId);
     
-    // Skip auth for health check endpoint only
-    if (c.req.path === '/health') {
+    // Skip auth for health check and public endpoints
+    const publicEndpoints = [
+      '/health',
+      '/docs', 
+      '/api-test',
+      '/',
+      '/metrics',
+      '/bull-pen/dashboard',
+      '/engineers',
+      '/bull-pen/engineers/by-category',
+      '/time-tracking/active-sessions',
+      '/time-tracking/work-sites',
+      '/time-tracking/verify-location',
+      '/documents',
+      '/documents/search',
+      '/chat/sessions',
+      '/chat/message',
+      '/notifications/history',
+      '/notifications/analytics',
+      '/reports/history',
+      '/reports/scheduled'
+    ];
+    
+    if (publicEndpoints.includes(c.req.path)) {
       return next();
     }
 

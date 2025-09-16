@@ -7,7 +7,7 @@ import {
   Camera, Fingerprint, WifiOff, Bell, Mail, MessageSquare,
   TrendingUp, AlertCircle, Activity, ChevronRight, Lock,
   Eye, EyeOff, Navigation, Signal, Battery, Zap, ExternalLink,
-  UserCheck, Calculator
+  UserCheck, Calculator, X
 } from 'lucide-react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
@@ -625,9 +625,22 @@ export default function TimeTrackingPage() {
       
       {/* Clock In/Out Modal */}
       {showClockModal && (
-        <EmployeeClockView 
-          onClose={() => setShowClockModal(false)}
-        />
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 rounded-2xl border border-slate-700/50 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="p-4 border-b border-slate-700/50 flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-white">Time Clock</h2>
+              <button
+                onClick={() => setShowClockModal(false)}
+                className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                <X className="h-5 w-5 text-slate-400" />
+              </button>
+            </div>
+            <EmployeeClockView 
+              onClose={() => setShowClockModal(false)}
+            />
+          </div>
+        </div>
       )}
     </div>
   )

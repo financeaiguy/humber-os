@@ -9,6 +9,7 @@ import {
   LogIn, LogOut, Activity, History, Sun, Moon, Coffee,
   Loader2, Check, X, Wifi, WifiOff
 } from 'lucide-react'
+import CameraVerification from './CameraVerification'
 
 interface EmployeeClockViewProps {
   employeeData?: {
@@ -36,6 +37,8 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
   const [elapsedTime, setElapsedTime] = useState('00:00:00')
   const [todayHours, setTodayHours] = useState(0)
   const [weekHours, setWeekHours] = useState(37.5)
+  const [showCamera, setShowCamera] = useState(false)
+  const [pendingAction, setPendingAction] = useState<'clock-in' | 'clock-out' | null>(null)
 
   // Mock employee data if not provided
   const employee = employeeData || {
@@ -212,46 +215,16 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
   }
 
   const handleClockIn = async () => {
+    // Step 1: Pre-flight checks
     setIsClockingIn(true)
     
     try {
-      // Step 1: Request location permission and verify
+      // Check location first
       if (!location) {
-        const permission = await navigator.permissions.query({ name: 'geolocation' as PermissionName })
-        
-        if (permission.state === 'denied') {
-          alert(
-            'Location access is required for clock in.\n\n' +
-            'Please enable location services in your browser settings and refresh the page.'
-          )
-          setIsClockingIn(false)
-          return
-        }
-        
-        // Try to get location again
-        await new Promise<void>((resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              setLocation({
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
-                accuracy: position.coords.accuracy
-              })
-              resolve()
-            },
-            (error) => {
-              alert(`Location error: ${error.message}\n\nPlease enable GPS and try again.`)
-              reject(error)
-            },
-            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-          )
-        }).catch(() => {
-          setIsClockingIn(false)
-          return
-        })
+        await getCurrentLocation()
       }
       
-      // Step 2: Verify device is approved (check device fingerprint)
+      // Check device approval
       const deviceFingerprint = await generateDeviceFingerprint()
       const isApprovedDevice = await verifyDevice(deviceFingerprint)
       
@@ -265,161 +238,86 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
         return
       }
       
-      // Step 3: Request biometric authentication
-      const biometric = await requestBiometric()
-      
-      if (!biometric) {
-        alert(
-          'Biometric verification failed or was cancelled.\n\n' +
-          'Please try again and approve the biometric prompt.'
-        )
-        setIsClockingIn(false)
-        return
-      }
-      
-      // Step 4: Verify location is within allowed radius (e.g., within 100 meters of work site)
-      const isWithinGeofence = await verifyGeofence(location!)
-      
-      if (!isWithinGeofence) {
+      // Verify location geofence
+      if (location && !await verifyGeofence(location)) {
         alert(
           'You are not within the authorized work location.\n\n' +
           'Please ensure you are at the work site and try again.\n' +
-          `Current accuracy: ±${Math.round(location!.accuracy)}m`
+          `Current accuracy: ±${Math.round(location.accuracy)}m`
         )
         setIsClockingIn(false)
         return
       }
       
-      // Step 5: Submit clock in request
-      const clockInData = {
-        employeeId: employee.id,
-        timestamp: new Date().toISOString(),
-        location: location,
-        deviceFingerprint,
-        biometricVerified: true,
-        verificationType: 'WebAuthn'
-      }
+      // All checks passed - show camera for photo verification
+      setPendingAction('clock-in')
+      setShowCamera(true)
+      setIsClockingIn(false)
       
-      // Simulate API call (replace with actual API call)
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      console.log('Clock in data:', clockInData)
-      
-      // Success
-      setIsClockedIn(true)
-      setClockInTime(new Date())
-      
-      // Show success notification
-      if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification('Clock In Successful', {
-          body: `You have successfully clocked in at ${new Date().toLocaleTimeString()}`,
-          icon: '/icon-192x192.png'
-        })
-      }
     } catch (error) {
-      console.error('Clock in error:', error)
-      alert('An error occurred during clock in. Please try again.')
-    } finally {
+      console.error('Clock in preparation error:', error)
+      alert('An error occurred preparing clock in. Please try again.')
       setIsClockingIn(false)
     }
   }
 
+  // Get current location helper
+  const getCurrentLocation = (): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error('Geolocation not supported'))
+        return
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+            accuracy: position.coords.accuracy
+          })
+          resolve()
+        },
+        (error) => {
+          setLocationError(error.message)
+          reject(error)
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      )
+    })
+  }
+
   const handleClockOut = async () => {
+    // Step 1: Pre-flight checks for clock out
     setIsClockingOut(true)
     
     try {
-      // Step 1: Verify location for clock out
+      // Check location (more lenient for clock out)
       if (!location) {
-        const permission = await navigator.permissions.query({ name: 'geolocation' as PermissionName })
-        
-        if (permission.state === 'denied') {
-          alert(
-            'Location access is required for clock out.\n\n' +
-            'Please enable location services in your browser settings.'
+        try {
+          await getCurrentLocation()
+        } catch (error) {
+          // Allow clock out without location but warn user
+          const proceed = confirm(
+            `Location unavailable: ${error}\n\n` +
+            'Do you want to clock out without location verification?\n' +
+            'This will be flagged for review.'
           )
-          setIsClockingOut(false)
-          return
+          if (!proceed) {
+            setIsClockingOut(false)
+            return
+          }
         }
-        
-        // Try to get location
-        await new Promise<void>((resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              setLocation({
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
-                accuracy: position.coords.accuracy
-              })
-              resolve()
-            },
-            (error) => {
-              // Allow clock out even without location (with warning)
-              if (confirm(
-                `Location unavailable: ${error.message}\n\n` +
-                'Do you want to clock out without location verification?\n' +
-                'This will be flagged for review.'
-              )) {
-                resolve()
-              } else {
-                reject(error)
-              }
-            },
-            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-          )
-        }).catch(() => {
-          setIsClockingOut(false)
-          return
-        })
       }
       
-      // Step 2: Request biometric authentication
-      const biometric = await requestBiometric()
+      // All checks passed - show camera for photo verification
+      setPendingAction('clock-out')
+      setShowCamera(true)
+      setIsClockingOut(false)
       
-      if (!biometric) {
-        alert(
-          'Biometric verification failed or was cancelled.\n\n' +
-          'Please try again and approve the biometric prompt.'
-        )
-        setIsClockingOut(false)
-        return
-      }
-      
-      // Step 3: Calculate total hours worked
-      const totalHours = todayHours
-      const overtimeHours = totalHours > 8 ? totalHours - 8 : 0
-      
-      // Step 4: Submit clock out request
-      const clockOutData = {
-        employeeId: employee.id,
-        clockInTime: clockInTime?.toISOString(),
-        clockOutTime: new Date().toISOString(),
-        totalHours: totalHours.toFixed(2),
-        overtimeHours: overtimeHours.toFixed(2),
-        location: location,
-        deviceFingerprint: await generateDeviceFingerprint(),
-        biometricVerified: true
-      }
-      
-      // Simulate API call (replace with actual API call)
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      console.log('Clock out data:', clockOutData)
-      
-      // Success
-      setIsClockedIn(false)
-      setClockInTime(null)
-      setElapsedTime('00:00:00')
-      setBiometricVerified(false)
-      
-      // Show success notification
-      if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification('Clock Out Successful', {
-          body: `You worked ${totalHours.toFixed(2)} hours today. Great job!`,
-          icon: '/icon-192x192.png'
-        })
-      }
     } catch (error) {
-      console.error('Clock out error:', error)
-      alert('An error occurred during clock out. Please try again.')
-    } finally {
+      console.error('Clock out preparation error:', error)
+      alert('An error occurred preparing clock out. Please try again.')
       setIsClockingOut(false)
     }
   }
@@ -486,6 +384,73 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
     // Check if within radius (accounting for GPS accuracy)
     return distance <= (workSite.radius + location.accuracy)
   }
+
+  // Handle camera capture and submit to secure API
+  const handleCameraCapture = async (imageData: string, metadata: any) => {
+    try {
+      const deviceFingerprint = await generateDeviceFingerprint()
+      const biometric = await requestBiometric()
+
+      if (!biometric) {
+        throw new Error('Biometric verification failed')
+      }
+
+      // Prepare secure time entry
+      const timeEntry = {
+        type: pendingAction,
+        timestamp: new Date().toISOString(),
+        photo: imageData,
+        metadata: {
+          ...metadata,
+          biometricVerified: true,
+          deviceFingerprint
+        }
+      }
+
+      // Submit to secure API
+      const response = await fetch('/api/time-tracking/secure-entry', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(timeEntry)
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to submit time entry')
+      }
+
+      // Success - update local state
+      if (pendingAction === 'clock-in') {
+        setIsClockedIn(true)
+        setClockInTime(new Date())
+        setBiometricVerified(true)
+      } else {
+        setIsClockedIn(false)
+        setClockInTime(null)
+        setElapsedTime('00:00:00')
+        setBiometricVerified(false)
+      }
+
+      // Show success notification
+      if ('Notification' in window && Notification.permission === 'granted') {
+        const action = pendingAction === 'clock-in' ? 'Clock In' : 'Clock Out'
+        new Notification(`${action} Successful`, {
+          body: `${action} completed with photo verification at ${new Date().toLocaleTimeString()}`,
+          icon: '/icon-192x192.png'
+        })
+      }
+
+      // Reset pending action
+      setPendingAction(null)
+
+    } catch (error: any) {
+      console.error('Camera capture submission error:', error)
+      alert(`Failed to submit ${pendingAction}: ${error.message}`)
+    }
+  }
   
   // Request notification permission on mount
   useEffect(() => {
@@ -505,7 +470,7 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
   const greeting = getGreeting()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 pb-20">
+    <div className="p-4">
       {/* Mobile Header */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
@@ -518,7 +483,17 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
               <p className="text-sm text-slate-400">{employee.name}</p>
             </div>
           </div>
-          <greeting.icon className="h-6 w-6 text-yellow-400" />
+          <div className="flex items-center space-x-2">
+            <greeting.icon className="h-6 w-6 text-yellow-400" />
+            {onClose && (
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                <X className="h-5 w-5 text-slate-400" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Status Bar */}
@@ -806,6 +781,18 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
           </button>
         </div>
       </div>
+
+      {/* Camera Verification Modal */}
+      <CameraVerification
+        isOpen={showCamera}
+        onClose={() => {
+          setShowCamera(false)
+          setPendingAction(null)
+        }}
+        onCapture={handleCameraCapture}
+        purpose={pendingAction || 'clock-in'}
+        employeeId={employee.id}
+      />
     </div>
   )
 }

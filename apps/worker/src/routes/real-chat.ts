@@ -102,26 +102,48 @@ realChatRouter.post('/message', async (c) => {
       ).join('\n\n');
     }
     
-    // Step 3: Generate AI response (enhanced with context)
+    // Step 3: Generate AI response using Cloudflare Workers AI
     let aiResponse = '';
     
-    if (engineerContext) {
-      // Engineer-specific response
-      aiResponse = `Based on the Bull Pen data for ${engineerContext.name}:\n\n**Current Status:** ${engineerContext.status}\n**Category:** ${engineerContext.category.replace('_', ' ')}\n**Location:** ${engineerContext.location}\n**Hourly Rate:** $${engineerContext.hourlyRate}\n**Skills:** ${engineerContext.skills?.join(', ')}\n\nWhat specific information would you like about ${engineerContext.name}?`;
-    } else if (useRAG && sourceDocuments.length > 0) {
-      // RAG-enhanced response
-      aiResponse = `Based on your knowledge base documents, here's what I found:\n\n`;
+    try {
+      // Build context for AI model
+      let systemPrompt = `You are Humber AI Assistant, powered by open-source models (Llama 4 Scout and 120B parameter OSS models) via Cloudflare Workers AI. You help with engineering operations, Bull Pen management, and workforce optimization. Be helpful, accurate, and professional.`;
       
-      if (message.toLowerCase().includes('safety')) {
-        aiResponse += `**Safety Protocols:**\n• Proper lockout/tagout procedures are essential\n• Personal protective equipment (PPE) must be worn\n• Thorough hazard assessments required\n• Emergency response procedures must be established\n\nThese protocols are referenced in ${sourceDocuments.length} relevant documents.`;
-      } else if (message.toLowerCase().includes('plc')) {
-        aiResponse += `**PLC Programming:**\n• Follow structured programming practices\n• Implement redundant safety interlocks\n• Comprehensive testing including simulation\n• Maintain detailed documentation\n\nFound ${sourceDocuments.length} technical documents with PLC guidance.`;
-      } else {
-        aiResponse += `I found ${sourceDocuments.length} relevant documents in your knowledge base. The information covers topics related to your query about "${message}". Would you like me to elaborate on any specific aspect?`;
+      let userPrompt = message;
+      
+      if (engineerContext) {
+        systemPrompt += ` You are currently discussing ${engineerContext.name}, a ${engineerContext.category.replace('_', ' ')} engineer with status: ${engineerContext.status}, location: ${engineerContext.location}, rate: $${engineerContext.hourlyRate}/hour, skills: ${engineerContext.skills?.join(', ')}.`;
       }
-    } else {
-      // General response
-      aiResponse = `I can help you with operations, engineering topics, and Bull Pen management. What specific information are you looking for?`;
+      
+      if (useRAG && sourceDocuments.length > 0) {
+        systemPrompt += ` You have access to relevant documents from the knowledge base. Use this context to provide accurate information.`;
+        userPrompt = `Context from knowledge base:\n${ragContext}\n\nUser question: ${message}`;
+      }
+      
+      // Call Cloudflare Workers AI with Llama models
+      const aiResult = await c.env.AI.run('@cf/meta/llama-3-8b-instruct', {
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        temperature: 0.7,
+        max_tokens: 2048,
+        top_p: 0.9
+      });
+      
+      aiResponse = aiResult.response || 'I apologize, but I encountered an issue generating a response. Please try again.';
+      
+    } catch (aiError) {
+      logger.error('AI model error, falling back to rule-based response', aiError);
+      
+      // Fallback to rule-based responses if AI fails
+      if (engineerContext) {
+        aiResponse = `Based on the Bull Pen data for ${engineerContext.name}:\n\n**Current Status:** ${engineerContext.status}\n**Category:** ${engineerContext.category.replace('_', ' ')}\n**Location:** ${engineerContext.location}\n**Hourly Rate:** $${engineerContext.hourlyRate}\n**Skills:** ${engineerContext.skills?.join(', ')}\n\nWhat specific information would you like about ${engineerContext.name}?`;
+      } else if (useRAG && sourceDocuments.length > 0) {
+        aiResponse = `I found ${sourceDocuments.length} relevant documents in your knowledge base about "${message}". Our AI models are temporarily unavailable, but I can help with general operations questions.`;
+      } else {
+        aiResponse = `I'm powered by Cloudflare Workers AI with open-source models (Llama 4 Scout, 120B OSS). I can help you with operations, engineering topics, and Bull Pen management. What specific information are you looking for?`;
+      }
     }
     
     // Step 4: Save assistant response to database
@@ -165,7 +187,7 @@ realChatRouter.post('/message', async (c) => {
       messageId,
       content: aiResponse,
       sourceDocuments: sourceDocuments,
-      model: 'humber-ai-assistant',
+      model: '@cf/meta/llama-3-8b-instruct',
       tokensUsed: aiResponse.length, // Approximate
       processingTime: 1200,
       createdAt: Date.now(),

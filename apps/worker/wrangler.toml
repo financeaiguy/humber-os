@@ -151,3 +151,7 @@ bucket_name = "humber-documents"
 [[vectorize]]
 binding = "VECTORIZE_INDEX"
 index_name = "humber-knowledge-base"
+
+# Cloudflare Workers AI for open-source models
+[ai]
+binding = "AI"

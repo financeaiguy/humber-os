@@ -637,13 +637,16 @@ export function ChatWidget({ isOpen, onToggle, className = '' }: ChatWidgetProps
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder={
-                      chatMode === 'engineer' && selectedEngineer
+                      !isConnected
+                        ? 'AI models offline - connecting to Llama 4 Scout and 120B OSS models...'
+                        : chatMode === 'engineer' && selectedEngineer
                         ? `Ask about ${selectedEngineer.name}'s skills, availability, projects, or performance...`
                         : chatMode === 'documents'
                         ? 'Ask about safety protocols, technical standards, project guidelines...'
                         : 'Ask about operations, projects, Bull Pen status...'
                     }
                     className="w-full px-4 py-3 text-sm bg-slate-900/50 border border-slate-600/50 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-purple-500/50 resize-none touch-manipulation"
+                    disabled={isLoading || !isConnected}
                     disabled={isLoading}
                     rows={2}
                     onKeyDown={(e) => {
@@ -679,7 +682,7 @@ export function ChatWidget({ isOpen, onToggle, className = '' }: ChatWidgetProps
                   
                   <button
                     type="submit"
-                    disabled={!input.trim() || isLoading}
+                    disabled={!input.trim() || isLoading || !isConnected}
                     className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
                   >
                     {isLoading ? (
