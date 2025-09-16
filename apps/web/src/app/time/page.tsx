@@ -11,11 +11,13 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
+import { useSession } from '@/components/session-context'
 
 // Lazy load heavy components
 const EmployeeDetailModal = dynamic(() => import('@/components/time-tracking/EmployeeDetailModal'), { ssr: false })
 const TimeReconciliation = dynamic(() => import('@/components/time-tracking/TimeReconciliation'), { ssr: false })
 const EmployeeClockView = dynamic(() => import('@/components/time-tracking/EmployeeClockView'), { ssr: false })
+const TimeTrackingCalendar = dynamic(() => import('@/components/time-tracking/TimeTrackingCalendar'), { ssr: false })
 import { ClientTimeDisplay } from '@/components/client-time-display'
 
 // Mock data for time entries with trust layers
@@ -175,11 +177,12 @@ const getStatusColor = (status: string) => {
 }
 
 export default function TimeTrackingPage() {
+  const { data: session } = useSession()
   const [selectedEntry, setSelectedEntry] = useState<typeof timeEntries[0] | null>(null)
   const [showTrustDetails, setShowTrustDetails] = useState(false)
   const [liveTracking, setLiveTracking] = useState(true)
   const [showEmployeeModal, setShowEmployeeModal] = useState(false)
-  const [activeView, setActiveView] = useState<'entries' | 'reconciliation'>('entries')
+  const [activeView, setActiveView] = useState<'entries' | 'reconciliation' | 'calendar'>('entries')
   const [showClockModal, setShowClockModal] = useState(false)
 
   return (
@@ -228,6 +231,17 @@ export default function TimeTrackingPage() {
         >
           <Calculator className="h-4 w-4" />
           <span>Time Reconciliation</span>
+        </button>
+        <button
+          onClick={() => setActiveView('calendar')}
+          className={`px-6 py-2.5 rounded-lg font-medium transition-all duration-300 flex items-center space-x-2 ${
+            activeView === 'calendar'
+              ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
+              : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+          }`}
+        >
+          <Calendar className="h-4 w-4" />
+          <span>Calendar View</span>
         </button>
       </div>
 
@@ -608,9 +622,18 @@ export default function TimeTrackingPage() {
       </motion.div>
 
         </>
-      ) : (
+      ) : activeView === 'reconciliation' ? (
         /* Time Reconciliation View */
         <TimeReconciliation />
+      ) : (
+        /* Calendar View */
+        <TimeTrackingCalendar 
+          userRole={session?.user?.role === 'ENGINEER_EMPLOYEE' ? 'employee' : 
+                   session?.user?.role === 'PARTNER_ADMIN' ? 'partner' :
+                   session?.user?.role === 'PARTNER_OPERATOR' ? 'operator' : 'engineer'}
+          employeeId={session?.user?.id}
+          isReadOnly={false}
+        />
       )}
 
       {/* Employee Detail Modal - Available in both views */}

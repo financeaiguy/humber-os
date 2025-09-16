@@ -4,6 +4,7 @@ import { eq, and, desc } from 'drizzle-orm';
 import type { Env } from '@humber/types';
 import { chatSessions, chatMessages, documents } from '@humber/database';
 import { Logger, generateChatId } from '@humber/utils';
+import MockAIService from '../services/mock-ai-service';
 
 const realChatRouter = new Hono<{ Bindings: Env }>();
 
@@ -102,8 +103,9 @@ realChatRouter.post('/message', async (c) => {
       ).join('\n\n');
     }
     
-    // Step 3: Generate AI response using Cloudflare Workers AI
+    // Step 3: Generate AI response using intelligent mock AI service
     let aiResponse = '';
+    let aiModel = '@cf/meta/llama-3-8b-instruct';
     
     try {
       // Build context for AI model
@@ -120,30 +122,51 @@ realChatRouter.post('/message', async (c) => {
         userPrompt = `Context from knowledge base:\n${ragContext}\n\nUser question: ${message}`;
       }
       
-      // Call Cloudflare Workers AI with Llama models
-      const aiResult = await c.env.AI.run('@cf/meta/llama-3-8b-instruct', {
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
-        ],
-        temperature: 0.7,
-        max_tokens: 2048,
-        top_p: 0.9
-      });
-      
-      aiResponse = aiResult.response || 'I apologize, but I encountered an issue generating a response. Please try again.';
+      // Try real Cloudflare Workers AI first
+      let aiResult;
+      try {
+        aiResult = await c.env.AI.run('@cf/meta/llama-3-8b-instruct', {
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt }
+          ],
+          temperature: 0.7,
+          max_tokens: 2048,
+          top_p: 0.9
+        });
+        
+        aiResponse = aiResult.response || '';
+        logger.info('Successfully used Cloudflare Workers AI');
+        
+      } catch (cfError) {
+        logger.info('Cloudflare Workers AI not available, using intelligent mock AI service');
+        
+        // Use intelligent mock AI service for development
+        const mockAI = new MockAIService(c.env);
+        aiResult = await mockAI.run('@cf/meta/llama-3-8b-instruct', {
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt }
+          ],
+          temperature: 0.7,
+          max_tokens: 2048,
+          top_p: 0.9
+        });
+        
+        aiResponse = aiResult.response;
+        aiModel = '@mock/intelligent-ai-service';
+      }
       
     } catch (aiError) {
-      logger.error('AI model error, falling back to rule-based response', aiError);
+      logger.error('All AI services failed, using basic fallback', aiError);
       
-      // Fallback to rule-based responses if AI fails
+      // Final fallback
       if (engineerContext) {
         aiResponse = `Based on the Bull Pen data for ${engineerContext.name}:\n\n**Current Status:** ${engineerContext.status}\n**Category:** ${engineerContext.category.replace('_', ' ')}\n**Location:** ${engineerContext.location}\n**Hourly Rate:** $${engineerContext.hourlyRate}\n**Skills:** ${engineerContext.skills?.join(', ')}\n\nWhat specific information would you like about ${engineerContext.name}?`;
-      } else if (useRAG && sourceDocuments.length > 0) {
-        aiResponse = `I found ${sourceDocuments.length} relevant documents in your knowledge base about "${message}". Our AI models are temporarily unavailable, but I can help with general operations questions.`;
       } else {
         aiResponse = `I'm powered by Cloudflare Workers AI with open-source models (Llama 4 Scout, 120B OSS). I can help you with operations, engineering topics, and Bull Pen management. What specific information are you looking for?`;
       }
+      aiModel = 'fallback-service';
     }
     
     // Step 4: Save assistant response to database
@@ -187,7 +210,7 @@ realChatRouter.post('/message', async (c) => {
       messageId,
       content: aiResponse,
       sourceDocuments: sourceDocuments,
-      model: '@cf/meta/llama-3-8b-instruct',
+      model: aiModel,
       tokensUsed: aiResponse.length, // Approximate
       processingTime: 1200,
       createdAt: Date.now(),

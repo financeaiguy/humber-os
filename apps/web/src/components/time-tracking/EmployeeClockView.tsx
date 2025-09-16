@@ -361,6 +361,12 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
   
   // Verify location is within geofence (mock - replace with actual coordinates)
   const verifyGeofence = async (location: { lat: number; lng: number; accuracy: number }): Promise<boolean> => {
+    // Development mode - bypass location check if running on localhost
+    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+      console.log('Development mode: Bypassing geofence verification')
+      return true
+    }
+    
     // Example: GM Assembly Plant coordinates (replace with actual work site)
     const workSite = {
       lat: 42.3149,  // Example latitude
