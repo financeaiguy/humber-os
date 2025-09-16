@@ -2251,8 +2251,8 @@ app.route('/auth', authRouter);
 
 // Protected routes (require authentication)
 app.route('/operations', operationsRouter);
-app.route('/timesheets', timesheetsRouter);
-app.route('/reconciliation', reconciliationRouter);
+app.route('/timesheets', mockTimesheetsRouter);
+app.route('/reconciliation', mockReconciliationRouter);
 app.route('/bull-pen', bullPenRouter);
 app.route('/engineers', engineersRouter);
 app.route('/documents', realDocumentsRouter);

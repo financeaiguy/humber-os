@@ -48,7 +48,7 @@ documentsRouter.post('/upload', async (c) => {
     // Parse multipart form data
     const formData = await c.req.formData();
     const fileData = formData.get('file');
-    const file = fileData instanceof File ? fileData : null;
+    const file = (fileData && typeof fileData === 'object' && 'stream' in fileData) ? fileData as File : null;
     const metadata = JSON.parse(formData.get('metadata') as string || '{}');
     
     if (!file) {

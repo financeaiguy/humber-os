@@ -1,4 +1,4 @@
-import NextAuth from "next-auth"
+import NextAuth, { type DefaultSession } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import type { NextAuthConfig } from "next-auth"
 import { AuthUser, UserRole } from "@humber/types"
@@ -174,6 +174,4 @@ export const config: NextAuthConfig = {
   debug: false, // Set to true if you need to debug auth issues
 }
 
-const authResult = NextAuth(config)
-export const { handlers, auth, signIn, signOut } = authResult
-export type AuthReturnType = typeof authResult
+export const { handlers, auth, signIn, signOut } = NextAuth(config)

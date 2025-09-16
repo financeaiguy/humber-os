@@ -335,10 +335,10 @@ export default function HomePage() {
             <h3 className="text-lg font-semibold text-white mb-4">Revenue & Project Volume</h3>
             <ChartWrapper width="100%" height={300}>
               <ComposedChart data={revenueData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="month" stroke="#9CA3AF" />
-                <YAxis yAxisId="left" stroke="#9CA3AF" />
-                <YAxis yAxisId="right" orientation="right" stroke="#9CA3AF" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
+                <XAxis dataKey="month" stroke="#CBD5E1" />
+                <YAxis yAxisId="left" stroke="#CBD5E1" />
+                <YAxis yAxisId="right" orientation="right" stroke="#CBD5E1" />
                 <Tooltip 
                   {...ENHANCED_TOOLTIP_PROPS}
                   formatter={(value, name) => [
@@ -375,9 +375,9 @@ export default function HomePage() {
             <h3 className="text-lg font-semibold text-white mb-4">Engineer Utilization by Discipline</h3>
             <ChartWrapper width="100%" height={300}>
               <LineChart data={utilizationData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="day" stroke="#9CA3AF" />
-                <YAxis stroke="#9CA3AF" domain={[0, 100]} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
+                <XAxis dataKey="day" stroke="#CBD5E1" />
+                <YAxis stroke="#CBD5E1" domain={[0, 100]} />
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: '#1F2937', 
@@ -448,9 +448,9 @@ export default function HomePage() {
             <h3 className="text-lg font-semibold text-white mb-4">Project Status Overview</h3>
             <ChartWrapper width="100%" height={300}>
               <BarChart data={projectStatusData} layout="horizontal">
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis type="number" stroke="#9CA3AF" />
-                <YAxis dataKey="status" type="category" stroke="#9CA3AF" width={80} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
+                <XAxis type="number" stroke="#CBD5E1" />
+                <YAxis dataKey="status" type="category" stroke="#CBD5E1" width={80} />
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: '#1F2937', 
