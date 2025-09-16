@@ -121,6 +121,43 @@ export default function CameraVerification({
     setIsCameraReady(false)
   }, [])
 
+  // Validate image on client side
+  const validateImageSize = (imageData: string): { valid: boolean; error?: string; sizeKB?: number } => {
+    try {
+      const base64Data = imageData.split(',')[1]
+      if (!base64Data) {
+        return { valid: false, error: 'Invalid image data' }
+      }
+
+      const sizeBytes = (base64Data.length * 3) / 4
+      const sizeKB = sizeBytes / 1024
+      const sizeMB = sizeKB / 1024
+
+      const MAX_SIZE_MB = 5
+      const MIN_SIZE_KB = 5
+
+      if (sizeMB > MAX_SIZE_MB) {
+        return { 
+          valid: false, 
+          error: `Image too large: ${sizeMB.toFixed(2)}MB (max: ${MAX_SIZE_MB}MB)`,
+          sizeKB: Math.round(sizeKB)
+        }
+      }
+
+      if (sizeKB < MIN_SIZE_KB) {
+        return { 
+          valid: false, 
+          error: `Image too small: ${sizeKB.toFixed(2)}KB (min: ${MIN_SIZE_KB}KB)`,
+          sizeKB: Math.round(sizeKB)
+        }
+      }
+
+      return { valid: true, sizeKB: Math.round(sizeKB) }
+    } catch (error) {
+      return { valid: false, error: 'Image validation failed' }
+    }
+  }
+
   // Capture photo with metadata
   const capturePhoto = useCallback(async () => {
     if (!videoRef.current || !canvasRef.current || !isCameraReady) {
@@ -137,9 +174,26 @@ export default function CameraVerification({
         throw new Error('Could not get canvas context')
       }
 
-      // Set canvas dimensions to match video
-      canvas.width = video.videoWidth
-      canvas.height = video.videoHeight
+      // Set canvas dimensions to match video with reasonable limits
+      const maxWidth = 1280
+      const maxHeight = 720
+      
+      let { videoWidth, videoHeight } = video
+      
+      // Scale down if too large
+      if (videoWidth > maxWidth || videoHeight > maxHeight) {
+        const aspectRatio = videoWidth / videoHeight
+        if (videoWidth > videoHeight) {
+          videoWidth = maxWidth
+          videoHeight = maxWidth / aspectRatio
+        } else {
+          videoHeight = maxHeight
+          videoWidth = maxHeight * aspectRatio
+        }
+      }
+
+      canvas.width = videoWidth
+      canvas.height = videoHeight
 
       // Draw current video frame to canvas
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
@@ -158,8 +212,25 @@ export default function CameraVerification({
       ctx.fillStyle = 'white'
       ctx.fillText(`Employee: ${employeeId}`, canvas.width - 190, 35)
 
-      // Convert to base64 with high quality
-      const imageData = canvas.toDataURL('image/jpeg', 0.9)
+      // Convert to base64 with optimized quality for size control
+      let quality = 0.8
+      let imageData = canvas.toDataURL('image/jpeg', quality)
+      
+      // Validate size and reduce quality if needed
+      let validation = validateImageSize(imageData)
+      
+      // Reduce quality if image is too large
+      while (!validation.valid && validation.error?.includes('too large') && quality > 0.3) {
+        quality -= 0.1
+        imageData = canvas.toDataURL('image/jpeg', quality)
+        validation = validateImageSize(imageData)
+      }
+      
+      if (!validation.valid) {
+        throw new Error(validation.error)
+      }
+      
+      console.log(`Photo captured: ${validation.sizeKB}KB at ${Math.round(quality * 100)}% quality`)
       setCapturedImage(imageData)
 
       // Prepare metadata

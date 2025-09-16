@@ -132,84 +132,133 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
     })
   }, [])
 
-  const requestBiometric = async () => {
+  const requestBiometric = async (): Promise<boolean> => {
     try {
       // Check if WebAuthn is available for biometric authentication
       if (window.PublicKeyCredential && navigator.credentials) {
-        // Create a challenge for WebAuthn
-        const challenge = new Uint8Array(32)
-        crypto.getRandomValues(challenge)
+        // Check available authenticators
+        const isAvailable = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
         
-        const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions = {
-          challenge,
-          rp: {
-            name: "Humber Operations",
-            id: window.location.hostname
-          },
-          user: {
-            id: new TextEncoder().encode(employee.id),
-            name: employee.name,
-            displayName: employee.name
-          },
-          pubKeyCredParams: [
-            { alg: -7, type: "public-key" },  // ES256
-            { alg: -257, type: "public-key" }  // RS256
-          ],
-          authenticatorSelection: {
-            authenticatorAttachment: "platform",
-            userVerification: "required"
-          },
-          timeout: 60000,
-          attestation: "direct"
-        }
-
-        try {
-          // Try to use existing credentials first
-          const assertion = await navigator.credentials.get({
-            publicKey: {
-              challenge,
-              timeout: 60000,
-              userVerification: "required",
-              rpId: window.location.hostname
-            }
-          } as CredentialRequestOptions)
+        if (isAvailable) {
+          // Create a challenge for WebAuthn
+          const challenge = new Uint8Array(32)
+          crypto.getRandomValues(challenge)
           
-          if (assertion) {
-            setBiometricVerified(true)
-            return true
-          }
-        } catch (error) {
-          // If no existing credentials, try to create new ones
           try {
-            const credential = await navigator.credentials.create({
-              publicKey: publicKeyCredentialCreationOptions
-            })
+            // Try to use existing credentials first (authentication)
+            const assertion = await navigator.credentials.get({
+              publicKey: {
+                challenge,
+                timeout: 60000,
+                userVerification: "required",
+                rpId: window.location.hostname,
+                allowCredentials: [] // Allow any registered credential
+              }
+            } as CredentialRequestOptions)
             
-            if (credential) {
+            if (assertion) {
               setBiometricVerified(true)
+              console.log('Biometric authentication successful')
               return true
             }
-          } catch (createError) {
-            console.error('Biometric creation failed:', createError)
+          } catch (getError) {
+            console.log('No existing credentials, attempting registration')
+            
+            // If no existing credentials, try to create new ones (registration)
+            const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions = {
+              challenge,
+              rp: {
+                name: "Humber Operations",
+                id: window.location.hostname
+              },
+              user: {
+                id: new TextEncoder().encode(employee.id),
+                name: employee.name,
+                displayName: employee.name
+              },
+              pubKeyCredParams: [
+                { alg: -7, type: "public-key" },  // ES256
+                { alg: -257, type: "public-key" }  // RS256
+              ],
+              authenticatorSelection: {
+                authenticatorAttachment: "platform",
+                userVerification: "required",
+                residentKey: "preferred"
+              },
+              timeout: 60000,
+              attestation: "none" // Changed from "direct" for better compatibility
+            }
+            
+            try {
+              const credential = await navigator.credentials.create({
+                publicKey: publicKeyCredentialCreationOptions
+              })
+              
+              if (credential) {
+                setBiometricVerified(true)
+                console.log('Biometric registration and authentication successful')
+                return true
+              }
+            } catch (createError) {
+              console.error('Biometric registration failed:', createError)
+            }
           }
         }
       }
       
-      // Fallback to simulated biometric for browsers without WebAuthn
-      const confirmed = window.confirm(
-        'Biometric authentication required.\n\n' +
-        'This would normally use Face ID, Touch ID, or Windows Hello.\n\n' +
-        'Click OK to simulate successful biometric verification.'
+      // Secure fallback: Require manual security verification
+      // In production, this might involve:
+      // 1. SMS verification
+      // 2. Email verification  
+      // 3. Security questions
+      // 4. Manager approval
+      
+      const fallbackOptions = [
+        'SMS Verification Code',
+        'Email Verification',
+        'Security Questions',
+        'Manager Approval Required'
+      ]
+      
+      const choice = window.confirm(
+        '⚠️ BIOMETRIC AUTHENTICATION UNAVAILABLE ⚠️\n\n' +
+        'Your device does not support biometric authentication.\n\n' +
+        'For security, time tracking requires additional verification.\n\n' +
+        'Would you like to use alternative verification?\n' +
+        '(In production: SMS, Email, or Manager approval)'
       )
       
-      if (confirmed) {
-        setBiometricVerified(true)
-        return true
+      if (choice) {
+        // In production, implement actual alternative verification
+        // For now, require manager/admin approval
+        alert(
+          '🔐 SECURITY NOTICE 🔐\n\n' +
+          'This time entry will be flagged for manual verification.\n\n' +
+          'A manager must approve this entry before it becomes official.\n\n' +
+          'Proceeding with manual verification flag...'
+        )
+        
+        setBiometricVerified(false) // Mark as NOT biometrically verified
+        return true // Allow but flag for review
       }
       
       return false
     } catch (error) {
       console.error('Biometric authentication error:', error)
+      
+      // Even errors should require fallback verification
+      const proceed = window.confirm(
+        '❌ AUTHENTICATION ERROR ❌\n\n' +
+        'Biometric system encountered an error.\n\n' +
+        'This entry will require manual verification.\n\n' +
+        'Continue with manual review process?'
+      )
+      
+      if (proceed) {
+        setBiometricVerified(false) // Mark for manual review
+        return true
+      }
+      
       return false
     }
   }

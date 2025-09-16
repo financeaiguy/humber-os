@@ -132,7 +132,26 @@ export default function HomePage() {
   }, [])
 
   if (!session?.user) {
-    return <div className="text-white">Loading...</div>
+    return (
+      <div className="text-white p-8">
+        <h1 className="text-2xl font-bold mb-4">Authentication Required</h1>
+        <p className="mb-4">Please sign in to access the dashboard.</p>
+        <a 
+          href="/auth/signin" 
+          className="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors"
+        >
+          Sign In
+        </a>
+        <div className="mt-6 text-sm text-slate-400">
+          <p>Development credentials:</p>
+          <ul className="mt-2 space-y-1">
+            <li>• Partner Admin: partner@ford.com / partner123</li>
+            <li>• Engineer: employee@humber.com / employee123</li>
+            <li>• Operator: operator@humber.com / operator123</li>
+          </ul>
+        </div>
+      </div>
+    )
   }
 
   // Return Jobs-styled dashboard if in Jobs mode

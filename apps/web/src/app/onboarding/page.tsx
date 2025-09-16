@@ -13,6 +13,7 @@ import dynamic from 'next/dynamic'
 // Lazy load heavy modals
 const NewOnboardingModal = dynamic(() => import('@/components/onboarding/NewOnboardingModal'), { ssr: false })
 const RoleBasedOnboardingModal = dynamic(() => import('@/components/onboarding/RoleBasedOnboardingModal'), { ssr: false })
+const CustomerOnboardingFlow = dynamic(() => import('@/components/onboarding/CustomerOnboardingFlow'), { ssr: false })
 import { OnboardingTracker } from '@/components/onboarding/OnboardingTrackerWrapper'
 
 const onboardingQueue = [
@@ -138,6 +139,7 @@ const getPriorityColor = (priority: string) => {
 export default function OnboardingPage() {
   const [showNewOnboardingModal, setShowNewOnboardingModal] = useState(false)
   const [showRoleBasedModal, setShowRoleBasedModal] = useState(false)
+  const [showCustomerOnboarding, setShowCustomerOnboarding] = useState(false)
 
   return (
     <>
@@ -153,6 +155,13 @@ export default function OnboardingPage() {
           </p>
         </div>
         <div className="flex items-center space-x-3">
+          <button
+            onClick={() => setShowCustomerOnboarding(true)}
+            className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg font-medium hover:from-orange-600 hover:to-red-600 transition-all duration-300 flex items-center space-x-2"
+          >
+            <Building className="h-5 w-5" />
+            <span>Customer Onboarding</span>
+          </button>
           <button
             onClick={() => setShowRoleBasedModal(true)}
             className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg font-medium hover:from-green-600 hover:to-emerald-600 transition-all duration-300 flex items-center space-x-2"
@@ -447,10 +456,21 @@ export default function OnboardingPage() {
       recruitId="example_recruit_123" // This would come from recruitment system integration
     />
 
+    {/* Customer Onboarding Modal */}
+    <CustomerOnboardingFlow
+      isOpen={showCustomerOnboarding}
+      onClose={() => setShowCustomerOnboarding(false)}
+      onComplete={(customerData) => {
+        console.log('Customer onboarding completed:', customerData)
+        // In production, this would create customer account and redirect to purchase interface
+        alert(`Welcome ${customerData.companyName}! Your account has been created. You can now purchase engineer time from our bull pen.`)
+      }}
+    />
+
     {/* Role-Based Onboarding Modal */}
-    <RoleBasedOnboardingModal
-      isOpen={showRoleBasedModal}
-      onClose={() => setShowRoleBasedModal(false)}
+    <RoleBasedOnboardingModal 
+      isOpen={showRoleBasedModal} 
+      onClose={() => setShowRoleBasedModal(false)} 
     />
     </>
   )

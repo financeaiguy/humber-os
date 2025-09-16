@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
+import { rateLimitCheck } from '@/lib/rate-limiting'
 import { z } from 'zod'
 
 // Cloudflare KV binding - these would be configured in wrangler.toml
@@ -146,29 +147,108 @@ async function storeImmutableEntry(entry: any) {
   }
 }
 
-// Validate photo integrity
-function validatePhoto(photoData: string): boolean {
+// Validate photo integrity and security
+function validatePhoto(photoData: string): { valid: boolean; error?: string; sizeKB?: number } {
   try {
     // Check if it's a valid base64 image
     if (!photoData.startsWith('data:image/')) {
-      return false
+      return { valid: false, error: 'Invalid image format' }
     }
     
-    // Extract base64 data
-    const base64Data = photoData.split(',')[1]
-    if (!base64Data) {
-      return false
+    // Extract MIME type and base64 data
+    const [header, base64Data] = photoData.split(',')
+    if (!base64Data || !header) {
+      return { valid: false, error: 'Malformed image data' }
     }
     
-    // Validate base64
+    // Validate MIME type
+    const allowedTypes = ['data:image/jpeg', 'data:image/png', 'data:image/webp']
+    const mimeType = header.split(';')[0]
+    if (!allowedTypes.includes(mimeType)) {
+      return { valid: false, error: `Unsupported image type: ${mimeType}` }
+    }
+    
+    // Calculate size
+    const sizeBytes = (base64Data.length * 3) / 4 // Base64 encoding ratio
+    const sizeKB = sizeBytes / 1024
+    const sizeMB = sizeKB / 1024
+    
+    // Enforce size limits
+    const MAX_SIZE_MB = 5 // 5MB limit
+    if (sizeMB > MAX_SIZE_MB) {
+      return { 
+        valid: false, 
+        error: `Image too large: ${sizeMB.toFixed(2)}MB (max: ${MAX_SIZE_MB}MB)`,
+        sizeKB: Math.round(sizeKB)
+      }
+    }
+    
+    // Minimum size check (prevent tiny/empty images)
+    const MIN_SIZE_KB = 5 // 5KB minimum
+    if (sizeKB < MIN_SIZE_KB) {
+      return { 
+        valid: false, 
+        error: `Image too small: ${sizeKB.toFixed(2)}KB (min: ${MIN_SIZE_KB}KB)`,
+        sizeKB: Math.round(sizeKB)
+      }
+    }
+    
+    // Validate base64 encoding
     try {
-      atob(base64Data)
-      return true
+      const decoded = atob(base64Data)
+      
+      // Additional security checks
+      
+      // Check for suspicious patterns (basic malware detection)
+      const suspiciousPatterns = [
+        /eval\(/i,
+        /script[^>]*>/i,
+        /javascript:/i,
+        /vbscript:/i,
+        /onload=/i,
+        /onerror=/i
+      ]
+      
+      for (const pattern of suspiciousPatterns) {
+        if (pattern.test(decoded) || pattern.test(photoData)) {
+          return { valid: false, error: 'Suspicious content detected' }
+        }
+      }
+      
+      // Validate image signature (magic bytes)
+      const bytes = new Uint8Array(decoded.length)
+      for (let i = 0; i < decoded.length; i++) {
+        bytes[i] = decoded.charCodeAt(i)
+      }
+      
+      // Check for valid image signatures
+      const signatures = {
+        jpeg: [0xFF, 0xD8, 0xFF],
+        png: [0x89, 0x50, 0x4E, 0x47],
+        webp: [0x52, 0x49, 0x46, 0x46] // RIFF header for WebP
+      }
+      
+      let hasValidSignature = false
+      for (const [format, signature] of Object.entries(signatures)) {
+        if (signature.every((byte, index) => bytes[index] === byte)) {
+          hasValidSignature = true
+          break
+        }
+      }
+      
+      if (!hasValidSignature) {
+        return { valid: false, error: 'Invalid image file signature' }
+      }
+      
+      return { 
+        valid: true, 
+        sizeKB: Math.round(sizeKB)
+      }
     } catch {
-      return false
+      return { valid: false, error: 'Invalid base64 encoding' }
     }
-  } catch {
-    return false
+  } catch (error) {
+    return { valid: false, error: 'Photo validation failed' }
   }
 }
 
@@ -210,6 +290,117 @@ function calculateDistance(
   return R * c
 }
 
+// Abuse detection and prevention
+async function detectAbusePatterns(userId: string, clientIP: string, timeEntry: any): Promise<void> {
+  const suspiciousPatterns = []
+  
+  // 1. Check for rapid successive entries (clock manipulation)
+  const now = new Date()
+  const entryTime = new Date(timeEntry.timestamp)
+  const timeDiff = Math.abs(now.getTime() - entryTime.getTime())
+  
+  // Flag if timestamp is more than 5 minutes off from server time
+  if (timeDiff > 5 * 60 * 1000) {
+    suspiciousPatterns.push({
+      type: 'timestamp_manipulation',
+      severity: 'high',
+      details: `Timestamp ${timeDiff / 1000}s off from server time`
+    })
+  }
+  
+  // 2. Check for suspicious photo characteristics
+  if (timeEntry.photo) {
+    const photoSize = (timeEntry.photo.length * 3) / 4 / 1024 // KB
+    
+    // Flag unusually small photos (possible fake/generated images)
+    if (photoSize < 10) {
+      suspiciousPatterns.push({
+        type: 'suspicious_photo_size',
+        severity: 'medium',
+        details: `Photo size only ${photoSize.toFixed(2)}KB`
+      })
+    }
+    
+    // Check for repeated identical photos (base64 hash)
+    const photoHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(timeEntry.photo))
+    const hashHex = Array.from(new Uint8Array(photoHash)).map(b => b.toString(16).padStart(2, '0')).join('')
+    
+    // In production, check if this photo hash was used recently
+    // if (await isRecentPhotoHash(hashHex, userId)) {
+    //   suspiciousPatterns.push({
+    //     type: 'duplicate_photo',
+    //     severity: 'high',
+    //     details: 'Identical photo used recently'
+    //   })
+    // }
+  }
+  
+  // 3. Check for location spoofing patterns
+  if (timeEntry.metadata.location) {
+    const { lat, lng, accuracy } = timeEntry.metadata.location
+    
+    // Flag if GPS accuracy is suspiciously perfect (possible spoofing)
+    if (accuracy < 1) {
+      suspiciousPatterns.push({
+        type: 'suspicious_gps_accuracy',
+        severity: 'medium',
+        details: `GPS accuracy ${accuracy}m is unusually precise`
+      })
+    }
+    
+    // Flag if coordinates are exactly at work site center (possible spoofing)
+    const workSites = [
+      { lat: 42.3149, lng: -83.0364 }, // GM Assembly
+      { lat: 42.3223, lng: -83.1963 }  // Ford Plant
+    ]
+    
+    for (const site of workSites) {
+      const distance = calculateDistance({ lat, lng }, site)
+      if (distance < 10) { // Within 10 meters of exact center
+        suspiciousPatterns.push({
+          type: 'exact_worksite_location',
+          severity: 'low',
+          details: `Location exactly ${distance.toFixed(1)}m from work site center`
+        })
+      }
+    }
+  }
+  
+  // 4. Check device fingerprint consistency
+  if (timeEntry.metadata.deviceFingerprint) {
+    // In production, verify this device fingerprint matches previous entries
+    // Flag if device fingerprint changes frequently for same user
+  }
+  
+  // 5. Log and potentially block based on pattern severity
+  if (suspiciousPatterns.length > 0) {
+    const highSeverityCount = suspiciousPatterns.filter(p => p.severity === 'high').length
+    const totalSeverityScore = suspiciousPatterns.reduce((sum, p) => {
+      return sum + (p.severity === 'high' ? 3 : p.severity === 'medium' ? 2 : 1)
+    }, 0)
+    
+    // Log suspicious activity
+    console.warn('Suspicious time entry detected:', {
+      userId,
+      clientIP,
+      patterns: suspiciousPatterns,
+      severityScore: totalSeverityScore,
+      timestamp: new Date().toISOString()
+    })
+    
+    // In production, you might:
+    // - Store in security audit log
+    // - Send alerts to administrators
+    // - Temporarily increase monitoring for this user
+    // - Require additional verification steps
+    
+    // For high-risk patterns, could reject the request
+    if (highSeverityCount >= 2 || totalSeverityScore >= 6) {
+      throw new Error('Multiple security violations detected - entry rejected for manual review')
+    }
+  }
+}
+
 export async function POST(request: NextRequest) {
   const requestId = `time_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
   
@@ -224,11 +415,87 @@ export async function POST(request: NextRequest) {
       }, { status: 401 })
     }
 
-    // 2. Parse and validate request body
-    const body = await request.json()
+    // 2. Rate limiting check - MOVED UP for early protection
+    const clientIP = request.headers.get('CF-Connecting-IP') || 
+                     request.headers.get('X-Forwarded-For') || 
+                     request.headers.get('X-Real-IP') || 
+                     'unknown'
+    
+    const rateLimitKey = `time_entry_${clientIP}_${session.userId}`
+    
+    // Multiple rate limit layers
+    const rateLimits = {
+      perMinute: { maxRequests: 5, windowMs: 60000 },      // 5 per minute
+      perHour: { maxRequests: 50, windowMs: 3600000 },     // 50 per hour  
+      perDay: { maxRequests: 200, windowMs: 86400000 }     // 200 per day
+    }
+    
+    // Check all rate limits
+    for (const [period, limit] of Object.entries(rateLimits)) {
+      const periodKey = `${rateLimitKey}_${period}`
+      const rateLimitResult = await rateLimitCheck(periodKey, limit)
+      
+      if (!rateLimitResult.allowed) {
+        return NextResponse.json({
+          success: false,
+          error: 'Rate limit exceeded',
+          message: `Too many time entry requests (${period})`,
+          retryAfter: rateLimitResult.retryAfter,
+          requestId
+        }, { 
+          status: 429,
+          headers: {
+            'Retry-After': rateLimitResult.retryAfter?.toString() || '60',
+            'X-RateLimit-Limit': limit.maxRequests.toString(),
+            'X-RateLimit-Remaining': rateLimitResult.remaining?.toString() || '0',
+            'X-RateLimit-Reset': Math.ceil(Date.now() / 1000 + (limit.windowMs / 1000)).toString()
+          }
+        })
+      }
+    }
+
+    // 3. Request size check (prevent DoS)
+    const contentLength = request.headers.get('content-length')
+    const MAX_REQUEST_SIZE = 10 * 1024 * 1024 // 10MB limit
+    
+    if (contentLength && parseInt(contentLength) > MAX_REQUEST_SIZE) {
+      return NextResponse.json({
+        success: false,
+        error: 'Request too large',
+        message: `Request size exceeds ${MAX_REQUEST_SIZE / 1024 / 1024}MB limit`,
+        requestId
+      }, { status: 413 })
+    }
+
+    // 4. Parse and validate request body with timeout
+    let body
+    try {
+      const bodyPromise = request.json()
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Request parsing timeout')), 10000)
+      )
+      body = await Promise.race([bodyPromise, timeoutPromise])
+    } catch (error: any) {
+      return NextResponse.json({
+        success: false,
+        error: 'Invalid request body',
+        message: error.message || 'Failed to parse request',
+        requestId
+      }, { status: 400 })
+    }
+    
     const validation = TimeEntrySchema.safeParse(body)
     
     if (!validation.success) {
+      // Log potential attack attempts
+      console.warn('Time entry validation failed:', {
+        requestId,
+        userId: session.userId,
+        ip: clientIP,
+        errors: validation.error.issues,
+        timestamp: new Date().toISOString()
+      })
+      
       return NextResponse.json({
         success: false,
         error: 'Validation failed',
@@ -242,6 +509,9 @@ export async function POST(request: NextRequest) {
 
     const timeEntry = validation.data
 
+    // 5. Additional abuse detection
+    await detectAbusePatterns(session.userId, clientIP, timeEntry)
+
     // 3. Validate employee authorization
     if (timeEntry.metadata.employeeId !== session.userId && session.role !== 'PARTNER_ADMIN') {
       return NextResponse.json({
@@ -251,11 +521,14 @@ export async function POST(request: NextRequest) {
       }, { status: 403 })
     }
 
-    // 4. Validate photo integrity
-    if (!validatePhoto(timeEntry.photo)) {
+    // 4. Validate photo integrity and security
+    const photoValidation = validatePhoto(timeEntry.photo)
+    if (!photoValidation.valid) {
       return NextResponse.json({
         success: false,
-        error: 'Invalid photo data',
+        error: 'Photo validation failed',
+        message: photoValidation.error,
+        details: photoValidation.sizeKB ? { sizeKB: photoValidation.sizeKB } : {},
         requestId
       }, { status: 400 })
     }
