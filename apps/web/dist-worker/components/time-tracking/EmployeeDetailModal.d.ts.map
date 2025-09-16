@@ -1,0 +1,1 @@
+{"version":3,"file":"EmployeeDetailModal.d.ts","sourceRoot":"","sources":["../../../src/components/time-tracking/EmployeeDetailModal.tsx"],"names":[],"mappings":"AAwPA,UAAU,wBAAwB;IAChC,QAAQ,EAAE,GAAG,CAAC;IACd,MAAM,EAAE,OAAO,CAAC;IAChB,OAAO,EAAE,MAAM,IAAI,CAAC;CACrB;AAED,MAAM,CAAC,OAAO,UAAU,mBAAmB,CAAC,EAAE,QAAQ,EAAE,MAAM,EAAE,OAAO,EAAE,EAAE,wBAAwB,kDA40BlG"}

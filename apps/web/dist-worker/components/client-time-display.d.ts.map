@@ -1,0 +1,1 @@
+{"version":3,"file":"client-time-display.d.ts","sourceRoot":"","sources":["../../src/components/client-time-display.tsx"],"names":[],"mappings":"AAIA,UAAU,sBAAsB;IAC9B,SAAS,CAAC,EAAE,MAAM,CAAA;IAClB,aAAa,CAAC,EAAE,MAAM,CAAA;CACvB;AAED,wBAAgB,iBAAiB,CAAC,EAAE,SAAS,EAAE,aAAa,EAAE,EAAE,sBAAsB,2CAwCrF"}

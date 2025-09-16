@@ -1,0 +1,629 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+  }
+}
+
+@layer base {
+  body {
+    font-feature-settings: "rlig" 1, "calt" 1;
+    background-color: rgb(2 6 23) !important; /* slate-950 */
+    color: rgb(226 232 240) !important; /* slate-200 - FORCE ALL TEXT TO BE BRIGHT */
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* FORCE ALL TEXT ELEMENTS TO BE BRIGHT */
+  p, span, div, h1, h2, h3, h4, h5, h6, label, td, th, li, a {
+    color: inherit !important;
+    min-color-contrast: 7 !important;
+  }
+  
+  /* Override all gray text colors globally */
+  .text-gray-300, .text-gray-400, .text-gray-500,
+  .text-slate-300, .text-slate-400, .text-slate-500 {
+    color: rgb(226 232 240) !important; /* slate-200 */
+  }
+  
+  /* NUCLEAR OPTION: Force all text to be visible */
+  * {
+    color: rgb(226 232 240);
+  }
+  
+  /* Keep specific colors for important elements */
+  .text-white { color: rgb(255 255 255) !important; }
+  .text-blue-400 { color: rgb(96 165 250) !important; }
+  .text-green-400 { color: rgb(74 222 128) !important; }
+  .text-red-400 { color: rgb(248 113 113) !important; }
+  .text-yellow-400 { color: rgb(250 204 21) !important; }
+  .text-purple-400 { color: rgb(196 181 253) !important; }
+  .text-orange-400 { color: rgb(251 146 60) !important; }
+  
+  /* Auth pages override */
+  .auth-page {
+    background: none !important;
+  }
+  
+  .auth-page * {
+    background-color: transparent !important;
+  }
+  
+  .auth-page .signin-container {
+    background: linear-gradient(135deg, rgb(15 23 42), rgb(30 58 138), rgb(15 23 42)) !important;
+  }
+  
+  /* Default dark background for non-auth pages */
+  html {
+    background-color: rgb(2 6 23); /* slate-950 */
+  }
+  
+  /* Force dark background on main app containers */
+  main, 
+  #__next,
+  [data-design-mode="jobs"],
+  .jobs-layout {
+    background-color: rgb(2 6 23); /* slate-950 */
+    color: rgb(248 250 252); /* slate-50 */
+  }
+  
+  /* Fix SVG backgrounds in Recharts */
+  .recharts-wrapper > svg > rect,
+  .recharts-wrapper svg > defs + rect,
+  .recharts-surface > rect {
+    fill: transparent !important;
+  }
+  
+  /* Remove white/gray backgrounds from any chart elements */
+  svg rect[fill="#fff"],
+  svg rect[fill="#ffffff"],
+  svg rect[fill="white"],
+  svg rect[fill="rgb(255, 255, 255)"],
+  svg rect[fill="#f0f0f0"],
+  svg rect[fill="#e0e0e0"],
+  svg rect[fill="#d0d0d0"],
+  svg rect[fill="#fafafa"],
+  svg rect[fill="#f5f5f5"] {
+    fill: transparent !important;
+  }
+  
+  /* Global dark theme enforcement for all floating elements */
+  [role="tooltip"],
+  [data-tooltip],
+  .tooltip,
+  .popover,
+  .dropdown {
+    background-color: rgb(30 41 59) !important; /* slate-800 */
+    color: rgb(248 250 252) !important; /* slate-50 */
+    border-color: rgb(71 85 105) !important; /* slate-600 */
+  }
+}
+
+/* Custom animations */
+@keyframes gradient {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient 15s ease infinite;
+}
+
+/* Glassmorphism effect */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Cross-platform compatibility fixes */
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* iOS Safari fixes */
+button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+input[type="date"],
+textarea,
+select {
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
+}
+
+/* Android Chrome fixes */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Firefox specific fixes */
+@-moz-document url-prefix() {
+  input, textarea, select {
+    -moz-appearance: none;
+    appearance: none;
+  }
+}
+
+/* Edge/IE fixes */
+input::-ms-clear,
+input::-ms-reveal {
+  display: none;
+}
+
+/* Chrome autofill fixes */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px rgb(51 65 85) inset !important;
+  -webkit-text-fill-color: rgb(248 250 252) !important;
+}
+
+/* Touch-friendly interactions */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Prevent zoom on input focus (iOS) */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  input[type="password"],
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+
+/* Fix viewport height issues on mobile browsers */
+.min-h-screen {
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+}
+
+/* Better backdrop blur support */
+.backdrop-blur-xl {
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.backdrop-blur-lg {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Platform-specific styles */
+.platform-ios {
+  /* iOS-specific fixes */
+  -webkit-overflow-scrolling: touch;
+}
+
+.platform-ios input,
+.platform-ios textarea {
+  /* Prevent zoom on focus */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+.platform-android {
+  /* Android-specific fixes */
+  overscroll-behavior: contain;
+}
+
+.platform-safari {
+  /* Safari-specific fixes */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+.platform-safari .backdrop-blur-xl,
+.platform-safari .backdrop-blur-lg,
+.platform-safari .backdrop-blur-sm {
+  /* Fallback for older Safari versions */
+  background-color: rgba(51, 65, 85, 0.8);
+}
+
+/* Mobile platform optimizations */
+.platform-mobile {
+  /* Prevent elastic scrolling */
+  overscroll-behavior-y: none;
+}
+
+.platform-mobile body {
+  /* Prevent mobile browser address bar issues */
+  min-height: 100vh;
+  width: 100vw;
+}
+
+.platform-mobile .min-h-screen {
+  /* Use JavaScript-calculated height for mobile */
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+}
+
+/* Safe area support for iOS devices with notches */
+@supports (padding: max(0px)) {
+  .platform-ios {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  .platform-ios .fixed {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Recharts Tooltip Visibility Fixes */
+.recharts-tooltip-wrapper {
+  z-index: 9999 !important;
+  position: relative !important;
+  pointer-events: none !important;
+}
+
+.recharts-tooltip-content {
+  z-index: 9999 !important;
+  position: relative !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+  border-radius: 8px !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+.recharts-tooltip-cursor {
+  z-index: 9998 !important;
+}
+
+/* Ensure tooltips are visible over all content */
+.recharts-wrapper {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.recharts-surface {
+  overflow: visible !important;
+}
+
+/* Fix for dark theme tooltips - Override Recharts defaults */
+.recharts-tooltip-content {
+  color: #F9FAFB !important;
+  background-color: #1e293b !important;
+  border: 1px solid #334155 !important;
+}
+
+/* Override Recharts default tooltip wrapper background */
+.recharts-default-tooltip {
+  background-color: #1e293b !important;
+  border: 1px solid #334155 !important;
+  border-radius: 8px !important;
+  padding: 10px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+}
+
+.recharts-default-tooltip .recharts-tooltip-label {
+  color: #F9FAFB !important;
+}
+
+.recharts-default-tooltip .recharts-tooltip-item {
+  color: #F9FAFB !important;
+}
+
+/* Force override any inline styles */
+.recharts-tooltip-wrapper .recharts-default-tooltip[style] {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+/* Override ALL possible tooltip backgrounds - aggressive fix */
+[class*="recharts-tooltip"] {
+  background-color: #1e293b !important;
+  background: #1e293b !important;
+}
+
+/* Target tooltip wrappers with inline styles */
+div[style*="background: rgb(255"],
+div[style*="background-color: rgb(255"],
+div[style*="background: white"],
+div[style*="background-color: white"],
+div[style*="background: #fff"],
+div[style*="background-color: #fff"],
+div[style*="background: rgba(255"],
+div[style*="background-color: rgba(255"],
+div[style*="background-color:#fff"],
+div[style*="background:#fff"],
+div[style*="background-color: #ffffff"],
+div[style*="background: #ffffff"] {
+  background-color: #1e293b !important;
+  background: #1e293b !important;
+}
+
+/* Specifically target Recharts tooltips with light backgrounds */
+.recharts-tooltip-wrapper div[style*="background"] {
+  background: #1e293b !important;
+  color: #F9FAFB !important;
+  border: 1px solid #334155 !important;
+}
+
+/* NUCLEAR OPTION: Target any div with light grey/white background */
+div[style*="rgb(240, 240, 240)"],
+div[style*="rgb(248, 249, 250)"], 
+div[style*="rgb(255, 255, 255)"],
+div[style*="rgba(255, 255, 255"],
+div[style*="#f0f0f0"],
+div[style*="#f8f9fa"],
+div[style*="#ffffff"],
+div[style*="background-color: #f0f0f0"],
+div[style*="background-color: #f8f9fa"],
+div[style*="background-color: #ffffff"],
+div[style*="background-color: white"],
+div[style*="background: rgb(255, 255, 255)"],
+div[style*="background: rgba(255, 255, 255"] {
+  background-color: #1e293b !important;
+  background: #1e293b !important;
+  color: #F9FAFB !important;
+  border: 1px solid #334155 !important;
+}
+
+/* Responsive tooltip adjustments */
+@media (max-width: 768px) {
+  .recharts-tooltip-content {
+    max-width: 250px !important;
+    font-size: 12px !important;
+    padding: 8px !important;
+  }
+}
+
+/* Fix for tooltip positioning issues */
+.recharts-tooltip-wrapper[style*="pointer-events: none"] {
+  pointer-events: none !important;
+  z-index: 10000 !important;
+}
+
+/* Prevent tooltip from being cut off */
+.recharts-wrapper svg {
+  overflow: visible !important;
+}
+
+/* Additional tooltip enhancements */
+.recharts-tooltip-item {
+  color: #F9FAFB !important;
+  margin: 2px 0 !important;
+}
+
+.recharts-tooltip-label {
+  color: #F9FAFB !important;
+  font-weight: 600 !important;
+  margin-bottom: 4px !important;
+}
+
+/* Walkthrough and Tutorial System Styles */
+.walkthrough-highlight {
+  position: relative !important;
+  z-index: 9997 !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5), 0 0 0 8px rgba(59, 130, 246, 0.2) !important;
+  border-radius: 8px !important;
+  animation: pulse-highlight 2s infinite !important;
+}
+
+@keyframes pulse-highlight {
+  0%, 100% {
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5), 0 0 0 8px rgba(59, 130, 246, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.7), 0 0 0 12px rgba(59, 130, 246, 0.1);
+  }
+}
+
+/* Tooltip system enhancements */
+.smart-tooltip-wrapper {
+  position: relative !important;
+  z-index: 10001 !important;
+}
+
+.smart-tooltip-content {
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(148, 163, 184, 0.2) !important;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Help button styles */
+.help-button {
+  position: relative !important;
+  z-index: 10000 !important;
+}
+
+.help-button::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #3b82f6, #8b5cf6, #3b82f6);
+  background-size: 200% 200%;
+  border-radius: 50%;
+  z-index: -1;
+  animation: gradient-spin 3s ease infinite;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.help-button:hover::before {
+  opacity: 1;
+}
+
+@keyframes gradient-spin {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Feature introduction animations */
+.feature-intro-card {
+  animation: gentle-bounce 0.6s ease-out;
+}
+
+@keyframes gentle-bounce {
+  0% {
+    transform: translateY(20px) scale(0.9);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(-5px) scale(1.02);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Progress indicator styles */
+.progress-step {
+  transition: all 0.3s ease !important;
+}
+
+.progress-step.active {
+  transform: scale(1.1) !important;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.5) !important;
+}
+
+.progress-step.completed {
+  background: linear-gradient(45deg, #10b981, #059669) !important;
+  color: white !important;
+}
+
+/* Accessibility improvements */
+.tooltip-focus:focus {
+  outline: 2px solid #3b82f6 !important;
+  outline-offset: 2px !important;
+}
+
+/* Mobile-specific tooltip adjustments */
+@media (max-width: 768px) {
+  .smart-tooltip-content {
+    max-width: 280px !important;
+    font-size: 14px !important;
+    padding: 12px !important;
+  }
+  
+  .walkthrough-highlight {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5), 0 0 0 4px rgba(59, 130, 246, 0.2) !important;
+  }
+  
+  .help-button {
+    bottom: 80px !important;
+    right: 16px !important;
+    padding: 12px !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .smart-tooltip-content {
+    background-color: #000000 !important;
+    border: 2px solid #ffffff !important;
+    color: #ffffff !important;
+  }
+  
+  .walkthrough-highlight {
+    box-shadow: 0 0 0 4px #ffff00, 0 0 0 8px #000000 !important;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .walkthrough-highlight {
+    animation: none !important;
+  }
+  
+  .smart-tooltip-content {
+    transition: none !important;
+  }
+  
+  .feature-intro-card {
+    animation: none !important;
+  }
+}

@@ -1,0 +1,1 @@
+{"version":3,"file":"NewRecruitModal.d.ts","sourceRoot":"","sources":["../../../src/components/recruiting/NewRecruitModal.tsx"],"names":[],"mappings":"AAWA,UAAU,oBAAoB;IAC5B,MAAM,EAAE,OAAO,CAAA;IACf,OAAO,EAAE,MAAM,IAAI,CAAA;IACnB,cAAc,CAAC,EAAE,MAAM,IAAI,CAAA;CAC5B;AAwDD,MAAM,CAAC,OAAO,UAAU,eAAe,CAAC,EAAE,MAAM,EAAE,OAAO,EAAE,cAAc,EAAE,EAAE,oBAAoB,kDA2uBhG"}
