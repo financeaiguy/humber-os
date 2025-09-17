@@ -181,34 +181,30 @@ stateDiagram-v2
     Cancelled --> [*]: Project Cancelled
     Terminated --> [*]: Project Ended
     
-    note right of Bidding
-        Actions:
-        - Submit Bid
-        - Request Info
-        - Schedule Meeting
-    end note
+    state Bidding {
+        [*] --> SubmitBid
+        [*] --> RequestInfo
+        [*] --> ScheduleMeeting
+    }
     
-    note right of Planning
-        Actions:
-        - Start Project
-        - Assign Team
-        - Create Timeline
-    end note
+    state Planning {
+        [*] --> StartProject
+        [*] --> AssignTeam
+        [*] --> CreateTimeline
+    }
     
-    note right of InProgress
-        Actions:
-        - Update Progress
-        - Add Milestone
-        - Pause Project
-        - Complete Project
-    end note
+    state InProgress {
+        [*] --> UpdateProgress
+        [*] --> AddMilestone
+        [*] --> PauseProject
+        [*] --> CompleteProject
+    }
     
-    note right of Completed
-        Actions:
-        - Generate Report
-        - Archive Project
-        - Get Feedback
-    end note
+    state Completed {
+        [*] --> GenerateReport
+        [*] --> ArchiveProject
+        [*] --> GetFeedback
+    }
 ```
 
 ## 🔄 Comprehensive Offboarding Flow
@@ -254,9 +250,13 @@ flowchart TD
     X --> Y[Status Update]
     Y --> Z[Offboarding Complete]
     
-    style A fill:#ff6b6b
-    style Z fill:#51cf66
-    style T fill:#ffd43b
+    classDef startNode fill:#ff6b6b,stroke:#333,stroke-width:2px
+    classDef endNode fill:#51cf66,stroke:#333,stroke-width:2px
+    classDef approvalNode fill:#ffd43b,stroke:#333,stroke-width:2px
+    
+    class A startNode
+    class Z endNode
+    class T approvalNode
 ```
 
 ## ⏰ Time Tracking Security Flow
@@ -702,105 +702,53 @@ Content-Type: application/json
 }
 ```
 
-## 🚀 Complete API System (59 Endpoints)
+## 🚀 Complete API System (65+ Endpoints)
 
 ```mermaid
-graph LR
-    subgraph "🖥️ Client Applications"
-        WEB[Web App<br/>:3003]
-        MOBILE[Mobile App<br/>Future]
-        API_CLIENT[API Clients<br/>External]
+graph TB
+    subgraph "Client Applications"
+        WEB[Web App :3003]
+        MOBILE[Mobile App Future]
+        API_CLIENT[API Clients External]
     end
 
-    subgraph "📡 API Gateway"
-        WORKER[Cloudflare Worker<br/>:8787]
-        DOCS[📚 /docs<br/>Interactive Docs]
-        TEST[🧪 /api-test<br/>No-Postman Testing]
+    subgraph "API Gateway"
+        WORKER[Cloudflare Worker :8787]
+        DOCS[Interactive Docs /docs]
+        TEST[No-Postman Testing /api-test]
     end
 
-    subgraph "🔧 Next.js API Routes"
-        subgraph "👥 Recruiting APIs (7 endpoints)"
-            REC_CREATE[POST /api/recruits<br/>🔐 Encrypted PII Storage]
-            REC_LIST[GET /api/recruits<br/>🔍 Search & Filter]
-            REC_ONBOARD[POST /api/recruits/{id}/onboard<br/>🔄 Status Transition]
-            REC_CONSENT[POST /api/recruits/{id}/consent<br/>🏛️ GDPR/BIPA Compliance]
-            REC_AUDIT[GET /api/recruits/{id}/audit-trail<br/>📋 Complete Transparency]
-        end
-        
-        subgraph "📋 Onboarding APIs (5 endpoints)"
-            ONB_CREATE[POST /api/onboarding<br/>📝 Document Processing]
-            ONB_SUBMIT[POST /api/onboarding/submit<br/>✅ Compliance Verification]
-        end
-    end
-
-    subgraph "⚡ Worker API Routes"
-        subgraph "⚙️ Operations (5 endpoints)"
-            OP_REC[POST /operations/recruiting-step-1<br/>👤 Initial Recruitment]
-            OP_VET[POST /operations/hiring-vetting-step-2<br/>🔍 Skills Assessment]
-            OP_BG[POST /operations/background-checks<br/>🛡️ Security Clearance]
-            OP_OFFER[POST /operations/offer-letter-visa<br/>💼 Employment Offer]
-            OP_DEPLOY[POST /operations/deployment<br/>🚀 Project Assignment]
-        end
-        
-        subgraph "⏰ Time Tracking (4 endpoints)"
-            TIME_CLOCK[POST /time-tracking/clock-action<br/>🔐 3-Layer Verification]
-            TIME_SESSIONS[GET /time-tracking/active-sessions<br/>📊 Live Monitoring]
-            TIME_SITES[GET /time-tracking/work-sites<br/>📍 Geofence Management]
-            TIME_VERIFY[POST /time-tracking/verify-location<br/>🌍 Location Validation]
-        end
-        
-        subgraph "🎯 Bull Pen (3 endpoints)"
-            BP_DASH[GET /bull-pen/dashboard<br/>📊 Real-time Metrics]
-            BP_ENG[GET /engineers<br/>👥 Engineer Management]
-            BP_CAT[GET /bull-pen/engineers/by-category<br/>🏷️ Skill Categories]
-        end
-        
-        subgraph "📄 Document Mgmt (6 endpoints)"
-            DOC_UPLOAD[POST /documents/upload<br/>📁 File Storage + RAG]
-            DOC_SEARCH[POST /documents/search<br/>🔍 AI-Powered Search]
-            DOC_LIST[GET /documents<br/>📋 Document Library]
-        end
-        
-        subgraph "🤖 AI Chat (3 endpoints)"
-            CHAT_MSG[POST /chat/message<br/>💬 RAG-Powered Responses]
-            CHAT_SESSIONS[GET /chat/sessions<br/>📜 Conversation History]
-        end
-        
-        subgraph "📧 Notifications (8 endpoints)"
-            NOTIF_SEND[POST /notifications/send<br/>📬 Multi-channel Delivery]
-            NOTIF_ALERT[POST /notifications/timesheet-submitted<br/>⏰ Timesheet Alerts]
-            NOTIF_DISCORD[POST /notifications/discrepancy-detected<br/>🚨 Critical Alerts]
-        end
-        
-        subgraph "📊 Reports (12 endpoints)"
-            REP_GEN[POST /reports/generate<br/>📄 Custom Reports]
-            REP_TIME[POST /reports/timesheet-summary<br/>⏰ Time Analytics]
-            REP_FIN[POST /reports/financial-summary<br/>💰 Financial Reports]
-        end
-        
-        subgraph "🔐 Authentication (3 endpoints)"
-            AUTH_LOGIN[POST /auth/login<br/>🔑 JWT Authentication]
-            AUTH_REFRESH[POST /auth/refresh<br/>🔄 Token Refresh]
-            AUTH_LOGOUT[POST /auth/logout<br/>🚪 Session Termination]
-        end
+    subgraph "Core API Systems"
+        RECRUITING[👥 Recruiting APIs<br/>7 endpoints<br/>GDPR/BIPA compliant]
+        TIME_TRACK[⏰ Time Tracking<br/>4 endpoints<br/>3-Layer Verification]
+        BULL_PEN[🎯 Bull Pen<br/>3 endpoints<br/>Engineer Management]
+        PROJECTS[🚀 Projects<br/>8 endpoints<br/>Bidding Workflow]
+        OFFBOARD[🔄 Offboarding<br/>6 endpoints<br/>Multi-type Support]
+        ONBOARD[📋 Onboarding<br/>5 endpoints<br/>Document Processing]
+        DOCS_API[📄 Documents<br/>6 endpoints<br/>RAG Knowledge Base]
+        AI_CHAT[🤖 AI Chat<br/>3 endpoints<br/>Context-aware]
+        NOTIFICATIONS[📧 Notifications<br/>8 endpoints<br/>Multi-channel]
+        REPORTS[📊 Reports<br/>12 endpoints<br/>Automated PDF]
+        AUTH[🔐 Authentication<br/>3 endpoints<br/>JWT Tokens]
     end
 
     WEB --> WORKER
-    WEB --> REC_CREATE
-    WEB --> REC_LIST
     MOBILE --> WORKER
     API_CLIENT --> WORKER
 
     WORKER --> DOCS
     WORKER --> TEST
-    WORKER --> OP_REC
-    WORKER --> TIME_CLOCK
-    WORKER --> BP_DASH
-    WORKER --> DOC_UPLOAD
-    WORKER --> CHAT_MSG
-    WORKER --> NOTIF_SEND
-    WORKER --> REP_GEN
-    WORKER --> AUTH_LOGIN
+    WORKER --> RECRUITING
+    WORKER --> TIME_TRACK
+    WORKER --> BULL_PEN
+    WORKER --> PROJECTS
+    WORKER --> OFFBOARD
+    WORKER --> ONBOARD
+    WORKER --> DOCS_API
+    WORKER --> AI_CHAT
+    WORKER --> NOTIFICATIONS
+    WORKER --> REPORTS
+    WORKER --> AUTH
 ```
 
 ### 📊 **API System Overview**
@@ -832,7 +780,7 @@ graph LR
 ### 🚀 **Enhanced Project Management System**
 
 ```mermaid
-graph LR
+graph TB
     subgraph "Project Lifecycle"
         A[Bidding] --> B[Planning]
         B --> C[In Progress]
@@ -854,10 +802,12 @@ graph LR
         N[Document Control]
     end
     
-    A --> I
-    B --> J
-    C --> K
-    D --> L
+    A -.-> I
+    B -.-> J
+    C -.-> K
+    D -.-> L
+    A -.-> M
+    B -.-> N
 ```
 
 **Project Management Capabilities:**
@@ -873,7 +823,7 @@ graph LR
 ### 🔄 **Comprehensive Offboarding System**
 
 ```mermaid
-graph TB
+graph TD
     subgraph "Offboarding Types"
         A[Project Completion]
         B[Project Pause]
@@ -1325,79 +1275,40 @@ npm run typecheck
 ## 🎯 Complete System Capabilities
 
 ```mermaid
-mindmap
-  root((Humber OS<br/>Enterprise Platform))
+graph TB
+    subgraph "Core Systems"
+        A[👥 Recruiting System<br/>GDPR/BIPA Compliant<br/>7 API Endpoints]
+        B[⏰ Time Tracking<br/>3-Layer Security<br/>Real-time Verification]
+        C[🎯 Bull Pen Management<br/>5 Engineer Categories<br/>Assignment Engine]
+        D[🚀 Project Management<br/>Interactive Cards<br/>Status-Aware Actions]
+        E[🔄 Offboarding System<br/>7 Offboarding Types<br/>Automated Workflows]
+    end
     
-    👥 Recruiting System
-      GDPR/BIPA Compliant
-        Encrypted PII Storage
-        Consent Management
-        Audit Logging
-        Data Anonymization
-      7 API Endpoints
-        Create Recruits
-        Search & Filter
-        Move to Onboarding
-        Consent Tracking
-        Audit Trails
+    subgraph "Analytics & AI"
+        F[📊 Analytics & Reporting<br/>Real-time Dashboards<br/>Automated Reports]
+        G[🤖 AI & Automation<br/>RAG Knowledge Base<br/>Workflow Automation]
+    end
     
-    ⏰ Time Tracking
-      3-Layer Security
-        Biometric Authentication
-        GPS Geolocation
-        Device Trust Scoring
-      Real-time Verification
-        Trust Score Calculation
-        Anomaly Detection
-        Manager Approval
+    subgraph "Security & Infrastructure"
+        H[🔐 Security & Compliance<br/>Zero Trust Architecture<br/>Regulatory Compliance]
+        I[📡 API Gateway<br/>65+ Endpoints<br/>Interactive Testing]
+    end
     
-    🎯 Bull Pen Management
-      Engineer Categories
-        Controls Engineers
-        Mechanical Engineers
-        Electrical Engineers
-        Piping Engineers
-        Robotics Engineers
-      Assignment Engine
-        Skill Matching
-        Location Optimization
-        Cost Analysis
-        Performance History
+    A --> F
+    B --> F
+    C --> F
+    D --> F
+    E --> F
     
-    📊 Analytics & Reporting
-      Real-time Dashboards
-        KPI Monitoring
-        Financial Analytics
-        Performance Metrics
-        Compliance Tracking
-      Automated Reports
-        PDF Generation
-        Email Delivery
-        Scheduled Reports
-        Custom Analytics
+    F --> G
+    G --> H
+    H --> I
     
-    🔐 Security & Compliance
-      Enterprise Security
-        Zero Trust Architecture
-        End-to-end Encryption
-        Multi-factor Authentication
-        Role-based Access
-      Regulatory Compliance
-        GDPR Article 6,7,15,17,30
-        BIPA Biometric Laws
-        CCPA Privacy Rights
-        SOX Financial Controls
-    
-    🤖 AI & Automation
-      RAG Knowledge Base
-        Document Processing
-        Semantic Search
-        Context-aware Chat
-      Workflow Automation
-        Background Processing
-        Email Notifications
-        Status Updates
-        Compliance Monitoring
+    I --> A
+    I --> B
+    I --> C
+    I --> D
+    I --> E
 ```
 
 ## 🔧 **Developer Tools & Error Handling**
