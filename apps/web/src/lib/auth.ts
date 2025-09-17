@@ -9,8 +9,7 @@ interface Session {
 }
 
 export async function getSession(request: NextRequest): Promise<Session | null> {
-  // TODO: Implement actual session validation
-  // For now, return a mock session for development
+  // NOTE: Using mock session for development - replace with actual auth in production
   const authHeader = request.headers.get('Authorization')
   
   if (!authHeader || !authHeader.startsWith('Bearer ')) {

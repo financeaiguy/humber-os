@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Invoice, InvoiceLineItem, EngineerCostBreakdown } from '@/types/invoicing'
 import { projectCostCalculator } from '@/lib/project-cost-calculator'
+import { generateInvoiceId, generateLineItemId, generateInvoiceNumber } from '@/lib/secure-token-generator'
 
 export async function POST(request: NextRequest) {
   try {
@@ -367,17 +368,4 @@ async function getMockInvoices(): Promise<Invoice[]> {
   return []
 }
 
-function generateInvoiceId(): string {
-  return `inv-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-}
-
-function generateLineItemId(): string {
-  return `line-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-}
-
-async function generateInvoiceNumber(): Promise<string> {
-  const year = new Date().getFullYear()
-  const month = String(new Date().getMonth() + 1).padStart(2, '0')
-  const sequence = String(Math.floor(Math.random() * 9999) + 1).padStart(4, '0')
-  return `HMB-${year}${month}-${sequence}`
-}
+// Secure ID generation moved to secure-token-generator.ts

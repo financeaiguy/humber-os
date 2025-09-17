@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { CustomerPortalSession } from '@/types/invoicing'
+import { withRateLimit, withAuditLog } from '@/lib/auth-middleware'
+import { 
+  customerPortalAuthSchema, 
+  customerPortalSessionSchema,
+  validateRequestBody,
+  createValidationResponse 
+} from '@/lib/validation-schemas'
 
 // Mock storage - replace with actual database/KV storage
 const portalSessions = new Map<string, CustomerPortalSession>()
@@ -7,23 +14,15 @@ const customerInvoices = new Map<string, string[]>() // email -> invoice IDs
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, invoiceId } = await request.json()
+    const requestData = await request.json()
     
-    if (!email || !invoiceId) {
-      return NextResponse.json(
-        { error: 'Email and invoice ID are required' },
-        { status: 400 }
-      )
+    // Validate request data
+    const validationResult = validateRequestBody(customerPortalAuthSchema, requestData)
+    if (!validationResult.success) {
+      return NextResponse.json(createValidationResponse(validationResult.errors), { status: 400 })
     }
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'Invalid email format' },
-        { status: 400 }
-      )
-    }
+    const { email, invoiceId } = validationResult.data
 
     // Check if the customer has access to this invoice
     const hasAccess = await validateCustomerInvoiceAccess(email, invoiceId)
@@ -80,15 +79,16 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const sessionId = searchParams.get('session')
-    const token = searchParams.get('token')
-
-    if (!sessionId || !token) {
-      return NextResponse.json(
-        { error: 'Session ID and token are required' },
-        { status: 400 }
-      )
+    
+    // Validate query parameters
+    const queryParams = Object.fromEntries(searchParams.entries())
+    const validationResult = validateRequestBody(customerPortalSessionSchema, queryParams)
+    
+    if (!validationResult.success) {
+      return NextResponse.json(createValidationResponse(validationResult.errors), { status: 400 })
     }
+
+    const { sessionId, token } = validationResult.data
 
     const session = portalSessions.get(sessionId)
     if (!session) {

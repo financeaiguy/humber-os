@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PaymentRecord, PaymentStatus, PaymentMethod } from '@/types/invoicing'
+import { generatePaymentId, generateTransactionId } from '@/lib/secure-token-generator'
 
 // Mock payment storage - replace with actual database
 const paymentRecords = new Map<string, PaymentRecord[]>()
@@ -323,10 +324,4 @@ async function sendPaymentConfirmation(paymentRecord: PaymentRecord) {
   console.log(`📧 Sending payment confirmation for ${paymentRecord.id}`)
 }
 
-function generatePaymentId(): string {
-  return `pay-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-}
-
-function generateTransactionId(): string {
-  return Math.random().toString(36).substr(2, 16).toUpperCase()
-}
+// Secure payment ID generation moved to secure-token-generator.ts

@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+import { generateKnowledgeId } from '@/lib/secure-token-generator';
 
 // Continuous Learning Knowledge Base System
 // Automatically learns from all application data and user interactions
@@ -662,7 +663,7 @@ class ContinuousLearningSystem extends EventEmitter {
 
   // Helper methods
   private generateId(): string {
-    return `kn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return generateKnowledgeId();
   }
 
   private detectSource(data: any): string {

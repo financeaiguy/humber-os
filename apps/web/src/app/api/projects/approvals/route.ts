@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ProjectApproval, ApprovalStatus, ApproverType } from '@/types/invoicing'
 import { projectCostCalculator } from '@/lib/project-cost-calculator'
+import { withAuth, withRole, withAuditLog, AuthenticatedRequest } from '@/lib/auth-middleware'
+import { 
+  projectApprovalRequestSchema, 
+  projectApprovalActionSchema,
+  approvalFiltersSchema,
+  validateRequestBody,
+  createValidationResponse 
+} from '@/lib/validation-schemas'
+import { generateApprovalId } from '@/lib/secure-token-generator'
 
 // Mock storage - replace with actual database
 const projectApprovals = new Map<string, ProjectApproval[]>()
@@ -8,14 +17,15 @@ const approvalWorkflows = new Map<string, ApproverType[]>()
 
 export async function POST(request: NextRequest) {
   try {
-    const { projectId, requestType, requesterId, requesterName, budgetAmount, deploymentDetails } = await request.json()
+    const requestData = await request.json()
     
-    if (!projectId || !requestType || !requesterId) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      )
+    // Validate approval request
+    const validationResult = validateRequestBody(projectApprovalRequestSchema, requestData)
+    if (!validationResult.success) {
+      return NextResponse.json(createValidationResponse(validationResult.errors), { status: 400 })
     }
+
+    const { projectId, requestType, requesterId, requesterName, budgetAmount, deploymentDetails } = validationResult.data
 
     // Determine required approvers based on request type and budget
     const requiredApprovers = determineRequiredApprovers(requestType, budgetAmount)
@@ -67,16 +77,18 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function PUT(request: NextRequest) {
+export const PUT = withAuditLog('APPROVE_PROJECT')(
+  withAuth(async function handler(request: AuthenticatedRequest) {
   try {
-    const { approvalId, action, approverId, notes, conditions } = await request.json()
+    const requestData = await request.json()
     
-    if (!approvalId || !action || !approverId) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      )
+    // Validate approval action
+    const validationResult = validateRequestBody(projectApprovalActionSchema, requestData)
+    if (!validationResult.success) {
+      return NextResponse.json(createValidationResponse(validationResult.errors), { status: 400 })
     }
+
+    const { approvalId, action, approverId, notes, conditions } = validationResult.data
 
     // Find and update approval
     const approval = await findApprovalById(approvalId)
@@ -137,14 +149,23 @@ export async function PUT(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+  })
+)
 
-export async function GET(request: NextRequest) {
+export const GET = withAuditLog('VIEW_APPROVALS')(
+  withAuth(async function handler(request: AuthenticatedRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const projectId = searchParams.get('projectId')
-    const approverId = searchParams.get('approverId')
-    const status = searchParams.get('status')
+    
+    // Validate query parameters
+    const queryParams = Object.fromEntries(searchParams.entries())
+    const validationResult = validateRequestBody(approvalFiltersSchema, queryParams)
+    
+    if (!validationResult.success) {
+      return NextResponse.json(createValidationResponse(validationResult.errors), { status: 400 })
+    }
+
+    const { projectId, approverId, status, page, limit } = validationResult.data
 
     let approvals: ProjectApproval[] = []
 
@@ -192,7 +213,8 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+  })
+)
 
 // Helper functions
 function determineRequiredApprovers(requestType: string, budgetAmount: number): ApproverType[] {
@@ -317,6 +339,4 @@ async function getProjectDetails(projectId: string) {
   }
 }
 
-function generateApprovalId(): string {
-  return `approval-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-}
+// Secure approval ID generation moved to secure-token-generator.ts

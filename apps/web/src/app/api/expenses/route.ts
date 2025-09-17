@@ -1,5 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { TravelExpense, MiscExpense, TravelExpenseType, ExpenseCategory } from '@/types/invoicing'
+import { withAuth, withRole, withAuditLog, AuthenticatedRequest } from '@/lib/auth-middleware'
+import { 
+  travelExpenseSchema, 
+  miscExpenseSchema, 
+  expenseApprovalSchema,
+  expenseFiltersSchema,
+  validateRequestBody,
+  createValidationResponse 
+} from '@/lib/validation-schemas'
+import { generateExpenseId } from '@/lib/secure-token-generator'
 
 // Mock storage - replace with actual database
 const travelExpenses = new Map<string, TravelExpense[]>()
@@ -8,26 +18,33 @@ const miscExpenses = new Map<string, MiscExpense[]>()
 export async function POST(request: NextRequest) {
   try {
     const expenseData = await request.json()
-    const { type, engineerId, projectId } = expenseData
+    const { type } = expenseData
     
-    if (!type || !engineerId || !projectId) {
-      return NextResponse.json(
-        { error: 'Missing required fields: type, engineerId, projectId' },
-        { status: 400 }
-      )
-    }
-
-    let savedExpense
-    
+    // Validate input based on expense type
+    let validationResult
     if (type === 'travel') {
-      savedExpense = await createTravelExpense(expenseData)
+      validationResult = validateRequestBody(travelExpenseSchema, expenseData)
     } else if (type === 'misc') {
-      savedExpense = await createMiscExpense(expenseData)
+      validationResult = validateRequestBody(miscExpenseSchema, expenseData)
     } else {
       return NextResponse.json(
         { error: 'Invalid expense type. Must be "travel" or "misc"' },
         { status: 400 }
       )
+    }
+
+    if (!validationResult.success) {
+      return NextResponse.json(createValidationResponse(validationResult.errors), { status: 400 })
+    }
+
+    const validatedData = validationResult.data
+
+    let savedExpense
+    
+    if (type === 'travel') {
+      savedExpense = await createTravelExpense(validatedData)
+    } else {
+      savedExpense = await createMiscExpense(validatedData)
     }
 
     // Auto-approve expenses under threshold or require approval
@@ -62,12 +79,16 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const engineerId = searchParams.get('engineerId')
-    const projectId = searchParams.get('projectId')
-    const type = searchParams.get('type')
-    const status = searchParams.get('status')
-    const startDate = searchParams.get('startDate')
-    const endDate = searchParams.get('endDate')
+    
+    // Validate query parameters
+    const queryParams = Object.fromEntries(searchParams.entries())
+    const validationResult = validateRequestBody(expenseFiltersSchema, queryParams)
+    
+    if (!validationResult.success) {
+      return NextResponse.json(createValidationResponse(validationResult.errors), { status: 400 })
+    }
+
+    const { engineerId, projectId, type, status, startDate, endDate, page, limit } = validationResult.data
 
     let allExpenses: (TravelExpense | MiscExpense)[] = []
 
@@ -142,14 +163,15 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { expenseId, action, approverId, notes } = await request.json()
+    const requestData = await request.json()
     
-    if (!expenseId || !action) {
-      return NextResponse.json(
-        { error: 'Missing required fields: expenseId, action' },
-        { status: 400 }
-      )
+    // Validate approval request
+    const validationResult = validateRequestBody(expenseApprovalSchema, requestData)
+    if (!validationResult.success) {
+      return NextResponse.json(createValidationResponse(validationResult.errors), { status: 400 })
     }
+
+    const { expenseId, action, approverId, notes } = validationResult.data
 
     const expense = await findExpenseById(expenseId)
     if (!expense) {
@@ -301,6 +323,4 @@ async function findExpenseById(expenseId: string): Promise<TravelExpense | MiscE
   return null
 }
 
-function generateExpenseId(): string {
-  return `exp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-}
+// Secure expense ID generation moved to secure-token-generator.ts

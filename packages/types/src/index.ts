@@ -21,6 +21,7 @@ export * from './auth';
 export * from './onboarding';
 export * from './notifications';
 export * from './reports';
+export * from './walkthrough';
 // export * from './tooltips'; // Temporarily disabled due to UserRole conflict
 
 // Enhanced Environment Interface with Multi-Tenant Support

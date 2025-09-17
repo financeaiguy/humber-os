@@ -41,10 +41,10 @@ const anonymizeData = (data: any) => {
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const recruitId = params.id
+    const { id: recruitId } = await params
     const body = await request.json() as AnonymizeRequest
     
     // Validate request

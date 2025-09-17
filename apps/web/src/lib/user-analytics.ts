@@ -1,6 +1,8 @@
 // User Metadata Collection & Analytics System
 // Comprehensive tracking for internal business optimization
 
+import { generateAnonymousUserId } from '@/lib/secure-token-generator'
+
 export interface UserMetadata {
   // Basic Identification
   userId: string
@@ -428,7 +430,7 @@ class UserAnalytics {
   // Privacy and compliance
   anonymizeData(): void {
     if (this.metadata.userId) {
-      this.metadata.userId = 'anonymous_' + Math.random().toString(36).substr(2, 9)
+      this.metadata.userId = generateAnonymousUserId()
     }
     delete this.metadata.email
   }

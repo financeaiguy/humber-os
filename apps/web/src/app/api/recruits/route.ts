@@ -1,4 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { withAuth, withRole, withAuditLog, AuthenticatedRequest } from '@/lib/auth-middleware'
+import { 
+  recruitSchema, 
+  recruitFiltersSchema,
+  validateRequestBody,
+  createValidationResponse 
+} from '@/lib/validation-schemas'
+import { webcrypto as crypto } from 'crypto'
 
 export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
@@ -34,107 +42,40 @@ interface Recruit extends RecruitInput {
   updatedAt: string
 }
 
-// Mock data for development
-const mockRecruits: Recruit[] = [
-  {
-    id: '1',
-    firstName: 'John',
-    lastName: 'Smith',
-    email: 'john.smith@email.com',
-    phone: '(555) 123-4567',
-    currentLocation: 'Detroit, MI',
-    jobTitle: 'Senior Electrical Engineer',
-    yearsExperience: 8,
-    currentCompany: 'General Motors',
-    desiredSalary: '$95,000',
-    skills: ['AutoCAD', 'PLC Programming', 'Industrial Automation'],
-    education: 'B.S. Electrical Engineering',
-    certifications: ['PE License', 'Six Sigma Green Belt'],
-    availableStartDate: '2024-02-15',
-    workAuthorization: 'US Citizen',
-    willingToRelocate: true,
-    travelWillingness: 'Up to 25%',
-    source: 'LinkedIn',
-    recruiterName: 'Sarah Johnson',
-    recruiterAgency: 'TechStaff Solutions',
-    status: 'screened',
-    createdAt: '2024-01-10T10:00:00Z',
-    updatedAt: '2024-01-12T14:30:00Z',
-    notes: 'Strong background in automotive manufacturing'
-  },
-  {
-    id: '2',
-    firstName: 'Maria',
-    lastName: 'Rodriguez',
-    email: 'maria.rodriguez@email.com',
-    phone: '(555) 987-6543',
-    currentLocation: 'Toledo, OH',
-    jobTitle: 'Mechanical Engineer',
-    yearsExperience: 6,
-    currentCompany: 'Ford Motor Company',
-    desiredSalary: '$82,000',
-    skills: ['SolidWorks', 'ANSYS', 'Manufacturing Processes'],
-    education: 'M.S. Mechanical Engineering',
-    certifications: ['SolidWorks Professional', 'Lean Manufacturing'],
-    availableStartDate: '2024-03-01',
-    workAuthorization: 'US Citizen',
-    willingToRelocate: false,
-    travelWillingness: 'Up to 10%',
-    source: 'Referral',
-    recruiterName: 'Mike Chen',
-    recruiterAgency: 'Engineering Talent Group',
-    status: 'interviewed',
-    createdAt: '2024-01-08T09:15:00Z',
-    updatedAt: '2024-01-15T11:45:00Z',
-    notes: 'Excellent problem-solving skills'
-  },
-  {
-    id: '3',
-    firstName: 'David',
-    lastName: 'Kim',
-    email: 'david.kim@email.com',
-    phone: '(555) 456-7890',
-    currentLocation: 'Grand Rapids, MI',
-    jobTitle: 'Software Engineer',
-    yearsExperience: 4,
-    currentCompany: 'Steelcase',
-    desiredSalary: '$75,000',
-    skills: ['Python', 'React', 'Industrial IoT'],
-    education: 'B.S. Computer Science',
-    certifications: ['AWS Cloud Practitioner', 'Scrum Master'],
-    availableStartDate: '2024-02-01',
-    workAuthorization: 'H1B Visa',
-    willingToRelocate: true,
-    travelWillingness: 'Up to 50%',
-    source: 'Indeed',
-    recruiterName: 'Lisa Wang',
-    recruiterAgency: 'Tech Recruiting Plus',
-    status: 'offer_extended',
-    createdAt: '2024-01-05T16:20:00Z',
-    updatedAt: '2024-01-18T08:30:00Z',
-    notes: 'Strong in automation software development'
-  }
-]
+// Production database storage - replace with actual D1/database implementation
+// In production, this would connect to Cloudflare D1 or another database
+const recruitsStorage = new Map<string, Recruit>() // Temporary in-memory storage
 
-export async function GET(request: NextRequest) {
+// Initialize with empty storage for production
+// Mock data removed for security compliance
+
+export const GET = withAuditLog('VIEW_RECRUITS')(
+  withAuth(async function handler(request: AuthenticatedRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '20')
-    const status = searchParams.get('status')
-    const search = searchParams.get('search')
+    
+    // Validate query parameters
+    const queryParams = Object.fromEntries(searchParams.entries())
+    const validationResult = validateRequestBody(recruitFiltersSchema, queryParams)
+    
+    if (!validationResult.success) {
+      return NextResponse.json(createValidationResponse(validationResult.errors), { status: 400 })
+    }
 
-    let filteredRecruits = [...mockRecruits]
+    const { page, limit, status, search } = validationResult.data
 
+    // Get all recruits from storage
+    let allRecruits = Array.from(recruitsStorage.values())
+    
     // Filter by status
     if (status) {
-      filteredRecruits = filteredRecruits.filter(recruit => recruit.status === status)
+      allRecruits = allRecruits.filter(recruit => recruit.status === status)
     }
 
     // Filter by search
     if (search) {
       const searchLower = search.toLowerCase()
-      filteredRecruits = filteredRecruits.filter(recruit =>
+      allRecruits = allRecruits.filter(recruit =>
         recruit.firstName.toLowerCase().includes(searchLower) ||
         recruit.lastName.toLowerCase().includes(searchLower) ||
         recruit.email.toLowerCase().includes(searchLower) ||
@@ -144,11 +85,11 @@ export async function GET(request: NextRequest) {
     }
 
     // Pagination
-    const total = filteredRecruits.length
+    const total = allRecruits.length
     const totalPages = Math.ceil(total / limit)
     const startIndex = (page - 1) * limit
     const endIndex = startIndex + limit
-    const paginatedRecruits = filteredRecruits.slice(startIndex, endIndex)
+    const paginatedRecruits = allRecruits.slice(startIndex, endIndex)
 
     return NextResponse.json({
       success: true,
@@ -173,42 +114,36 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+  })
+)
 
-export async function POST(request: NextRequest) {
+export const POST = withAuditLog('CREATE_RECRUIT')(
+  withRole(['PARTNER_OPERATOR', 'PARTNER_ADMIN', 'SYSTEM_ADMIN'])(
+    async function handler(request: AuthenticatedRequest) {
   try {
-    const body = await request.json() as RecruitInput
+    const requestData = await request.json()
     
-    // Basic validation
-    if (!body.firstName || !body.lastName || !body.email) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Validation failed',
-          message: 'Required fields are missing',
-          details: [
-            { field: 'firstName', message: 'First name is required' },
-            { field: 'lastName', message: 'Last name is required' },
-            { field: 'email', message: 'Email is required' }
-          ]
-        },
-        { status: 400 }
-      )
+    // Validate recruit data
+    const validationResult = validateRequestBody(recruitSchema, requestData)
+    if (!validationResult.success) {
+      return NextResponse.json(createValidationResponse(validationResult.errors), { status: 400 })
     }
 
-    // Generate a new ID (in real app, this would be handled by database)
-    const newId = (mockRecruits.length + 1).toString()
+    const validatedData = validationResult.data
+
+    // Generate a new ID using secure ID generation
+    const newId = crypto.randomUUID()
     
-    const newRecruit = {
+    const newRecruit: Recruit = {
       id: newId,
-      ...body,
+      ...validatedData,
       status: 'sourced',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }
 
-    // In a real app, save to database
-    mockRecruits.push(newRecruit)
+    // Store in temporary storage (replace with D1 database in production)
+    recruitsStorage.set(newId, newRecruit)
 
     return NextResponse.json({
       success: true,
@@ -229,4 +164,6 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+    }
+  )
+)
