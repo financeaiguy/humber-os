@@ -184,9 +184,5 @@ export const config: NextAuthConfig = {
   trustHost: true, // Required for Cloudflare Pages
 }
 
-export const { handlers, auth, signIn, signOut }: {
-  handlers: { GET: any; POST: any };
-  auth: () => Promise<any>;
-  signIn: (provider?: string, options?: any) => Promise<any>;
-  signOut: (options?: any) => Promise<any>;
-} = NextAuth(config)
+const nextAuth = NextAuth(config)
+export const { handlers, auth, signIn, signOut } = nextAuth

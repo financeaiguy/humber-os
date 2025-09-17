@@ -143,7 +143,7 @@ class SessionStorage {
     try {
       // In a Cloudflare Worker environment, we'd have access to the KV binding
       // For now, we'll use the API approach
-      const response = await fetch('/api/auth/session', {
+      const response = await fetch('/api/auth/kv-session', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -167,7 +167,7 @@ class SessionStorage {
 
   private async getKVSession(sessionToken: string): Promise<SessionData | null> {
     try {
-      const response = await fetch('/api/auth/session', {
+      const response = await fetch('/api/auth/kv-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -193,7 +193,7 @@ class SessionStorage {
 
   private async deleteKVSession(sessionToken: string): Promise<void> {
     try {
-      const response = await fetch('/api/auth/session', {
+      const response = await fetch('/api/auth/kv-session', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -216,7 +216,7 @@ class SessionStorage {
 
   private async deleteKVUserSessions(userId: string): Promise<void> {
     try {
-      const response = await fetch('/api/auth/session', {
+      const response = await fetch('/api/auth/kv-session', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

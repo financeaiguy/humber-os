@@ -108,19 +108,3 @@ export async function DELETE(request: NextRequest) {
   }
 }
 
-// Handle NextAuth session requests
-export async function GET() {
-  try {
-    const { auth } = await import('@/auth')
-    const session = await auth()
-    
-    if (!session) {
-      return NextResponse.json(null)
-    }
-    
-    return NextResponse.json(session)
-  } catch (error) {
-    console.error('Session GET error:', error)
-    return NextResponse.json(null)
-  }
-}

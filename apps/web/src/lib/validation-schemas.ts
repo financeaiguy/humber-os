@@ -47,6 +47,41 @@ export const expenseApprovalSchema = z.object({
   notes: z.string().max(1000, 'Notes too long').optional()
 })
 
+// GDPR compliance validation schemas
+export const gdprDataRequestSchema = z.object({
+  requestType: z.enum(['access', 'rectification', 'erasure', 'portability', 'restriction', 'objection']),
+  subjectEmail: emailSchema,
+  subjectId: z.string().optional(),
+  requestDetails: z.record(z.any()).optional(),
+  verificationMethod: z.enum(['email', 'identity_document', 'two_factor']).optional()
+})
+
+export const gdprConsentSchema = z.object({
+  userId: z.string().min(1, 'User ID is required'),
+  email: emailSchema,
+  consentType: z.enum(['marketing', 'analytics', 'functional', 'necessary', 'biometric', 'profiling']),
+  purpose: z.string().min(1, 'Purpose is required'),
+  consentGiven: z.boolean(),
+  consentMethod: z.enum(['explicit', 'opt_in', 'granular', 'bundled']),
+  dataRetentionPeriod: z.string().min(1, 'Retention period is required'),
+  thirdPartySharing: z.boolean().optional()
+})
+
+// SOC 2 compliance validation schemas
+export const soc2AccessControlSchema = z.object({
+  userId: z.string().min(1, 'User ID is required'),
+  userName: z.string().min(1, 'User name is required'),
+  userEmail: emailSchema,
+  role: z.string().min(1, 'Role is required'),
+  permissions: z.array(z.string()).min(1, 'At least one permission required'),
+  accessReason: z.string().min(1, 'Access reason is required'),
+  businessJustification: z.string().min(1, 'Business justification is required'),
+  supervisorApproval: z.string().min(1, 'Supervisor approval is required'),
+  systemBoundaries: z.array(z.string()).min(1, 'System boundaries required'),
+  dataClassifications: z.array(z.string()).min(1, 'Data classifications required'),
+  accessLevel: z.enum(['read', 'write', 'admin', 'super_admin'])
+})
+
 // Project approval validation schemas
 export const projectApprovalRequestSchema = z.object({
   projectId: z.string().min(1, 'Project ID is required'),

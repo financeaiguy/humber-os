@@ -610,7 +610,7 @@ curl -X POST http://localhost:8787/documents/search \\
 
     <div class="header">
         <h3>🚀 Total System Capabilities</h3>
-        <p><strong>59 Total API Endpoints across 9 integrated systems:</strong></p>
+        <p><strong>75+ Total API Endpoints across 15+ integrated systems:</strong></p>
         <ul>
             <li>Operations Management (5 endpoints) - Complete engineer lifecycle</li>
             <li>Timesheet Processing (4 endpoints) - Advanced reconciliation</li>
@@ -623,6 +623,14 @@ curl -X POST http://localhost:8787/documents/search \\
             <li><strong>👥 Recruiting System (7 endpoints) - GDPR/BIPA compliant recruiting</strong></li>
             <li><strong>📧 Notifications System (8 endpoints) - Multi-channel alerts</strong></li>
             <li><strong>📊 PDF Reports System (12 endpoints) - Automated reporting</strong></li>
+            <li><strong>💰 Expenses Management (2 endpoints) - Travel & misc expense tracking</strong></li>
+            <li><strong>🛡️ GDPR Data Subject Rights (1 endpoint) - Privacy compliance</strong></li>
+            <li><strong>📄 Invoice Generation (2 endpoints) - Project billing automation</strong></li>
+            <li><strong>🔄 Offboarding Management (1 endpoint) - Employee lifecycle</strong></li>
+            <li><strong>💳 Payments Processing (3 endpoints) - Stripe integration</strong></li>
+            <li><strong>✅ Project Approvals (2 endpoints) - Workflow management</strong></li>
+            <li><strong>🏢 Customer Portal (1 endpoint) - Client authentication</strong></li>
+            <li><strong>⏰ Advanced Time Tracking (1 endpoint) - Biometric + GPS</strong></li>
         </ul>
     </div>
 
@@ -822,7 +830,7 @@ app.get('/api-test', (c) => {
             <h1 class="title">🧪 Humber API Testing</h1>
             <p class="subtitle">Interactive API Documentation & Testing Interface</p>
             <div class="highlight">
-                🚀 59 Total Endpoints Available • Click any "Test" button - no Postman needed!
+                🚀 75+ Total Endpoints Available • Click any "Test" button - no Postman needed!
             </div>
         </div>
 
@@ -1762,6 +1770,247 @@ app.get('/api-test', (c) => {
             </div>
         </div>
 
+        <!-- Expenses Management -->
+        <div class="endpoint-section">
+            <div class="section-header">💰 Expenses Management (Next.js API)</div>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="url">/api/expenses</span>
+                    <button class="test-button" onclick="toggleForm('expensesCreateForm')">🧪 Test Create Expense</button>
+                </div>
+                <p class="description">Create travel or miscellaneous expenses with auto-approval for amounts under threshold</p>
+                <div class="test-form" id="expensesCreateForm" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">💰 Expense Data (JSON):</label>
+                        <textarea class="form-textarea" id="expensesCreateData">{"type":"travel","engineerId":"eng_001","amount":150.00,"date":"2025-01-15","description":"Client meeting travel","category":"TRANSPORTATION","receiptUrl":"https://example.com/receipt.pdf","projectId":"proj_001"}</textarea>
+                    </div>
+                    <button class="execute-btn" onclick="executeExpensesCreate()">🚀 Create Expense</button>
+                    <div id="expensesCreateResponse" class="response-area" style="display: none;"></div>
+                </div>
+            </div>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="url">/api/expenses</span>
+                    <button class="test-button" onclick="toggleForm('expensesGetForm')">🧪 Test Get Expenses</button>
+                </div>
+                <p class="description">Get expenses with filtering by engineer, project, status, and date range</p>
+                <div class="test-form" id="expensesGetForm" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">👤 Engineer ID:</label>
+                        <input type="text" class="form-input" id="expensesEngineerId" placeholder="eng_001">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">📊 Status:</label>
+                        <select class="form-input" id="expensesStatus">
+                            <option value="">All</option>
+                            <option value="approved">Approved</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                    </div>
+                    <button class="execute-btn" onclick="executeExpensesGet()">🚀 Get Expenses</button>
+                    <div id="expensesGetResponse" class="response-area" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GDPR Data Subject Rights -->
+        <div class="endpoint-section">
+            <div class="section-header">🛡️ GDPR Data Subject Rights (Next.js API)</div>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="url">/api/gdpr/data-subject-rights</span>
+                    <button class="test-button" onclick="toggleForm('gdprRequestForm')">🧪 Test GDPR Request</button>
+                </div>
+                <p class="description">Submit GDPR data subject rights requests (access, portability, erasure, rectification)</p>
+                <div class="test-form" id="gdprRequestForm" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">📋 GDPR Request Data (JSON):</label>
+                        <textarea class="form-textarea" id="gdprRequestData">{"requestType":"access","subjectEmail":"john.doe@example.com","subjectId":"rec_123","requestDetails":"I would like to access all personal data you have about me","verificationMethod":"email"}</textarea>
+                    </div>
+                    <button class="execute-btn" onclick="executeGdprRequest()">🚀 Submit GDPR Request</button>
+                    <div id="gdprRequestResponse" class="response-area" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice Generation -->
+        <div class="endpoint-section">
+            <div class="section-header">📄 Invoice Generation (Next.js API)</div>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="url">/api/invoices/generate</span>
+                    <button class="test-button" onclick="toggleForm('invoiceGenerateForm')">🧪 Test Generate Invoice</button>
+                </div>
+                <p class="description">Generate comprehensive project invoices with expenses, travel, and custom line items</p>
+                <div class="test-form" id="invoiceGenerateForm" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">📄 Invoice Generation Data (JSON):</label>
+                        <textarea class="form-textarea" id="invoiceGenerateData">{"projectId":"proj_001","invoiceType":"project_milestone","billingPeriod":{"start":"2025-01-01","end":"2025-01-31"},"includeExpenses":true,"includeTravel":true,"clientEmail":"client@example.com","dueDate":"2025-02-15"}</textarea>
+                    </div>
+                    <button class="execute-btn" onclick="executeInvoiceGenerate()">🚀 Generate Invoice</button>
+                    <div id="invoiceGenerateResponse" class="response-area" style="display: none;"></div>
+                </div>
+            </div>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="url">/api/invoices/generate</span>
+                    <button class="test-button" onclick="executeInvoicesList()">🧪 Test List Invoices</button>
+                </div>
+                <p class="description">Get list of generated invoices with filtering and pagination</p>
+                <div id="invoicesListResponse" class="response-area" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Offboarding Management -->
+        <div class="endpoint-section">
+            <div class="section-header">🔄 Offboarding Management (Next.js API)</div>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="url">/api/offboarding</span>
+                    <button class="test-button" onclick="executeOffboardingGet()">🧪 Test Get Offboarding</button>
+                </div>
+                <p class="description">Get offboarding requests with filtering by type, status, and assignee</p>
+                <div id="offboardingGetResponse" class="response-area" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Payments Processing -->
+        <div class="endpoint-section">
+            <div class="section-header">💳 Payments Processing (Next.js API)</div>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="url">/api/payments</span>
+                    <button class="test-button" onclick="toggleForm('paymentsCreateForm')">🧪 Test Create Payment</button>
+                </div>
+                <p class="description">Create payment links and process payments via Stripe integration</p>
+                <div class="test-form" id="paymentsCreateForm" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">💳 Payment Data (JSON):</label>
+                        <textarea class="form-textarea" id="paymentsCreateData">{"amount":1500.00,"currency":"USD","description":"Project milestone payment","clientEmail":"client@example.com","invoiceId":"inv_001","projectId":"proj_001"}</textarea>
+                    </div>
+                    <button class="execute-btn" onclick="executePaymentsCreate()">🚀 Create Payment</button>
+                    <div id="paymentsCreateResponse" class="response-area" style="display: none;"></div>
+                </div>
+            </div>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="url">/api/payments</span>
+                    <button class="test-button" onclick="executePaymentsGet()">🧪 Test Get Payments</button>
+                </div>
+                <p class="description">Get payment history with status tracking and filtering</p>
+                <div id="paymentsGetResponse" class="response-area" style="display: none;"></div>
+            </div>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method put">PUT</span>
+                    <span class="url">/api/payments</span>
+                    <button class="test-button" onclick="toggleForm('paymentsUpdateForm')">🧪 Test Update Payment</button>
+                </div>
+                <p class="description">Update payment status and process refunds</p>
+                <div class="test-form" id="paymentsUpdateForm" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">💳 Payment Update Data (JSON):</label>
+                        <textarea class="form-textarea" id="paymentsUpdateData">{"paymentId":"pay_001","status":"refunded","refundAmount":500.00,"reason":"Partial project cancellation"}</textarea>
+                    </div>
+                    <button class="execute-btn" onclick="executePaymentsUpdate()">🚀 Update Payment</button>
+                    <div id="paymentsUpdateResponse" class="response-area" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Approvals -->
+        <div class="endpoint-section">
+            <div class="section-header">✅ Project Approvals Workflow (Next.js API)</div>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method put">PUT</span>
+                    <span class="url">/api/projects/approvals</span>
+                    <button class="test-button" onclick="toggleForm('approvalsUpdateForm')">🧪 Test Update Approval</button>
+                </div>
+                <p class="description">Process approval decisions for projects, budgets, and resource requests</p>
+                <div class="test-form" id="approvalsUpdateForm" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">✅ Approval Data (JSON):</label>
+                        <textarea class="form-textarea" id="approvalsUpdateData">{"requestId":"req_001","action":"approve","approverId":"mgr_001","comments":"Budget approved for Q1 project","conditions":[]}</textarea>
+                    </div>
+                    <button class="execute-btn" onclick="executeApprovalsUpdate()">🚀 Process Approval</button>
+                    <div id="approvalsUpdateResponse" class="response-area" style="display: none;"></div>
+                </div>
+            </div>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="url">/api/projects/approvals</span>
+                    <button class="test-button" onclick="executeApprovalsGet()">🧪 Test Get Approvals</button>
+                </div>
+                <p class="description">Get pending approval requests with filtering by type and priority</p>
+                <div id="approvalsGetResponse" class="response-area" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Customer Portal -->
+        <div class="endpoint-section">
+            <div class="section-header">🏢 Customer Portal Authentication (Next.js API)</div>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="url">/api/customer-portal/auth</span>
+                    <button class="test-button" onclick="toggleForm('customerAuthForm')">🧪 Test Customer Auth</button>
+                </div>
+                <p class="description">Authenticate customers for portal access with secure token generation</p>
+                <div class="test-form" id="customerAuthForm" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">🏢 Customer Auth Data (JSON):</label>
+                        <textarea class="form-textarea" id="customerAuthData">{"email":"customer@example.com","companyId":"comp_001","accessCode":"TEMP123"}</textarea>
+                    </div>
+                    <button class="execute-btn" onclick="executeCustomerAuth()">🚀 Authenticate Customer</button>
+                    <div id="customerAuthResponse" class="response-area" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Secure Time Tracking (Next.js) -->
+        <div class="endpoint-section">
+            <div class="section-header">⏰ Secure Time Tracking (Next.js API)</div>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="url">/api/time-tracking/secure-entry</span>
+                    <button class="test-button" onclick="toggleForm('secureTimeForm')">🧪 Test Secure Time Entry</button>
+                </div>
+                <p class="description">Advanced time tracking with biometric authentication and geolocation verification</p>
+                <div class="test-form" id="secureTimeForm" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">⏰ Secure Time Entry Data (JSON):</label>
+                        <textarea class="form-textarea" id="secureTimeData">{"action":"CLOCK_IN","engineerId":"eng_001","biometricData":{"verified":true,"confidenceLevel":95},"geolocation":{"latitude":42.3314,"longitude":-83.0458,"accuracy":10},"deviceInfo":{"deviceId":"device_123","trustLevel":"HIGH"}}</textarea>
+                    </div>
+                    <button class="execute-btn" onclick="executeSecureTime()">🚀 Submit Time Entry</button>
+                    <div id="secureTimeResponse" class="response-area" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+
         <!-- System Health -->
         <div class="endpoint-section">
             <div class="section-header">🔧 System Health & Monitoring</div>
@@ -1954,6 +2203,92 @@ Timestamp: \${new Date().toISOString()}\`;
         async function executeChatSessions() {
             const response = await makeRequest('GET', '/chat/sessions');
             displayResponse('sessionsResponse', response);
+        }
+        
+        // Expenses Management Functions
+        async function executeExpensesCreate() {
+            const data = JSON.parse(document.getElementById('expensesCreateData').value);
+            const response = await makeRequest('POST', '/api/expenses', data);
+            displayResponse('expensesCreateResponse', response);
+        }
+        
+        async function executeExpensesGet() {
+            const engineerId = document.getElementById('expensesEngineerId').value;
+            const status = document.getElementById('expensesStatus').value;
+            let endpoint = '/api/expenses?';
+            if (engineerId) endpoint += `engineerId=${engineerId}&`;
+            if (status) endpoint += `status=${status}&`;
+            const response = await makeRequest('GET', endpoint);
+            displayResponse('expensesGetResponse', response);
+        }
+
+        // GDPR Functions
+        async function executeGdprRequest() {
+            const data = JSON.parse(document.getElementById('gdprRequestData').value);
+            const response = await makeRequest('POST', '/api/gdpr/data-subject-rights', data);
+            displayResponse('gdprRequestResponse', response);
+        }
+
+        // Invoice Functions
+        async function executeInvoiceGenerate() {
+            const data = JSON.parse(document.getElementById('invoiceGenerateData').value);
+            const response = await makeRequest('POST', '/api/invoices/generate', data);
+            displayResponse('invoiceGenerateResponse', response);
+        }
+        
+        async function executeInvoicesList() {
+            const response = await makeRequest('GET', '/api/invoices/generate');
+            displayResponse('invoicesListResponse', response);
+        }
+
+        // Offboarding Functions
+        async function executeOffboardingGet() {
+            const response = await makeRequest('GET', '/api/offboarding');
+            displayResponse('offboardingGetResponse', response);
+        }
+
+        // Payments Functions
+        async function executePaymentsCreate() {
+            const data = JSON.parse(document.getElementById('paymentsCreateData').value);
+            const response = await makeRequest('POST', '/api/payments', data);
+            displayResponse('paymentsCreateResponse', response);
+        }
+        
+        async function executePaymentsGet() {
+            const response = await makeRequest('GET', '/api/payments');
+            displayResponse('paymentsGetResponse', response);
+        }
+        
+        async function executePaymentsUpdate() {
+            const data = JSON.parse(document.getElementById('paymentsUpdateData').value);
+            const response = await makeRequest('PUT', '/api/payments', data);
+            displayResponse('paymentsUpdateResponse', response);
+        }
+
+        // Approvals Functions
+        async function executeApprovalsUpdate() {
+            const data = JSON.parse(document.getElementById('approvalsUpdateData').value);
+            const response = await makeRequest('PUT', '/api/projects/approvals', data);
+            displayResponse('approvalsUpdateResponse', response);
+        }
+        
+        async function executeApprovalsGet() {
+            const response = await makeRequest('GET', '/api/projects/approvals');
+            displayResponse('approvalsGetResponse', response);
+        }
+
+        // Customer Portal Functions
+        async function executeCustomerAuth() {
+            const data = JSON.parse(document.getElementById('customerAuthData').value);
+            const response = await makeRequest('POST', '/api/customer-portal/auth', data);
+            displayResponse('customerAuthResponse', response);
+        }
+
+        // Secure Time Tracking Functions
+        async function executeSecureTime() {
+            const data = JSON.parse(document.getElementById('secureTimeData').value);
+            const response = await makeRequest('POST', '/api/time-tracking/secure-entry', data);
+            displayResponse('secureTimeResponse', response);
         }
         
         async function executeHealth() {
