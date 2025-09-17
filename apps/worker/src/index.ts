@@ -2216,8 +2216,8 @@ Timestamp: \${new Date().toISOString()}\`;
             const engineerId = document.getElementById('expensesEngineerId').value;
             const status = document.getElementById('expensesStatus').value;
             let endpoint = '/api/expenses?';
-            if (engineerId) endpoint += `engineerId=${engineerId}&`;
-            if (status) endpoint += `status=${status}&`;
+            if (engineerId) endpoint += 'engineerId=' + engineerId + '&';
+            if (status) endpoint += 'status=' + status + '&';
             const response = await makeRequest('GET', endpoint);
             displayResponse('expensesGetResponse', response);
         }
