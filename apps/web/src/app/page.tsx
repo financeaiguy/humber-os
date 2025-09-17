@@ -1,5 +1,7 @@
 'use client'
 
+export const runtime = 'edge'
+
 import { motion } from 'framer-motion'
 import { useSession } from '@/components/session-context'
 import { 
@@ -341,8 +343,8 @@ export default function HomePage() {
                 <YAxis yAxisId="right" orientation="right" {...AXIS_STYLE} />
                 <Tooltip 
                   {...ENHANCED_TOOLTIP_PROPS}
-                  formatter={(value, name) => [
-                    name === 'revenue' ? `$${(value / 1000).toFixed(0)}K` : value,
+                  formatter={(value: any, name: any) => [
+                    name === 'revenue' ? `$${(Number(value) / 1000).toFixed(0)}K` : value,
                     name === 'revenue' ? 'Revenue' : 'Projects'
                   ]}
                 />

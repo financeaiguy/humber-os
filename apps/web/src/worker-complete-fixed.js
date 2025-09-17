@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Complete Humber Operations Worker with actual Next.js components
 export default {
   async fetch(request, env, ctx) {

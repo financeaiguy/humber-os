@@ -1,7 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+export const runtime = 'edge'
+export const dynamic = 'force-dynamic'
+
+// Type definitions
+interface RecruitInput {
+  firstName: string
+  lastName: string
+  email: string
+  phone?: string
+  currentLocation?: string
+  jobTitle?: string
+  yearsExperience?: number
+  currentCompany?: string
+  desiredSalary?: string
+  skills?: string[]
+  education?: string
+  certifications?: string[]
+  availableStartDate?: string
+  workAuthorization?: string
+  willingToRelocate?: boolean
+  travelWillingness?: string
+  source?: string
+  recruiterName?: string
+  recruiterAgency?: string
+  notes?: string
+}
+
+interface Recruit extends RecruitInput {
+  id: string
+  status: string
+  createdAt: string
+  updatedAt: string
+}
+
 // Mock data for development
-const mockRecruits = [
+const mockRecruits: Recruit[] = [
   {
     id: '1',
     firstName: 'John',
@@ -104,7 +138,7 @@ export async function GET(request: NextRequest) {
         recruit.firstName.toLowerCase().includes(searchLower) ||
         recruit.lastName.toLowerCase().includes(searchLower) ||
         recruit.email.toLowerCase().includes(searchLower) ||
-        recruit.jobTitle.toLowerCase().includes(searchLower) ||
+        recruit.jobTitle?.toLowerCase().includes(searchLower) ||
         recruit.currentCompany?.toLowerCase().includes(searchLower)
       )
     }
@@ -143,7 +177,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+    const body = await request.json() as RecruitInput
     
     // Basic validation
     if (!body.firstName || !body.lastName || !body.email) {

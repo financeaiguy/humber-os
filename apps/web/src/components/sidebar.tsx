@@ -11,6 +11,7 @@ import {
   Users,
   UserPlus,
   UserSearch,
+  UserMinus,
   BarChart3,
   BookOpen,
   UserCircle,
@@ -32,6 +33,7 @@ const navigation = [
   { name: 'Bull Pen', href: '/bull-pen', icon: Target },
   { name: 'Recruits', href: '/recruits', icon: UserSearch },
   { name: 'Onboarding', href: '/onboarding', icon: UserPlus },
+  { name: 'Off-boarding', href: '/offboarding', icon: UserMinus },
   { name: 'Time Tracking', href: '/time', icon: Clock },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
   { name: 'Knowledge Base', href: '/knowledge', icon: BookOpen },
@@ -52,11 +54,14 @@ export function Sidebar() {
     await signOut({ callbackUrl: '/auth/signin' })
   }
 
-  // Hide sidebar completely for employee users - they only access time tracking and knowledge via direct routes
+  // For employee users, show limited navigation
   const isEmployee = session?.user?.role === 'ENGINEER_EMPLOYEE'
-  if (isEmployee) {
-    return null
-  }
+  
+  // Employee-specific navigation (limited access)
+  const employeeNavigation = [
+    { name: 'Time Tracking', href: '/time', icon: Clock },
+    { name: 'Knowledge Base', href: '/knowledge', icon: BookOpen },
+  ]
 
   return (
     <>
@@ -76,16 +81,24 @@ export function Sidebar() {
         <div className="flex h-full flex-col bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-r border-slate-700/50">
           {/* Logo */}
           <div className="flex h-16 items-center justify-center border-b border-slate-700/50">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              Humber OS
-            </h1>
+            <div className="text-center">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                Humber OS
+              </h1>
+              {/* Debug info */}
+              {process.env.NODE_ENV === 'development' && (
+                <p className="text-xs text-slate-400 mt-1">
+                  {session?.user ? `${session.user.role}` : 'No session'}
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Navigation */}
           <nav className="flex-1 space-y-1 p-4">
-            {navigation.map((item) => {
+            {(isEmployee ? employeeNavigation : navigation).map((item) => {
               const isActive = pathname === item.href
-              const hasAccess = !session?.user || canAccessRoute(session.user.role, item.href)
+              const hasAccess = isEmployee || !session?.user || canAccessRoute(session.user.role, item.href)
               
               if (!hasAccess) return null
               

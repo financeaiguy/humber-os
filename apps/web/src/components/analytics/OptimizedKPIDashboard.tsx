@@ -171,7 +171,14 @@ const PartnerTable = memo<{ partners: any[] }>(({ partners }) => (
 PartnerTable.displayName = 'PartnerTable';
 
 export default function OptimizedKPIDashboard() {
-  const [data, setData] = useState(() => generateOptimizedData());
+  const [data, setData] = useState(() => {
+    try {
+      return generateOptimizedData();
+    } catch (error) {
+      console.error('Error generating initial data:', error);
+      return null;
+    }
+  });
   const [selectedTimeRange, setSelectedTimeRange] = useState('6M');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -181,13 +188,23 @@ export default function OptimizedKPIDashboard() {
     // Use requestIdleCallback for non-critical updates
     if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
       window.requestIdleCallback(() => {
-        setData(generateOptimizedData());
-        setIsLoading(false);
+        try {
+          setData(generateOptimizedData());
+        } catch (error) {
+          console.error('Error refreshing data:', error);
+        } finally {
+          setIsLoading(false);
+        }
       });
     } else {
       setTimeout(() => {
-        setData(generateOptimizedData());
-        setIsLoading(false);
+        try {
+          setData(generateOptimizedData());
+        } catch (error) {
+          console.error('Error refreshing data:', error);
+        } finally {
+          setIsLoading(false);
+        }
       }, 0);
     }
   }, []);
@@ -200,10 +217,23 @@ export default function OptimizedKPIDashboard() {
 
   // Memoized current metrics calculation
   const currentMetrics = useMemo(() => {
-    const lastMonth = data.revenueData[data.revenueData.length - 1];
-    const lastDeployment = data.deploymentEfficiencyData[data.deploymentEfficiencyData.length - 1];
-    const totalEngineers = data.partnerPerformance.reduce((sum, p) => sum + p.engineers, 0);
-    const avgUtilization = data.partnerPerformance.reduce((sum, p) => sum + p.utilization, 0) / data.partnerPerformance.length;
+    if (!data || typeof data !== 'object') {
+      return {
+        mrr: 0,
+        deployTime: 30,
+        successRate: 94,
+        utilization: '0.0',
+        totalEngineers: 0,
+        benchCost: 0
+      };
+    }
+    
+    const lastMonth = data.revenueData?.[data.revenueData.length - 1];
+    const lastDeployment = data.deploymentEfficiencyData?.[data.deploymentEfficiencyData.length - 1];
+    const totalEngineers = data.partnerPerformance?.reduce((sum: number, p: any) => sum + p.engineers, 0) || 0;
+    const avgUtilization = data.partnerPerformance?.length > 0 
+      ? data.partnerPerformance.reduce((sum: number, p: any) => sum + p.utilization, 0) / data.partnerPerformance.length 
+      : 0;
     
     return {
       mrr: lastMonth?.mrr || 0,
@@ -220,8 +250,13 @@ export default function OptimizedKPIDashboard() {
     setSelectedTimeRange(range);
     setIsLoading(true);
     setTimeout(() => {
-      setData(generateOptimizedData());
-      setIsLoading(false);
+      try {
+        setData(generateOptimizedData());
+      } catch (error) {
+        console.error('Error changing time range:', error);
+      } finally {
+        setIsLoading(false);
+      }
     }, 200);
   }, []);
 
@@ -295,10 +330,14 @@ export default function OptimizedKPIDashboard() {
       </div>
 
       {/* Lazy-loaded Charts */}
-      <LazyCharts data={data} />
+      {data && Object.keys(data).length > 0 && (
+        <LazyCharts data={data} />
+      )}
 
       {/* Partner Performance Table */}
-      <PartnerTable partners={data.partnerPerformance} />
+      {data?.partnerPerformance && data.partnerPerformance.length > 0 && (
+        <PartnerTable partners={data.partnerPerformance} />
+      )}
 
       {/* Alerts and Insights */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

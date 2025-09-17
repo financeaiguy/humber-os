@@ -47,8 +47,21 @@ const CustomTooltip = memo(({ active, payload, label }: any) => {
 CustomTooltip.displayName = 'CustomTooltip';
 
 // Memoized chart components
-const RevenueChart = memo<{ data: any[] }>(({ data }) => (
-  <div className="bg-slate-800/50 backdrop-blur-xl p-6 rounded-xl border border-slate-700/50">
+const RevenueChart = memo<{ data: any[] }>(({ data }) => {
+  if (!data || !Array.isArray(data) || data.length === 0) {
+    return (
+      <div className="bg-slate-800/50 backdrop-blur-xl p-6 rounded-xl border border-slate-700/50">
+        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <BarChart3 size={20} className="text-blue-400" />
+          Revenue & Growth Trends
+        </h3>
+        <div className="animate-pulse bg-slate-700 rounded h-[300px]" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-slate-800/50 backdrop-blur-xl p-6 rounded-xl border border-slate-700/50">
     <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
       <BarChart3 size={20} className="text-blue-400" />
       Revenue & Growth Trends
@@ -91,11 +104,25 @@ const RevenueChart = memo<{ data: any[] }>(({ data }) => (
       </AreaChart>
     </ResponsiveContainer>
   </div>
-));
+  );
+});
 
 RevenueChart.displayName = 'RevenueChart';
 
-const DeploymentChart = memo<{ data: any[] }>(({ data }) => (
+const DeploymentChart = memo<{ data: any[] }>(({ data }) => {
+  if (!data || !Array.isArray(data) || data.length === 0) {
+    return (
+      <div className="bg-slate-800/50 backdrop-blur-xl p-6 rounded-xl border border-slate-700/50">
+        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <Target size={20} className="text-green-400" />
+          Deployment Performance
+        </h3>
+        <div className="animate-pulse bg-slate-700 rounded h-[300px]" />
+      </div>
+    );
+  }
+
+  return (
   <div className="bg-slate-800/50 backdrop-blur-xl p-6 rounded-xl border border-slate-700/50">
     <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
       <Target size={20} className="text-green-400" />
@@ -130,11 +157,25 @@ const DeploymentChart = memo<{ data: any[] }>(({ data }) => (
       </LineChart>
     </ResponsiveContainer>
   </div>
-));
+  );
+});
 
 DeploymentChart.displayName = 'DeploymentChart';
 
-const PipelineChart = memo<{ data: any[] }>(({ data }) => (
+const PipelineChart = memo<{ data: any[] }>(({ data }) => {
+  if (!data || !Array.isArray(data) || data.length === 0) {
+    return (
+      <div className="bg-slate-800/50 backdrop-blur-xl p-6 rounded-xl border border-slate-700/50">
+        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <Users size={20} className="text-purple-400" />
+          Recruitment Pipeline
+        </h3>
+        <div className="animate-pulse bg-slate-700 rounded h-[300px]" />
+      </div>
+    );
+  }
+
+  return (
   <div className="bg-slate-800/50 backdrop-blur-xl p-6 rounded-xl border border-slate-700/50">
     <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
       <Users size={20} className="text-purple-400" />
@@ -155,12 +196,25 @@ const PipelineChart = memo<{ data: any[] }>(({ data }) => (
       </BarChart>
     </ResponsiveContainer>
   </div>
-));
+  );
+});
 
 PipelineChart.displayName = 'PipelineChart';
 
 const ClientDistributionChart = memo<{ data: any[] }>(({ data }) => {
   const COLORS = ['#10B981', '#3B82F6', '#8B5CF6', '#F59E0B', '#EF4444'];
+  
+  if (!data || !Array.isArray(data) || data.length === 0) {
+    return (
+      <div className="bg-slate-800/50 backdrop-blur-xl p-6 rounded-xl border border-slate-700/50">
+        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <CheckCircle size={20} className="text-orange-400" />
+          Client Distribution by Industry
+        </h3>
+        <div className="animate-pulse bg-slate-700 rounded h-[300px]" />
+      </div>
+    );
+  }
   
   // Calculate total for percentage
   const total = data.reduce((sum, item) => sum + item.value, 0);
@@ -186,7 +240,7 @@ const ClientDistributionChart = memo<{ data: any[] }>(({ data }) => {
             fill="#8884d8"
             paddingAngle={2}
             dataKey="value"
-            label={(entry) => `${entry.name}: ${entry.percentage}%`}
+            label={(entry: any) => `${entry.name}: ${entry.percentage}%`}
             labelLine={false}
           >
             {dataWithPercentage.map((_, index) => (
@@ -222,12 +276,37 @@ interface ChartComponentsProps {
 }
 
 const ChartComponents: React.FC<ChartComponentsProps> = ({ data }) => {
+  // Validate data before rendering charts
+  if (!data || typeof data !== 'object') {
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="animate-pulse bg-slate-700 rounded-xl h-[350px]" />
+        ))}
+      </div>
+    );
+  }
+
+  const {
+    revenueData = [],
+    deploymentEfficiencyData = [],
+    pipelineConversionData = [],
+    clientRetentionData = []
+  } = data;
+
+  // Additional validation to ensure data is properly structured
+  const validateData = (data: any[]): boolean => {
+    return Array.isArray(data) && 
+           data.length > 0 && 
+           data.every(item => item && typeof item === 'object');
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <RevenueChart data={data.revenueData} />
-      <DeploymentChart data={data.deploymentEfficiencyData} />
-      <PipelineChart data={data.pipelineConversionData} />
-      <ClientDistributionChart data={data.clientRetentionData} />
+      {validateData(revenueData) && <RevenueChart data={revenueData} />}
+      {validateData(deploymentEfficiencyData) && <DeploymentChart data={deploymentEfficiencyData} />}
+      {validateData(pipelineConversionData) && <PipelineChart data={pipelineConversionData} />}
+      {validateData(clientRetentionData) && <ClientDistributionChart data={clientRetentionData} />}
     </div>
   );
 };

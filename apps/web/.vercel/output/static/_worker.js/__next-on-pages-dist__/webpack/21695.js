@@ -1,0 +1,1 @@
+var e={},l=(d,n,s)=>(e.__chunk_21695=(h,a,t)=>{"use strict";t.d(a,{A:()=>o});let o=(0,t(756).A)("download",[["path",{d:"M12 15V3",key:"m9g1x1"}],["path",{d:"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4",key:"ih7n3h"}],["path",{d:"m7 10 5 5 5-5",key:"brsn70"}]])},e);export{l as __getNamedExports};

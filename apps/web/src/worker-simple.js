@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Simple React TypeScript Worker - No SSR
 export default {
   async fetch(request, env, ctx) {
@@ -226,27 +227,27 @@ function getReactApp(pathname, env) {
         .hidden { display: none; }
         .ml-10 { margin-left: 2.5rem; }
         .transition-colors { transition-property: color, background-color, border-color, text-decoration-color, fill, stroke; }
-        .hover\\:text-white:hover { color: #ffffff; }
-        .hover\\:bg-slate-700:hover { background-color: #334155; }
-        .hover\\:bg-green-700:hover { background-color: #15803d; }
-        .hover\\:bg-blue-700:hover { background-color: #1d4ed8; }
-        .hover\\:bg-red-700:hover { background-color: #b91c1c; }
+        .hover\:text-white:hover { color: #ffffff; }
+        .hover\:bg-slate-700:hover { background-color: #334155; }
+        .hover\:bg-green-700:hover { background-color: #15803d; }
+        .hover\:bg-blue-700:hover { background-color: #1d4ed8; }
+        .hover\:bg-red-700:hover { background-color: #b91c1c; }
         .cursor-pointer { cursor: pointer; }
         @media (min-width: 640px) {
-          .sm\\:px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
-          .sm\\:text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+          .sm\:px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+          .sm\:text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
         }
         @media (min-width: 768px) {
-          .md\\:block { display: block; }
-          .md\\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-          .md\\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-          .md\\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+          .md\:block { display: block; }
+          .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+          .md\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
         }
         @media (min-width: 1024px) {
-          .lg\\:px-8 { padding-left: 2rem; padding-right: 2rem; }
-          .lg\\:text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
-          .lg\\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-          .lg\\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+          .lg\:px-8 { padding-left: 2rem; padding-right: 2rem; }
+          .lg\:text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+          .lg\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .lg\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
         }
     </style>
     <script>

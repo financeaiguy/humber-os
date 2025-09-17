@@ -1,5 +1,5 @@
 name = "humber-workers-real"
-main = "dist-workers/worker.js"
+main = "src/worker-actually-working.js"
 compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]
 

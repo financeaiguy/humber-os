@@ -1,5 +1,7 @@
 'use client'
 
+export const runtime = 'edge'
+
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { AlertTriangle } from 'lucide-react'

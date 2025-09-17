@@ -653,24 +653,27 @@ export class PDFReportService {
     // Implementation for scheduled reports
     // This would integrate with Cloudflare Cron Triggers
     const scheduleId = `schedule_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const now = Date.now();
     
     // Store schedule in database
     await this.env.DB.prepare(`
       INSERT INTO scheduled_reports (
-        id, name, type, format, frequency, recipients, 
-        is_active, tenant_id, created_by, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        id, name, type, format, frequency, schedule_config, recipients, 
+        is_active, tenant_id, created_by, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       scheduleId,
       schedule.name,
       schedule.type,
       schedule.format,
       schedule.frequency,
+      JSON.stringify(schedule.scheduleConfig || {}),
       JSON.stringify(schedule.recipients),
       true,
       schedule.tenantId,
-      'system',
-      new Date().toISOString()
+      schedule.createdBy || 'system',
+      now,
+      now
     ).run();
     
     return scheduleId;

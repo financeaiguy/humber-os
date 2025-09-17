@@ -1,17 +1,17 @@
-name = "humber-web-frontend"
-main = "src/worker-simple.js"
+name = "humber-nextjs-app"
 compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = ".vercel/output/static"
 
 [env.production]
-name = "humber-web-frontend-prod"
+name = "humber-nextjs-app"
 
 [env.production.vars]
 ENVIRONMENT = "production"
-API_VERSION = "1.0.0"
-LOG_LEVEL = "info"
-NEXTAUTH_SECRET = "your-super-secret-key-change-in-production-please-make-this-longer-and-secure"
-NEXTAUTH_URL = "https://humber-complete.pages.dev"
+API_VERSION = "4.0.0"
+AUTH_SECRET = "humber-nextjs-cloudflare-pages-production-secret-2024"
+NEXTAUTH_SECRET = "humber-nextjs-cloudflare-pages-production-secret-2024"
+NEXTAUTH_URL = "https://585d5d9b.humber-nextjs-app.pages.dev"
 NEXT_PUBLIC_API_URL = "https://humber-operations-worker-prod.evafiai.workers.dev"
 NEXT_PUBLIC_TENANT_ID = "tenant-001"
 
@@ -36,7 +36,7 @@ binding = "DB_ENGINEER_003"
 database_name = "humber-tenant-003"
 database_id = "22e3d3e8-fd0d-43f0-a587-bab533ce6e2e"
 
-# KV Namespaces
+# KV Namespaces  
 [[env.production.kv_namespaces]]
 binding = "KV_TENANT_CACHE"
 id = "7d7a6b3d94b24cb5b96177556a2f7130"
@@ -58,54 +58,11 @@ bucket_name = "humber-documents"
 binding = "ASSETS"
 bucket_name = "humber-web-assets"
 
-# Vectorize
+# Vectorize for AutoRAG
 [[env.production.vectorize]]
 binding = "VECTORIZE_INDEX"
 index_name = "humber-knowledge-base"
 
 # Workers AI
 [env.production.ai]
-binding = "AI"
-
-# Durable Objects (will be added after initial deployment)
-# [[env.production.durable_objects.bindings]]
-# name = "CHAT_SESSIONS"
-# class_name = "ChatSession"
-# script_name = "humber-web-frontend-prod"
-
-# [[env.production.durable_objects.bindings]]
-# name = "REALTIME_CONNECTIONS"
-# class_name = "RealtimeConnection"
-# script_name = "humber-web-frontend-prod"
-
-# Development Environment
-[env.development]
-name = "humber-web-frontend-dev"
-
-[env.development.vars]
-ENVIRONMENT = "development"
-API_VERSION = "1.0.0"
-LOG_LEVEL = "debug"
-NEXT_PUBLIC_API_URL = "https://humber-operations-worker-prod.evafiai.workers.dev"
-NEXT_PUBLIC_TENANT_ID = "tenant-001"
-
-# Development bindings (same as production for now)
-[[env.development.d1_databases]]
-binding = "DB_MASTER"
-database_name = "humber_os_master"
-database_id = "1d392f9e-b2f3-4bfb-9bb3-f82484ad140f"
-
-[[env.development.kv_namespaces]]
-binding = "KV_CACHE"
-id = "16640e4d080d4de8879962927ad31732"
-
-[[env.development.r2_buckets]]
-binding = "DOCUMENTS"
-bucket_name = "humber-documents"
-
-[[env.development.vectorize]]
-binding = "VECTORIZE_INDEX"
-index_name = "humber-knowledge-base"
-
-[env.development.ai]
 binding = "AI"

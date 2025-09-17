@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:workers": "webpack --config webpack.workers.js",
-    "deploy:workers": "npm run build:workers && wrangler deploy --config wrangler-workers.toml --env production",
+    "build:pages": "npx @cloudflare/next-on-pages",
+    "deploy:pages": "npm run build:pages && wrangler pages deploy .vercel/output/static --project-name=humber-nextjs-app",
     "deploy:dev": "npm run build:worker && wrangler deploy --env development",
     "start": "next start",
     "lint": "next lint",

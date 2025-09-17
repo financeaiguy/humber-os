@@ -1,5 +1,8 @@
 'use client'
 
+export const runtime = 'edge'
+
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { 
   Briefcase, 
@@ -12,9 +15,13 @@ import {
   AlertCircle,
   CheckCircle,
   PlayCircle,
-  PauseCircle
+  PauseCircle,
+  Eye,
+  Edit,
+  MoreHorizontal
 } from 'lucide-react'
 import Link from 'next/link'
+import ProjectDetailModal from '@/components/projects/ProjectDetailModal'
 
 const projects = [
   {
@@ -35,6 +42,21 @@ const projects = [
       { name: 'David Kim', role: 'Systems Engineer' }
     ],
     description: 'Complete automation upgrade for GM assembly line including PLC programming, robotic integration, and quality control systems.'
+  },
+  {
+    id: 6,
+    name: 'Tesla Gigafactory Expansion',
+    client: 'Tesla Inc.',
+    status: 'bidding',
+    priority: 'high',
+    completion: 0,
+    startDate: '2025-03-01',
+    endDate: '2025-12-31',
+    budget: 2500000,
+    spent: 0,
+    location: 'Austin, TX',
+    engineers: [],
+    description: 'Large-scale automation project for Tesla Gigafactory expansion including battery production line automation and quality control systems.'
   },
   {
     id: 2,
@@ -114,6 +136,7 @@ const getStatusIcon = (status: string) => {
     case 'in_progress': return <PlayCircle className="h-5 w-5 text-blue-400" />
     case 'planning': return <Clock className="h-5 w-5 text-yellow-400" />
     case 'on_hold': return <PauseCircle className="h-5 w-5 text-orange-400" />
+    case 'bidding': return <Target className="h-5 w-5 text-purple-400" />
     default: return <AlertCircle className="h-5 w-5 text-gray-400" />
   }
 }
@@ -124,6 +147,7 @@ const getStatusColor = (status: string) => {
     case 'in_progress': return 'bg-blue-500/20 text-blue-400'
     case 'planning': return 'bg-yellow-500/20 text-yellow-400'
     case 'on_hold': return 'bg-orange-500/20 text-orange-400'
+    case 'bidding': return 'bg-purple-500/20 text-purple-400'
     default: return 'bg-gray-500/20 text-gray-400'
   }
 }
@@ -138,10 +162,18 @@ const getPriorityColor = (priority: string) => {
 }
 
 export default function ProjectsPage() {
+  const [selectedProject, setSelectedProject] = useState(null)
+  const [showProjectModal, setShowProjectModal] = useState(false)
+  
   const activeProjects = projects.filter(p => p.status === 'in_progress').length
   const completedProjects = projects.filter(p => p.status === 'completed').length
   const totalBudget = projects.reduce((sum, p) => sum + p.budget, 0)
   const totalSpent = projects.reduce((sum, p) => sum + p.spent, 0)
+
+  const handleProjectClick = (project: any) => {
+    setSelectedProject(project)
+    setShowProjectModal(true)
+  }
 
   return (
     <div className="space-y-8">
@@ -233,7 +265,8 @@ export default function ProjectsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="rounded-2xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-6 hover:border-slate-600 transition-all duration-300"
+            className="rounded-2xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-6 hover:border-slate-600 hover:bg-slate-800/70 transition-all duration-300 cursor-pointer group"
+            onClick={() => handleProjectClick(project)}
           >
             {/* Project Header */}
             <div className="flex items-start justify-between mb-4">
@@ -251,6 +284,10 @@ export default function ProjectsPage() {
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
                   {project.status.replace('_', ' ')}
                 </span>
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center space-x-1">
+                  <Eye className="h-4 w-4 text-blue-400" />
+                  <span className="text-xs text-blue-400">View Details</span>
+                </div>
               </div>
             </div>
 
@@ -325,6 +362,28 @@ export default function ProjectsPage() {
           </motion.div>
         ))}
       </div>
+
+      {/* Project Detail Modal */}
+      <ProjectDetailModal
+        project={selectedProject}
+        isOpen={showProjectModal}
+        onClose={() => {
+          setShowProjectModal(false)
+          setSelectedProject(null)
+        }}
+        onUpdateProject={(projectId, updates) => {
+          // Handle project updates
+          console.log('Update project:', projectId, updates)
+        }}
+        onAssignEngineer={(projectId, engineerId) => {
+          // Handle engineer assignment
+          console.log('Assign engineer:', projectId, engineerId)
+        }}
+        onCreateTask={(projectId, task) => {
+          // Handle task creation
+          console.log('Create task:', projectId, task)
+        }}
+      />
     </div>
   )
 }

@@ -40,6 +40,11 @@
     "out/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "src/worker*.js",
+    "src/worker*.mjs",
+    "src/worker-fresh.js",
+    "src/pages-functions.js",
+    "**/*.js"
   ]
 }

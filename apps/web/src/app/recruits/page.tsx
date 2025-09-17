@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+
+export const runtime = 'edge'
 import { motion } from 'framer-motion'
 import { UserSearch, Target, Briefcase, Globe, DollarSign, FileText, Shield, Award, Clock, Users, UserPlus, ArrowRight, CheckCircle } from 'lucide-react'
 import NewRecruitModal from '@/components/recruiting/NewRecruitModal'
@@ -160,7 +162,7 @@ export default function RecruitsPage() {
       // Update the recruit status locally
       setRecruits(prev => prev.map(recruit => 
         recruit.id === recruitId 
-          ? { ...recruit, status: 'onboarding' as const }
+          ? { ...recruit, status: 'accepted' as const }
           : recruit
       ))
       
@@ -456,10 +458,10 @@ export default function RecruitsPage() {
                       )}
                     </button>
                   )}
-                  {recruit.status === 'onboarding' && (
+                  {recruit.status === 'accepted' && (
                     <div className="flex items-center space-x-2 text-green-400 text-sm">
                       <CheckCircle className="h-4 w-4" />
-                      <span>In Onboarding</span>
+                      <span>Ready for Onboarding</span>
                     </div>
                   )}
                 </div>

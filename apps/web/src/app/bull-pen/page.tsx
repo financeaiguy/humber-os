@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+
+export const runtime = 'edge'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Users, 
@@ -841,7 +843,7 @@ export default function BullPenDashboard() {
         engineer={selectedEngineer}
         onAssignToProject={(engineer) => {
           setShowProfileModal(false)
-          setSelectedEngineer(engineer)
+          setSelectedEngineer(engineer as any)
           setShowAllocationModal(true)
         }}
         onMessage={(engineer) => {

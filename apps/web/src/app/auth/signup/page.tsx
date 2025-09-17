@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+
+export const runtime = 'edge'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Building2, User, Mail, Lock, Eye, EyeOff, Users } from 'lucide-react'

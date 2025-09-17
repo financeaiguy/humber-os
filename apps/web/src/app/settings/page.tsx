@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+
+export const runtime = 'edge'
 import { motion } from 'framer-motion'
 import { useSession } from '@/components/session-context'
 import { 

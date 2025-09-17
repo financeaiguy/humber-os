@@ -282,3 +282,5 @@ local_protocol = "http"
 # Cloudflare Workers AI for open-source models
 [ai]
 binding = "AI"
+# AI bindings always access remote resources
+remote = true

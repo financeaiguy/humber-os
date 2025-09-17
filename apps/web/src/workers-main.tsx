@@ -106,13 +106,32 @@ function renderActualApp(pathname: string, env: Env): string {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Humber Operations - ${pathname === '/' ? 'Dashboard' : pathname.slice(1)}</title>
-    <script src="https://unpkg.com/react@19/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@19/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/framer-motion@12/dist/framer-motion.js"></script>
-    <script src="https://unpkg.com/recharts@3.2.0/lib/index.js"></script>
-    <script src="https://unpkg.com/lucide-react@0.544.0/dist/cjs/lucide-react.js"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              slate: {
+                950: '#020617',
+                900: '#0f172a',
+                800: '#1e293b',
+                700: '#334155',
+                600: '#475569',
+                500: '#64748b',
+                400: '#94a3b8',
+                300: '#cbd5e1',
+                200: '#e2e8f0'
+              }
+            }
+          }
+        }
+      }
+    </script>
     <style>
       body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
       .bg-slate-950 { background-color: #020617; }
@@ -167,11 +186,12 @@ function renderActualApp(pathname: string, env: Env): string {
 </body>
 </html>`
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return `<!DOCTYPE html>
 <html><head><title>Error</title></head>
 <body style="background: #0f172a; color: white; font-family: sans-serif; padding: 2rem;">
   <h1>Humber Operations</h1>
-  <p>Component Error: ${error.message}</p>
+  <p>Component Error: ${errorMessage}</p>
   <p>Pathname: ${pathname}</p>
 </body></html>`
   }
@@ -198,10 +218,10 @@ export default {
       
       // AI chat
       if (url.pathname === '/ai/chat') {
-        const { message } = await request.json()
+        const { message } = await request.json() as { message: string }
         const aiResponse = await env.AI.run('@cf/meta/llama-2-7b-chat-int8', {
           messages: [{ role: 'user', content: message }]
-        })
+        }) as any
         return Response.json({ response: aiResponse.response })
       }
       
@@ -218,7 +238,8 @@ export default {
       
     } catch (error) {
       console.error('Workers error:', error)
-      return Response.json({ error: error.message }, { status: 500 })
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      return Response.json({ error: errorMessage }, { status: 500 })
     }
   }
 }

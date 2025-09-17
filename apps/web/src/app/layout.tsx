@@ -4,7 +4,6 @@ import './globals.css'
 import '../styles/jobs-design-system.css'
 import { LayoutClient } from '@/components/layout-client'
 import { SessionProvider } from '@/components/session-context'
-import { auth } from '@/auth'
 import { ErrorBoundary } from '@/components/error-boundary'
 import { Suspense } from 'react'
 import dynamic from 'next/dynamic'
@@ -56,18 +55,19 @@ export const viewport: Viewport = {
   ],
 }
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const session = await auth()
+  // For static export, we can't use server-side auth
+  // Session will be handled client-side
   
   return (
     <html lang="en">
       <body className={inter.className}>
         <ErrorBoundary>
-          <SessionProvider session={session}>
+          <SessionProvider>
             <ContinuousLearningProvider>
               <LoadingProvider>
                 <LayoutClient>

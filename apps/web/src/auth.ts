@@ -88,6 +88,7 @@ export const config: NextAuthConfig = {
     signIn: "/auth/signin",
     error: "/auth/error",
   },
+  useSecureCookies: process.env.NODE_ENV === 'production',
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user
@@ -110,14 +111,17 @@ export const config: NextAuthConfig = {
     },
     jwt({ token, user }) {
       if (user) {
-        // Initial sign in
+        // Initial sign in - simple token setup
         token.id = user.id
         token.email = user.email
         token.name = user.name
         token.role = user.role
         token.partnerId = user.partnerId
         token.partnerName = user.partnerName
+        
+        console.log('✅ JWT created for user:', user.email)
       }
+      
       return token
     },
     session({ session, token }) {
@@ -130,6 +134,11 @@ export const config: NextAuthConfig = {
         session.user.partnerName = token.partnerName as string
       }
       return session
+    },
+    signIn({ user }) {
+      // Log successful sign-ins
+      console.log('✅ User signed in:', user.email)
+      return true
     },
   },
   providers: [
@@ -168,10 +177,16 @@ export const config: NextAuthConfig = {
   ],
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 7 * 24 * 60 * 60, // 7 days for now to reduce complexity
   },
-  secret: process.env.AUTH_SECRET,
-  debug: false, // Set to true if you need to debug auth issues
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || "humber-nextjs-cloudflare-pages-production-secret-2024",
+  debug: process.env.NODE_ENV === 'development', // Only debug in development
+  trustHost: true, // Required for Cloudflare Pages
 }
 
-export const { handlers, auth, signIn, signOut } = NextAuth(config)
+export const { handlers, auth, signIn, signOut }: {
+  handlers: { GET: any; POST: any };
+  auth: () => Promise<any>;
+  signIn: (provider?: string, options?: any) => Promise<any>;
+  signOut: (options?: any) => Promise<any>;
+} = NextAuth(config)

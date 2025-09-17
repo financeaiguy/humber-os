@@ -289,11 +289,13 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
       
       // Verify location geofence
       if (location && !await verifyGeofence(location)) {
-        alert(
-          'You are not within the authorized work location.\n\n' +
-          'Please ensure you are at the work site and try again.\n' +
-          `Current accuracy: ±${Math.round(location.accuracy)}m`
-        )
+        if (!isDemoMode()) {
+          alert(
+            'You are not within the authorized work location.\n\n' +
+            'Please ensure you are at the work site and try again.\n' +
+            `Current accuracy: ±${Math.round(location.accuracy)}m`
+          )
+        }
         setIsClockingIn(false)
         return
       }
@@ -347,10 +349,32 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
           await getCurrentLocation()
         } catch (error) {
           // Allow clock out without location but warn user
+          if (!isDemoMode()) {
+            const proceed = confirm(
+              `Location unavailable: ${error}\n\n` +
+              'Do you want to clock out without location verification?\n' +
+              'This will be flagged for review.'
+            )
+            if (!proceed) {
+              setIsClockingOut(false)
+              return
+            }
+          }
+        }
+      }
+      
+      // Verify location for clock out (in demo mode, this might fail)
+      if (location && !await verifyGeofence(location)) {
+        if (isDemoMode()) {
+          // In demo mode, show the failure but allow retry
+          setIsClockingOut(false)
+          return
+        } else {
+          // In production, allow clock out with warning
           const proceed = confirm(
-            `Location unavailable: ${error}\n\n` +
-            'Do you want to clock out without location verification?\n' +
-            'This will be flagged for review.'
+            'Location verification failed for clock out.\n\n' +
+            'You may still clock out, but this will be flagged for review.\n' +
+            'Continue with clock out?'
           )
           if (!proceed) {
             setIsClockingOut(false)
@@ -408,13 +432,22 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
     return devices.includes(fingerprint)
   }
   
-  // Verify location is within geofence (replace with actual coordinates)
+  // Check if we're in demo mode
+  const isDemoMode = (): boolean => {
+    return window.location.hostname.includes('demo') || 
+           window.location.hostname.includes('pages.dev') ||
+           process.env.NODE_ENV === 'development'
+  }
+
+  // Verify location is within geofence with demo mode scenarios
   const verifyGeofence = async (location: { lat: number; lng: number; accuracy: number }): Promise<boolean> => {
-    // SECURITY: No development bypasses - always verify location
-    // Environment-specific configuration should be handled server-side
+    // Demo mode: Simulate different scenarios
+    if (isDemoMode()) {
+      return handleDemoLocationScenarios(location)
+    }
     
+    // Production mode: Always verify location
     // Get work sites from environment configuration (server-side)
-    // In production, this would come from your API/database
     const workSites = [
       {
         name: 'GM Assembly Plant',
@@ -444,6 +477,78 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
     
     console.warn('Location verification failed: Not at any authorized work site')
     return false
+  }
+
+  // Demo mode location scenarios
+  const handleDemoLocationScenarios = (location: { lat: number; lng: number; accuracy: number }): boolean => {
+    const currentAttempts = parseInt(localStorage.getItem('demoLocationAttempts') || '0')
+    
+    // Scenario 1: First attempt (clock in) - SUCCESS
+    if (currentAttempts === 0) {
+      localStorage.setItem('demoLocationAttempts', '1')
+      console.log('🎭 DEMO: Clock in successful - authorized location')
+      showDemoNotification('✅ Location Verified', 'You are at an authorized work site', 'success')
+      return true
+    }
+    
+    // Scenario 2: Second attempt (clock out) - FAIL
+    if (currentAttempts === 1) {
+      localStorage.setItem('demoLocationAttempts', '2')
+      console.log('🎭 DEMO: Clock out failed - location verification failed')
+      showDemoNotification('❌ Location Verification Failed', 'You are not within the authorized work location.\n\nPlease ensure you are at the work site and try again.', 'error')
+      return false
+    }
+    
+    // Scenario 3: Third attempt - SUCCESS (after moving back to work site)
+    if (currentAttempts === 2) {
+      localStorage.setItem('demoLocationAttempts', '3')
+      console.log('🎭 DEMO: Clock out successful - back at authorized location')
+      showDemoNotification('✅ Location Verified', 'Successfully verified work site location', 'success')
+      return true
+    }
+    
+    // Reset after demo cycle
+    if (currentAttempts >= 3) {
+      localStorage.setItem('demoLocationAttempts', '0')
+      return true
+    }
+    
+    return true
+  }
+
+  // Show demo notifications
+  const showDemoNotification = (title: string, message: string, type: 'success' | 'error' | 'warning') => {
+    const colors = {
+      success: { bg: 'bg-green-500/20', border: 'border-green-500/50', text: 'text-green-400' },
+      error: { bg: 'bg-red-500/20', border: 'border-red-500/50', text: 'text-red-400' },
+      warning: { bg: 'bg-yellow-500/20', border: 'border-yellow-500/50', text: 'text-yellow-400' }
+    }
+    
+    // Create notification element
+    const notification = document.createElement('div')
+    notification.className = `fixed top-4 right-4 z-50 ${colors[type].bg} ${colors[type].border} border rounded-xl p-4 max-w-sm shadow-xl backdrop-blur-xl`
+    notification.innerHTML = `
+      <div class="flex items-start space-x-3">
+        <div class="flex-1">
+          <p class="font-semibold ${colors[type].text}">${title}</p>
+          <p class="text-sm text-slate-300 mt-1">${message}</p>
+        </div>
+        <button onclick="this.parentElement.parentElement.remove()" class="text-slate-400 hover:text-white">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    `
+    
+    document.body.appendChild(notification)
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.remove()
+      }
+    }, 5000)
   }
 
   // Helper function to calculate distance between two points (Haversine formula)
@@ -732,6 +837,40 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
           </button>
         )}
       </motion.div>
+
+      {/* Demo Mode Indicator */}
+      {isDemoMode() && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+          className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-xl rounded-2xl border border-purple-500/30 p-4 mb-6"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center space-x-2">
+              <div className="h-2 w-2 bg-purple-400 rounded-full animate-pulse"></div>
+              <h3 className="text-sm font-semibold text-purple-300">Demo Mode Active</h3>
+            </div>
+            <button 
+              onClick={() => {
+                localStorage.removeItem('demoLocationAttempts')
+                showDemoNotification('🔄 Demo Reset', 'Location scenarios have been reset', 'success')
+              }}
+              className="text-xs bg-purple-500/20 hover:bg-purple-500/30 px-3 py-1 rounded-lg transition-colors text-purple-300"
+            >
+              Reset Demo
+            </button>
+          </div>
+          <div className="text-xs text-slate-300 space-y-1">
+            <p>• First clock-in: ✅ Location verified</p>
+            <p>• First clock-out: ❌ Location verification fails</p>
+            <p>• Second clock-out: ✅ Location verified (retry success)</p>
+          </div>
+          <div className="mt-2 text-xs text-purple-300">
+            Current attempt: {parseInt(localStorage.getItem('demoLocationAttempts') || '0') + 1}
+          </div>
+        </motion.div>
+      )}
 
       {/* Verification Status */}
       <motion.div

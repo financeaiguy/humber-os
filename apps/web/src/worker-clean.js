@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Ultra Clean Humber Operations Worker - No Template Literals
 export default {
   async fetch(request, env, ctx) {

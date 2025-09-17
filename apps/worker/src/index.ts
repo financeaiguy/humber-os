@@ -17,6 +17,7 @@ import { notificationsRouter } from './routes/notifications';
 import { reportsRouter } from './routes/reports';
 import knowledgeBaseRouter from './routes/knowledge-base';
 import mockTimesheetsRouter from './routes/mock-timesheets';
+import { recruitsRouter } from './routes/recruits';
 // import mockRecruitingRouter from './routes/mock-recruiting'; // Removed - using real API
 
 // Define context variables used across the app
@@ -2304,6 +2305,7 @@ app.route('/notifications', notificationsRouter);
 app.route('/reports', reportsRouter);
 app.route('/knowledge-base', knowledgeBaseRouter);
 app.route('/mock-timesheets', mockTimesheetsRouter);
+app.route('/api/recruits', recruitsRouter);
 // app.route('/api/recruits', mockRecruitingRouter); // Removed - using real Next.js API
 
 app.onError((err, c) => {

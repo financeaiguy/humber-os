@@ -1,0 +1,18 @@
+{
+  "runtime": "edge",
+  "name": "auth/signup",
+  "deploymentTarget": "v8-worker",
+  "entrypoint": "index.js",
+  "assets": [],
+  "framework": {
+    "slug": "nextjs",
+    "version": "15.1.4"
+  },
+  "environment": {
+    "__NEXT_BUILD_ID": "iBA0gOZ0UMJs2Ih0JXPQw",
+    "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "STlSxgPUQF1F7wQfGTXbD3D9E5RN7ajTLq4qw6RQPJU=",
+    "__NEXT_PREVIEW_MODE_ID": "fd8785f3c32e049071f823c3314d8968",
+    "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "e59d72275f86833ff86e5986975f6fb6ddfa75c668049918fc9c34241ed6926c",
+    "__NEXT_PREVIEW_MODE_SIGNING_KEY": "4243f59eeff619f0a3245edfd17dab840670ac23c622cc164decae33eebb359c"
+  }
+}

@@ -1,5 +1,7 @@
 'use client'
 
+export const runtime = 'edge'
+
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { ArrowLeft, Shield, Eye, Lock, Database, Users, Clock, FileText, Globe, Phone } from 'lucide-react'

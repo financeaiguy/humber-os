@@ -1,6 +1,9 @@
 'use client'
 
-import { motion } from 'framer-motion'
+export const runtime = 'edge'
+
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Building2, 
   MapPin, 
@@ -9,8 +12,10 @@ import {
   DollarSign,
   Users,
   Briefcase,
-  TrendingUp
+  TrendingUp,
+  Plus
 } from 'lucide-react'
+import { NewCustomerModal } from '@/components/clients/NewCustomerModal'
 
 const clients = [
   {
@@ -129,21 +134,48 @@ const getStatusColor = (status: string) => {
 }
 
 export default function ClientsPage() {
-  const totalRevenue = clients.reduce((sum, client) => sum + client.projects.totalValue, 0)
-  const totalProjects = clients.reduce((sum, client) => sum + client.projects.active + client.projects.completed, 0)
-  // const totalEngineers = clients.reduce((sum, client) => sum + client.engineers.deployed, 0)
-  const avgSatisfaction = clients.reduce((sum, client) => sum + client.relationship.satisfaction, 0) / clients.length
+  const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false)
+  const [clientList, setClientList] = useState(clients)
+  
+  const totalRevenue = clientList.reduce((sum, client) => sum + client.projects.totalValue, 0)
+  const totalProjects = clientList.reduce((sum, client) => sum + client.projects.active + client.projects.completed, 0)
+  // const totalEngineers = clientList.reduce((sum, client) => sum + client.engineers.deployed, 0)
+  const avgSatisfaction = clientList.reduce((sum, client) => sum + client.relationship.satisfaction, 0) / clientList.length
+
+  const handleAddCustomer = (newCustomer: any) => {
+    const customerWithId = {
+      ...newCustomer,
+      id: Math.max(...clientList.map(c => c.id)) + 1,
+      relationship: {
+        ...newCustomer.relationship,
+        since: new Date().toISOString().split('T')[0],
+        status: 'active',
+        lastContact: new Date().toISOString().split('T')[0]
+      }
+    }
+    setClientList([...clientList, customerWithId])
+    setIsNewCustomerModalOpen(false)
+  }
 
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-4xl font-bold text-white mb-2">
-          Customer Management
-        </h1>
-        <p className="text-slate-400">
-          Manage customer relationships and track project performance.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-4xl font-bold text-white mb-2">
+            Customer Management
+          </h1>
+          <p className="text-slate-400">
+            Manage customer relationships and track project performance.
+          </p>
+        </div>
+        <button
+          onClick={() => setIsNewCustomerModalOpen(true)}
+          className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center space-x-2 shadow-lg hover:shadow-xl"
+        >
+          <Plus className="h-5 w-5" />
+          <span>Add New Customer</span>
+        </button>
       </div>
 
       {/* Client Overview Stats */}
@@ -156,7 +188,7 @@ export default function ClientsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-slate-400">Total Clients</p>
-              <p className="text-2xl font-bold text-white mt-1">{clients.length}</p>
+              <p className="text-2xl font-bold text-white mt-1">{clientList.length}</p>
             </div>
             <Building2 className="h-8 w-8 text-blue-400" />
           </div>
@@ -210,7 +242,7 @@ export default function ClientsPage() {
 
       {/* Clients Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        {clients.map((client, index) => (
+        {clientList.map((client, index) => (
           <motion.div
             key={client.id}
             initial={{ opacity: 0, y: 20 }}
@@ -288,6 +320,13 @@ export default function ClientsPage() {
           </motion.div>
         ))}
       </div>
+
+      {/* New Customer Modal */}
+      <NewCustomerModal
+        isOpen={isNewCustomerModalOpen}
+        onClose={() => setIsNewCustomerModalOpen(false)}
+        onSubmit={handleAddCustomer}
+      />
     </div>
   )
 }

@@ -404,7 +404,7 @@ export default function CameraVerification({
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
-          className="fixed inset-4 bg-slate-900 rounded-2xl border border-slate-700 overflow-hidden"
+          className="fixed inset-4 bg-slate-900 rounded-2xl border border-slate-700 overflow-hidden flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -426,7 +426,7 @@ export default function CameraVerification({
           </div>
 
           {/* Camera View */}
-          <div className="flex-1 relative overflow-hidden">
+          <div className="flex-1 relative overflow-hidden min-h-0">
             {isLoading && (
               <div className="absolute inset-0 flex items-center justify-center bg-slate-900">
                 <div className="text-center">
@@ -526,11 +526,12 @@ export default function CameraVerification({
             )}
           </div>
 
-          {/* Bottom Controls */}
-          <div className="p-4 border-t border-slate-700">
+          {/* Bottom Controls - Fixed at bottom */}
+          <div className="p-4 border-t border-slate-700 bg-slate-900 flex-shrink-0">
             {!capturedImage ? (
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
+              <div className="space-y-3">
+                {/* Camera info */}
+                <div className="flex items-center justify-center space-x-4">
                   <div className="flex items-center space-x-2 text-slate-400">
                     <Camera size={16} />
                     <span className="text-sm">
@@ -544,41 +545,59 @@ export default function CameraVerification({
                     </div>
                   )}
                 </div>
+                
+                {/* Main capture button - full width and prominent */}
                 <button
                   onClick={handleCaptureWithCountdown}
                   disabled={!isCameraReady || countdown !== null}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                  className="w-full py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-bold text-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-3 shadow-lg"
                 >
-                  <Aperture size={20} />
-                  <span>Capture Photo</span>
+                  <Aperture size={24} />
+                  <span>Take Photo of Me at Location</span>
                 </button>
+                
+                {/* Camera status */}
+                <div className="text-center">
+                  {!isCameraReady && !isLoading && !error && (
+                    <p className="text-sm text-slate-400">Preparing camera...</p>
+                  )}
+                  {isCameraReady && (
+                    <p className="text-sm text-green-400">Camera ready</p>
+                  )}
+                </div>
               </div>
             ) : (
-              <div className="flex items-center justify-between">
-                <button
-                  onClick={handleRetake}
-                  disabled={isProcessing}
-                  className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors disabled:opacity-50"
-                >
-                  Retake
-                </button>
-                <button
-                  onClick={handleConfirmCapture}
-                  disabled={isProcessing}
-                  className="px-6 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center space-x-2"
-                >
-                  {isProcessing ? (
-                    <>
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                      <span>Processing...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Check size={20} />
-                      <span>Confirm & Submit</span>
-                    </>
-                  )}
-                </button>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <button
+                    onClick={handleRetake}
+                    disabled={isProcessing}
+                    className="px-6 py-3 bg-slate-700 text-white rounded-xl hover:bg-slate-600 transition-colors disabled:opacity-50 flex items-center space-x-2"
+                  >
+                    <RotateCcw size={20} />
+                    <span>Retake</span>
+                  </button>
+                  <button
+                    onClick={handleConfirmCapture}
+                    disabled={isProcessing}
+                    className="px-8 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center space-x-2"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        <span>Processing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Check size={20} />
+                        <span>Confirm & Submit</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+                <p className="text-center text-sm text-slate-400">
+                  Review your photo and confirm to proceed
+                </p>
               </div>
             )}
           </div>

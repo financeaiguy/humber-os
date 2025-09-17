@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { getAssetFromKV } from '@cloudflare/kv-asset-handler';
 
 // Durable Objects

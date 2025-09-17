@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { Sidebar } from '@/components/sidebar'
+import { SessionManager } from '@/components/session-manager'
 import dynamic from 'next/dynamic'
 
 // Lazy load heavy components
@@ -29,7 +30,7 @@ export function LayoutClient({ children }: LayoutClientProps) {
   const [platformClasses, setPlatformClasses] = useState('')
   const [isJobsMode, setIsJobsMode] = useState(false)
   const pathname = usePathname()
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   
   // Check if current path is an auth page
   const isAuthPage = pathname.startsWith('/auth')
@@ -51,6 +52,51 @@ export function LayoutClient({ children }: LayoutClientProps) {
     return <>{children}</>
   }
   
+  // Show loading while checking session
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </div>
+    )
+  }
+  
+  // Show authentication required message if not authenticated
+  if (status === 'unauthenticated' || !session) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
+        <div className="max-w-md w-full">
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold text-white mb-2">Authentication Required</h1>
+            <p className="text-slate-400">Please sign in to access the dashboard.</p>
+          </div>
+          
+          <div className="bg-slate-900/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-6">
+            <Link 
+              href="/auth/signin"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center"
+            >
+              Sign In
+            </Link>
+            
+            <div className="mt-6 pt-6 border-t border-slate-700/50">
+              <p className="text-sm text-slate-500 mb-3">Development credentials:</p>
+              <div className="space-y-1 text-xs text-slate-400">
+                <div>• Partner Admin: partner@ford.com / partner123</div>
+                <div>• Engineer: employee@humber.com / employee123</div>
+                <div>• Operator: operator@humber.com / operator123</div>
+              </div>
+            </div>
+          </div>
+          
+          <footer className="text-center mt-8 text-xs text-slate-500">
+            © 2024 Humber Operations - Engineering Staffing Solutions
+          </footer>
+        </div>
+      </div>
+    )
+  }
+  
   // Use Jobs layout if in Jobs mode
   if (isJobsMode) {
     return (
@@ -67,6 +113,9 @@ export function LayoutClient({ children }: LayoutClientProps) {
 
   return (
     <div className={`flex flex-col min-h-screen bg-slate-950 ${platformClasses}`}>
+      {/* Session Manager - handles persistent login */}
+      <SessionManager />
+      
       <div className="flex flex-1">
         {shouldShowSidebar && <Sidebar />}
         <main className={`flex-1 flex flex-col ${shouldShowSidebar ? 'lg:ml-64' : ''}`}>
