@@ -25,8 +25,8 @@ const ContinuousLearningProvider = dynamic(() => import('@/components/continuous
 
 const inter = Inter({ subsets: ['latin'] })
 
-// Force edge runtime for Cloudflare Workers compatibility
-export const runtime = 'edge'
+// Removed edge runtime to fix webpack compatibility issues
+// export const runtime = 'edge'
 export const revalidate = 0
 
 export const metadata: Metadata = {

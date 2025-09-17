@@ -14,7 +14,7 @@ const secureTimeTrackingRouter = new Hono<{ Bindings: Env; Variables: AuthVariab
 // Secure Clock In/Out with Biometric and Geolocation Verification
 secureTimeTrackingRouter.post('/clock-action', async (c) => {
   const logger = new Logger('secure-clock-action');
-  c.get('tenantId') as string || 'demo-tenant';
+  const tenantId = c.get('tenantId') as string || 'demo-tenant';
   
   try {
     const body = await c.req.json();
@@ -118,7 +118,7 @@ secureTimeTrackingRouter.post('/clock-action', async (c) => {
 // Get Active Time Tracking Sessions
 secureTimeTrackingRouter.get('/active-sessions', async (c) => {
   const logger = new Logger('active-time-sessions');
-  c.get('tenantId') as string || 'demo-tenant';
+  const tenantId = c.get('tenantId') as string || 'demo-tenant';
   
   try {
     // Mock active sessions (would query actual database)
@@ -221,7 +221,7 @@ secureTimeTrackingRouter.get('/active-sessions', async (c) => {
 // Get Work Sites for Geolocation Verification
 secureTimeTrackingRouter.get('/work-sites', async (c) => {
   const logger = new Logger('work-sites');
-  c.get('tenantId') as string || 'demo-tenant';
+  const tenantId = c.get('tenantId') as string || 'demo-tenant';
   
   try {
     // Mock work sites (would query actual database)
@@ -279,7 +279,7 @@ secureTimeTrackingRouter.get('/work-sites', async (c) => {
 // Verify Location Against Work Site
 secureTimeTrackingRouter.post('/verify-location', async (c) => {
   const logger = new Logger('verify-location');
-  c.get('tenantId') as string || 'demo-tenant';
+  const tenantId = c.get('tenantId') as string || 'demo-tenant';
   
   try {
     const { latitude, longitude, accuracy } = await c.req.json();

@@ -1,0 +1,35 @@
+name = "humber-workers-real"
+main = "dist-workers/worker.js"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+[env.production]
+name = "humber-workers-real-prod"
+
+[env.production.vars]
+ENVIRONMENT = "production"
+API_VERSION = "3.0.0"
+NEXTAUTH_SECRET = "humber-workers-real-secret-2024"
+NEXTAUTH_URL = "https://humber-workers-real-prod.evafiai.workers.dev"
+NEXT_PUBLIC_API_URL = "https://humber-operations-worker-prod.evafiai.workers.dev"
+NEXT_PUBLIC_TENANT_ID = "tenant-001"
+
+# D1 Databases
+[[env.production.d1_databases]]
+binding = "DB_MASTER"
+database_name = "humber_os_master"
+database_id = "1d392f9e-b2f3-4bfb-9bb3-f82484ad140f"
+
+# KV Namespaces
+[[env.production.kv_namespaces]]
+binding = "KV_CACHE"
+id = "16640e4d080d4de8879962927ad31732"
+
+# Vectorize
+[[env.production.vectorize]]
+binding = "VECTORIZE_INDEX"
+index_name = "humber-knowledge-base"
+
+# Workers AI
+[env.production.ai]
+binding = "AI"

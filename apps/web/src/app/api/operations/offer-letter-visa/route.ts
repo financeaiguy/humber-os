@@ -1,51 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-export const runtime = 'edge'
-
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     
-    // Basic validation
-    if (!body.candidateId) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Validation failed',
-          message: 'Candidate ID is required'
-        },
-        { status: 400 }
-      )
-    }
-
-    // Mock processing - in real app, this would send offer letter and process visa
-    const result = {
-      candidateId: body.candidateId,
-      offerAmount: body.offerAmount || 85000,
-      startDate: body.startDate || '2025-10-01',
-      position: body.position || 'Senior Engineer',
-      location: body.location || 'Remote',
-      visaRequired: body.visaRequired || false,
-      offerSent: true,
-      processedAt: new Date().toISOString(),
-      nextStep: 'deployment'
-    }
-
-    return NextResponse.json({
+    // Mock offer letter processing
+    const response = {
       success: true,
-      data: result,
-      message: 'Offer letter sent and visa processing initiated'
-    })
+      message: 'Offer letter and visa documentation processed',
+      offerId: `OL-${Date.now()}`,
+      timestamp: new Date().toISOString()
+    }
+    
+    return NextResponse.json(response)
   } catch (error) {
-    console.error('Error processing offer letter and visa:', error)
     return NextResponse.json(
-      {
-        success: false,
-        error: 'Internal error',
-        message: 'An error occurred while processing your request',
-        requestId: Date.now().toString()
-      },
+      { error: 'Failed to process offer letter', message: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }
+}
+
+export async function GET() {
+  return NextResponse.json({
+    endpoint: 'offer-letter-visa',
+    status: 'active',
+    description: 'Handles offer letter and visa documentation processing'
+  })
 }
