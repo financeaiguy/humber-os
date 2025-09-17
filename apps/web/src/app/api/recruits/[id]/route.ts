@@ -57,30 +57,34 @@ async function proxyToWorker(request: NextRequest, id: string) {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  return proxyToWorker(request, params.id)
+  const { id } = await params
+  return proxyToWorker(request, id)
 }
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  return proxyToWorker(request, params.id)
+  const { id } = await params
+  return proxyToWorker(request, id)
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  return proxyToWorker(request, params.id)
+  const { id } = await params
+  return proxyToWorker(request, id)
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  return proxyToWorker(request, params.id)
+  const { id } = await params
+  return proxyToWorker(request, id)
 }
 
 export async function PATCH(

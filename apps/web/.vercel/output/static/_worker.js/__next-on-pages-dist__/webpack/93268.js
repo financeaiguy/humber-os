@@ -1,1 +1,0 @@
-var e={},c=(o,s,_)=>(e.__chunk_93268=(a,r,t)=>{"use strict";t.d(r,{A:()=>h});let h=(0,t(756).A)("smartphone",[["rect",{width:"14",height:"20",x:"5",y:"2",rx:"2",ry:"2",key:"1yt0o3"}],["path",{d:"M12 18h.01",key:"mhygvu"}]])},e);export{c as __getNamedExports};

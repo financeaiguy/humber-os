@@ -1,9 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+interface SetSessionRequest {
+  action: 'set'
+  sessionToken: string
+  sessionData: unknown
+}
+
+interface GetSessionRequest {
+  action: 'get'
+  sessionToken: string
+}
+
+interface DeleteSessionRequest {
+  action: 'delete' | 'deleteUser'
+  sessionToken?: string
+  userId?: string
+}
+
 // This API endpoint manages session storage in KV store for production
 export async function PUT(request: NextRequest) {
   try {
-    const { action, sessionToken, sessionData } = await request.json()
+    const body = await request.json() as SetSessionRequest
+    const { action, sessionToken, sessionData } = body
     
     if (action !== 'set' || !sessionToken || !sessionData) {
       return NextResponse.json(
@@ -19,7 +37,7 @@ export async function PUT(request: NextRequest) {
 
     // For now, we'll simulate KV storage with a simple in-memory store
     // In production, replace this with actual KV binding
-    console.log('📝 KV Store - Setting session:', sessionToken.substring(0, 8) + '...')
+    console.log('📝 KV Store - Setting session:', sessionToken.substring(0, Math.min(8, sessionToken.length)) + '...')
     
     return NextResponse.json({ success: true })
   } catch (error) {
@@ -33,7 +51,8 @@ export async function PUT(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { action, sessionToken } = await request.json()
+    const body = await request.json() as GetSessionRequest
+    const { action, sessionToken } = body
     
     if (action !== 'get' || !sessionToken) {
       return NextResponse.json(
@@ -51,7 +70,7 @@ export async function POST(request: NextRequest) {
 
     // For now, we'll simulate that sessions don't exist in KV
     // This will cause fallback to localStorage
-    console.log('🔍 KV Store - Getting session:', sessionToken.substring(0, 8) + '...')
+    console.log('🔍 KV Store - Getting session:', sessionToken.substring(0, Math.min(8, sessionToken.length)) + '...')
     
     return NextResponse.json(
       { error: 'Session not found in KV store' },
@@ -68,7 +87,8 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const { action, sessionToken, userId } = await request.json()
+    const body = await request.json() as DeleteSessionRequest
+    const { action, sessionToken, userId } = body
     
     if (!action || (action === 'delete' && !sessionToken) || (action === 'deleteUser' && !userId)) {
       return NextResponse.json(
@@ -77,12 +97,12 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    if (action === 'delete') {
+    if (action === 'delete' && sessionToken) {
       // In a Cloudflare Worker environment, you would use:
       // await env.HUMBER_SESSIONS.delete(`session:${sessionToken}`)
       
-      console.log('🗑️ KV Store - Deleting session:', sessionToken.substring(0, 8) + '...')
-    } else if (action === 'deleteUser') {
+      console.log('🗑️ KV Store - Deleting session:', sessionToken.substring(0, Math.min(8, sessionToken.length)) + '...')
+    } else if (action === 'deleteUser' && userId) {
       // In a Cloudflare Worker environment, you would use:
       // const list = await env.HUMBER_SESSIONS.list({ prefix: `session:` })
       // for (const key of list.keys) {
@@ -107,4 +127,3 @@ export async function DELETE(request: NextRequest) {
     )
   }
 }
-
