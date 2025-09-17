@@ -1,1 +1,0 @@
-{"version":3,"file":"CustomerPurchaseInterface.d.ts","sourceRoot":"","sources":["../../../src/components/bull-pen/CustomerPurchaseInterface.tsx"],"names":[],"mappings":"AAkCA,UAAU,qBAAqB;IAC7B,MAAM,EAAE,OAAO,CAAA;IACf,OAAO,EAAE,MAAM,IAAI,CAAA;IACnB,YAAY,CAAC,EAAE,GAAG,CAAA;CACnB;AAED,MAAM,CAAC,OAAO,UAAU,yBAAyB,CAAC,EAAE,MAAM,EAAE,OAAO,EAAE,YAAY,EAAE,EAAE,qBAAqB,kDAwdzG"}

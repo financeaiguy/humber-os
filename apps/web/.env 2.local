@@ -1,0 +1,2 @@
+AUTH_SECRET=humber-operations-auth-secret-key-2025-secure
+NEXTAUTH_URL=http://localhost:3001

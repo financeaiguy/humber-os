@@ -141,12 +141,17 @@ const PipelineChart = memo<{ data: any[] }>(({ data }) => (
       Recruitment Pipeline
     </h3>
     <ResponsiveContainer width="100%" height={300}>
-      <BarChart data={data} layout="horizontal">
+      <BarChart data={data}>
         <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-        <XAxis type="number" stroke="#94a3b8" />
-        <YAxis dataKey="stage" type="category" width={80} stroke="#94a3b8" />
+        <XAxis dataKey="stage" stroke="#94a3b8" />
+        <YAxis stroke="#94a3b8" />
         <Tooltip content={<CustomTooltip />} />
-        <Bar dataKey="candidates" fill="#8B5CF6" radius={[0, 8, 8, 0]} />
+        <Legend />
+        <Bar dataKey="candidates" fill="#8B5CF6" radius={[8, 8, 0, 0]}>
+          {data.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={`hsl(${260 - index * 15}, 70%, 60%)`} />
+          ))}
+        </Bar>
       </BarChart>
     </ResponsiveContainer>
   </div>
@@ -157,6 +162,13 @@ PipelineChart.displayName = 'PipelineChart';
 const ClientDistributionChart = memo<{ data: any[] }>(({ data }) => {
   const COLORS = ['#10B981', '#3B82F6', '#8B5CF6', '#F59E0B', '#EF4444'];
   
+  // Calculate total for percentage
+  const total = data.reduce((sum, item) => sum + item.value, 0);
+  const dataWithPercentage = data.map(item => ({
+    ...item,
+    percentage: ((item.value / total) * 100).toFixed(1)
+  }));
+  
   return (
     <div className="bg-slate-800/50 backdrop-blur-xl p-6 rounded-xl border border-slate-700/50">
       <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
@@ -166,7 +178,7 @@ const ClientDistributionChart = memo<{ data: any[] }>(({ data }) => {
       <ResponsiveContainer width="100%" height={300}>
         <PieChart>
           <Pie
-            data={data}
+            data={dataWithPercentage}
             cx="50%"
             cy="50%"
             innerRadius={60}
@@ -174,15 +186,25 @@ const ClientDistributionChart = memo<{ data: any[] }>(({ data }) => {
             fill="#8884d8"
             paddingAngle={2}
             dataKey="value"
+            label={(entry) => `${entry.name}: ${entry.percentage}%`}
+            labelLine={false}
           >
-            {data.map((_, index) => (
+            {dataWithPercentage.map((_, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>
           <Tooltip content={<CustomTooltip />} />
-          <Legend />
         </PieChart>
       </ResponsiveContainer>
+      {/* Legend as separate list for better visibility */}
+      <div className="mt-4 flex flex-wrap gap-3">
+        {dataWithPercentage.map((item, index) => (
+          <div key={item.name} className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
+            <span className="text-sm text-slate-300">{item.name}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 });

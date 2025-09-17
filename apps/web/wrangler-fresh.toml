@@ -1,0 +1,68 @@
+name = "humber-operations-fresh"
+main = "src/worker-clean.js"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+[env.production]
+name = "humber-operations-fresh-prod"
+
+[env.production.vars]
+ENVIRONMENT = "production"
+API_VERSION = "2.0.0"
+LOG_LEVEL = "info"
+NEXTAUTH_SECRET = "humber-fresh-secret-key-2024-production-secure-deployment"
+NEXTAUTH_URL = "https://humber-operations-fresh-prod.evafiai.workers.dev"
+NEXT_PUBLIC_API_URL = "https://humber-operations-worker-prod.evafiai.workers.dev"
+NEXT_PUBLIC_TENANT_ID = "tenant-001"
+
+# D1 Databases
+[[env.production.d1_databases]]
+binding = "DB_MASTER"
+database_name = "humber_os_master"
+database_id = "1d392f9e-b2f3-4bfb-9bb3-f82484ad140f"
+
+[[env.production.d1_databases]]
+binding = "DB_ENGINEER_001"
+database_name = "humber-tenant-001"
+database_id = "38c9a86b-64db-4235-b283-b9b8d93b11f1"
+
+[[env.production.d1_databases]]
+binding = "DB_ENGINEER_002"
+database_name = "humber-tenant-002"
+database_id = "ec971ef9-1f98-49ca-8a91-dd3192b12429"
+
+[[env.production.d1_databases]]
+binding = "DB_ENGINEER_003"
+database_name = "humber-tenant-003"
+database_id = "22e3d3e8-fd0d-43f0-a587-bab533ce6e2e"
+
+# KV Namespaces
+[[env.production.kv_namespaces]]
+binding = "KV_TENANT_CACHE"
+id = "7d7a6b3d94b24cb5b96177556a2f7130"
+
+[[env.production.kv_namespaces]]
+binding = "KV_CACHE"
+id = "16640e4d080d4de8879962927ad31732"
+
+[[env.production.kv_namespaces]]
+binding = "KV_SESSIONS"
+id = "81526f64e8cf4928a9ec1b903a8024ef"
+
+# R2 Buckets
+[[env.production.r2_buckets]]
+binding = "DOCUMENTS"
+bucket_name = "humber-documents"
+
+[[env.production.r2_buckets]]
+binding = "ASSETS"
+bucket_name = "humber-web-assets"
+
+# Vectorize
+[[env.production.vectorize]]
+binding = "VECTORIZE_INDEX"
+index_name = "humber-knowledge-base"
+
+# Workers AI
+[env.production.ai]
+binding = "AI"

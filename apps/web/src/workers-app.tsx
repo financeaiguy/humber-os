@@ -16,7 +16,7 @@ const mockSession = {
     id: '1',
     name: 'Demo User',
     email: 'demo@humber.com',
-    role: 'partner_admin',
+    role: 'PARTNER_ADMIN' as const,
     partnerId: 'partner-001',
     partnerName: 'Demo Partner'
   },

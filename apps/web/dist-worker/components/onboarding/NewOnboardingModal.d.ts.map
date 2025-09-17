@@ -1,1 +1,0 @@
-{"version":3,"file":"NewOnboardingModal.d.ts","sourceRoot":"","sources":["../../../src/components/onboarding/NewOnboardingModal.tsx"],"names":[],"mappings":"AAuCA,UAAU,uBAAuB;IAC/B,MAAM,EAAE,OAAO,CAAA;IACf,OAAO,EAAE,MAAM,IAAI,CAAA;IACnB,SAAS,CAAC,EAAE,MAAM,CAAA;CACnB;AAED,MAAM,CAAC,OAAO,UAAU,kBAAkB,CAAC,EACzC,MAAM,EACN,OAAO,EACP,SAAS,EACV,EAAE,uBAAuB,kDAi7BzB"}

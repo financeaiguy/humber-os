@@ -1,1 +1,0 @@
-{"version":3,"file":"chat-widget.d.ts","sourceRoot":"","sources":["../../src/components/chat-widget.tsx"],"names":[],"mappings":"AA4CA,UAAU,eAAe;IACvB,MAAM,EAAE,OAAO,CAAA;IACf,QAAQ,EAAE,MAAM,IAAI,CAAA;IACpB,SAAS,CAAC,EAAE,MAAM,CAAA;CACnB;AAED,wBAAgB,UAAU,CAAC,EAAE,MAAM,EAAE,QAAQ,EAAE,SAAc,EAAE,EAAE,eAAe,2CA2oB/E"}

@@ -195,18 +195,18 @@ operationsRouter.post('/background-checks', async (c) => {
     const db = drizzle(c.env.DB);
     
     const allChecksPassed = 
-      input.drugTestResult === 'pass' &&
-      input.backgroundCheckResult === 'clear' &&
+      input.drugTestCompleted &&
+      input.backgroundCheckCompleted &&
       input.certificationVerified &&
       input.ssnVerified;
     
     await db.update(candidates)
       .set({
         status: allChecksPassed ? 'offer_sent' : 'background_check',
-        drugTestStatus: input.drugTestResult,
-        backgroundCheckStatus: input.backgroundCheckResult,
-        certificationStatus: input.certificationVerified ? 'verified' : 'pending',
-        ssnVerificationStatus: input.ssnVerified ? 'verified' : 'pending',
+        drugTestStatus: input.drugTestCompleted ? 'pass' : 'pending',
+        backgroundCheckStatus: input.backgroundCheckCompleted ? 'pass' : 'pending',
+        certificationStatus: input.certificationVerified ? 'pass' : 'pending',
+        ssnVerificationStatus: input.ssnVerified ? 'pass' : 'pending',
         updatedAt: Date.now(),
       })
       .where(and(
