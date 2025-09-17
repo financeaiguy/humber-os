@@ -3,9 +3,9 @@ import { NextRequest, NextResponse } from 'next/server'
 export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
 
-const WORKER_URL = process.env.WORKER_URL || 'http://localhost:8787'
+const WORKER_URL = 'http://localhost:8787'
 
-async function proxyToWorker(request: NextRequest) {
+async function proxyToWorker(request: NextRequest, id: string) {
   try {
     const url = new URL(request.url)
     const workerUrl = `${WORKER_URL}${url.pathname}${url.search}`
@@ -31,7 +31,7 @@ async function proxyToWorker(request: NextRequest) {
     const response = await fetch(workerUrl, {
       method: request.method,
       headers,
-      body: request.method !== 'GET' ? await request.text() : undefined,
+      body: request.method !== 'GET' && request.method !== 'DELETE' ? await request.text() : undefined,
     })
 
     const responseData = await response.text()
@@ -55,6 +55,37 @@ async function proxyToWorker(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
-  return proxyToWorker(request)
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  return proxyToWorker(request, params.id)
+}
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  return proxyToWorker(request, params.id)
+}
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  return proxyToWorker(request, params.id)
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  return proxyToWorker(request, params.id)
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  return proxyToWorker(request, params.id)
 }

@@ -1,163 +1,77 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { withAuth, withRole, withAuditLog, AuthenticatedRequest } from '@/lib/auth-middleware'
-import { 
-  recruitSchema, 
-  recruitFiltersSchema,
-  validateRequestBody,
-  createValidationResponse 
-} from '@/lib/validation-schemas'
-export const runtime = 'edge'
+
+// Using nodejs runtime for development to allow localhost connections
+// export const runtime = 'edge'  
 export const dynamic = 'force-dynamic'
 
-// Type definitions
-interface RecruitInput {
-  firstName: string
-  lastName: string
-  email: string
-  phone?: string
-  currentLocation?: string
-  jobTitle?: string
-  yearsExperience?: number
-  currentCompany?: string
-  desiredSalary?: string
-  skills?: string[]
-  education?: string
-  certifications?: string[]
-  availableStartDate?: string
-  workAuthorization?: string
-  willingToRelocate?: boolean
-  travelWillingness?: string
-  source?: string
-  recruiterName?: string
-  recruiterAgency?: string
-  notes?: string
-}
+const WORKER_URL = 'http://localhost:8787'
 
-interface Recruit extends RecruitInput {
-  id: string
-  status: string
-  createdAt: string
-  updatedAt: string
-}
-
-// Production database storage - replace with actual D1/database implementation
-// In production, this would connect to Cloudflare D1 or another database
-const recruitsStorage = new Map<string, Recruit>() // Temporary in-memory storage
-
-// Initialize with empty storage for production
-// Mock data removed for security compliance
-
-export async function GET(request: NextRequest) {
+async function proxyToWorker(request: NextRequest) {
   try {
-    // TODO: Add auth validation here instead of HOF wrapper
-    const { searchParams } = new URL(request.url)
+    const url = new URL(request.url)
+    const workerUrl = `${WORKER_URL}${url.pathname}${url.search}`
     
-    // Validate query parameters
-    const queryParams = Object.fromEntries(searchParams.entries())
-    const validationResult = validateRequestBody(recruitFiltersSchema, queryParams)
-    
-    if (!validationResult.success) {
-      return NextResponse.json(createValidationResponse(validationResult.errors), { status: 400 })
-    }
-
-    const { page, limit, status, search } = validationResult.data
-
-    // Get all recruits from storage
-    let allRecruits = Array.from(recruitsStorage.values())
-    
-    // Filter by status
-    if (status) {
-      allRecruits = allRecruits.filter(recruit => recruit.status === status)
-    }
-
-    // Filter by search
-    if (search) {
-      const searchLower = search.toLowerCase()
-      allRecruits = allRecruits.filter(recruit =>
-        recruit.firstName.toLowerCase().includes(searchLower) ||
-        recruit.lastName.toLowerCase().includes(searchLower) ||
-        recruit.email.toLowerCase().includes(searchLower) ||
-        recruit.jobTitle?.toLowerCase().includes(searchLower) ||
-        recruit.currentCompany?.toLowerCase().includes(searchLower)
-      )
-    }
-
-    // Pagination
-    const total = allRecruits.length
-    const totalPages = Math.ceil(total / limit)
-    const startIndex = (page - 1) * limit
-    const endIndex = startIndex + limit
-    const paginatedRecruits = allRecruits.slice(startIndex, endIndex)
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        recruits: paginatedRecruits,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages
-        }
+    const headers = new Headers()
+    // Copy relevant headers
+    request.headers.forEach((value, key) => {
+      if (key.toLowerCase().startsWith('content-') || 
+          key.toLowerCase() === 'authorization' ||
+          key.toLowerCase() === 'x-tenant-id') {
+        headers.set(key, value)
       }
     })
+    
+    // Add default headers for API testing
+    if (!headers.has('x-tenant-id')) {
+      headers.set('x-tenant-id', 'demo-tenant')
+    }
+    if (!headers.has('authorization')) {
+      headers.set('authorization', 'Bearer test-token-for-api-testing')
+    }
+
+    const response = await fetch(workerUrl, {
+      method: request.method,
+      headers,
+      body: request.method !== 'GET' ? await request.text() : undefined,
+    })
+
+    const responseData = await response.text()
+    
+    return new NextResponse(responseData, {
+      status: response.status,
+      headers: {
+        'Content-Type': response.headers.get('Content-Type') || 'application/json',
+      },
+    })
   } catch (error) {
-    console.error('Error fetching recruits:', error)
+    console.error('Error proxying to worker:', error)
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to fetch recruits',
-        message: 'An error occurred while retrieving recruit data'
+        error: 'Failed to connect to worker API',
+        message: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }
     )
   }
+}
+
+export async function GET(request: NextRequest) {
+  return proxyToWorker(request)
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    // TODO: Add auth and role validation here instead of HOF wrapper
-    const requestData = await request.json()
-    
-    // Validate recruit data
-    const validationResult = validateRequestBody(recruitSchema, requestData)
-    if (!validationResult.success) {
-      return NextResponse.json(createValidationResponse(validationResult.errors), { status: 400 })
-    }
+  return proxyToWorker(request)
+}
 
-    const validatedData = validationResult.data
+export async function PUT(request: NextRequest) {
+  return proxyToWorker(request)
+}
 
-    // Generate a new ID using edge runtime crypto
-    const newId = crypto.randomUUID()
-    
-    const newRecruit: Recruit = {
-      id: newId,
-      ...validatedData,
-      status: 'sourced',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
+export async function DELETE(request: NextRequest) {
+  return proxyToWorker(request)
+}
 
-    // Store in temporary storage (replace with D1 database in production)
-    recruitsStorage.set(newId, newRecruit)
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        recruitId: newId,
-        status: 'sourced',
-        message: 'Recruit successfully submitted'
-      }
-    })
-  } catch (error) {
-    console.error('Error creating recruit:', error)
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Failed to create recruit',
-        message: 'An error occurred while creating the recruit'
-      },
-      { status: 500 }
-    )
-  }
+export async function PATCH(request: NextRequest) {
+  return proxyToWorker(request)
 }

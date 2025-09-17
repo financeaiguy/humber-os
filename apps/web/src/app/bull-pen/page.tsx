@@ -38,6 +38,7 @@ import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import dynamic from 'next/dynamic'
+import Link from 'next/link'
 
 // Dynamically import modals with proper configuration
 const EngineerAllocationModal = dynamic(() => import('@/components/bull-pen/EngineerAllocationModal').then((mod) => ({ default: mod.default })), { 
@@ -348,31 +349,31 @@ export default function BullPenDashboard() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Resource Allocation Hub</h1>
-          <p className="text-slate-400 mt-1">Mix and match engineers for projects • Manage travel and expenses</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">Resource Allocation Hub</h1>
+          <p className="text-slate-400 mt-1 text-sm sm:text-base">Mix and match engineers for projects • Manage travel and expenses</p>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <Button
             onClick={() => setShowFlightModal(true)}
-            className="bg-blue-500 hover:bg-blue-600"
+            className="bg-blue-500 hover:bg-blue-600 w-full sm:w-auto"
           >
             <Plane className="h-4 w-4 mr-2" />
-            Book Travel
+            <span className="sm:inline">Book Travel</span>
           </Button>
           <Button
             onClick={() => setShowExpenseModal(true)}
-            className="bg-green-500 hover:bg-green-600"
+            className="bg-green-500 hover:bg-green-600 w-full sm:w-auto"
           >
             <DollarSign className="h-4 w-4 mr-2" />
-            Track Expenses
+            <span className="sm:inline">Track Expenses</span>
           </Button>
         </div>
       </div>
 
       {/* View Toggle */}
-      <div className="flex items-center space-x-1 bg-slate-800/50 backdrop-blur-xl rounded-xl p-1 w-fit">
+      <div className="flex items-center space-x-1 bg-slate-800/50 backdrop-blur-xl rounded-xl p-1 w-full sm:w-fit overflow-x-auto">
         <button
           onClick={() => setActiveView('engineers')}
           className={`px-6 py-2.5 rounded-lg font-medium transition-all duration-300 flex items-center space-x-2 ${
@@ -409,7 +410,7 @@ export default function BullPenDashboard() {
       </div>
 
       {/* Quick Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
         {categories.map((category, index) => (
           <motion.div
             key={category.name}
@@ -483,7 +484,7 @@ export default function BullPenDashboard() {
             </div>
 
             {/* Engineer Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {filteredEngineers.map((engineer, index) => (
                 <motion.div
                   key={engineer.id}
@@ -719,12 +720,12 @@ export default function BullPenDashboard() {
           >
             <Card className="bg-slate-800/50 border-slate-700">
               <CardHeader>
-                <CardTitle className="text-white">Resource Allocation Matrix</CardTitle>
-                <CardDescription>Real-time view of engineer-project assignments</CardDescription>
+                <CardTitle className="text-white text-lg sm:text-xl">Resource Allocation Matrix</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">Real-time view of engineer-project assignments</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
+              <CardContent className="px-2 sm:px-6">
+                <div className="overflow-x-auto -mx-2 sm:mx-0">
+                  <table className="w-full min-w-[640px]">
                     <thead>
                       <tr className="border-b border-slate-700">
                         <th className="text-left p-3 text-slate-300">Engineer</th>
@@ -806,6 +807,323 @@ export default function BullPenDashboard() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Deployment Readiness Cards */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="space-y-6"
+      >
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-white">Deployment Readiness Dashboard</h2>
+          <Badge variant="outline" className="text-green-400 border-green-400">
+            80% Complete
+          </Badge>
+        </div>
+
+        {/* Pre-deployment Checklist */}
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader>
+            <CardTitle className="text-white">Pre-Deployment Checklist</CardTitle>
+            <CardDescription>Complete all items before engineer deployment</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {[
+                { id: 'tools', label: 'Tool Certification', completed: true, priority: 'medium' },
+                { id: 'travel', label: 'Travel Arrangements', completed: true, priority: 'high' },
+                { id: 'housing', label: 'Housing Confirmation', completed: true, priority: 'medium' },
+                { id: 'credentials', label: 'Site Credentials', completed: false, priority: 'high' },
+                { id: 'insurance', label: 'Insurance Verification', completed: false, priority: 'medium' }
+              ].map((item, index) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 * index }}
+                  className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
+                    item.completed 
+                      ? 'bg-green-900/20 border-green-500/30 line-through opacity-60' 
+                      : 'bg-slate-700/50 border-slate-600 hover:border-blue-500/50'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    {item.completed ? (
+                      <CheckCircle className="h-5 w-5 text-green-400" />
+                    ) : (
+                      <AlertCircle className={`h-5 w-5 ${item.priority === 'high' ? 'text-red-400' : 'text-yellow-400'}`} />
+                    )}
+                    <span className={`font-medium ${item.completed ? 'text-slate-400' : 'text-white'}`}>
+                      {item.label}
+                    </span>
+                  </div>
+                  <Badge variant={item.priority === 'high' ? 'destructive' : 'warning'} className="text-xs">
+                    {item.priority}
+                  </Badge>
+                </motion.div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Deployment Progress Bar */}
+        <Card className="bg-gradient-to-r from-slate-800/50 to-slate-700/50 border-slate-600">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <Target className="h-8 w-8 text-blue-400" />
+                <div>
+                  <h3 className="text-xl font-bold text-white">Deployment Readiness</h3>
+                  <p className="text-slate-400">Overall progress to go-live</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-3xl font-bold text-white">80%</div>
+                <p className="text-sm text-slate-400">4 of 5 complete</p>
+              </div>
+            </div>
+            <div className="w-full bg-slate-700 rounded-full h-3 mb-4">
+              <motion.div 
+                initial={{ width: 0 }}
+                animate={{ width: '80%' }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+                className="bg-gradient-to-r from-blue-500 to-green-500 h-3 rounded-full relative overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
+              </motion.div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Interactive Project Management Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {[
+            {
+              id: 'resource-allocation',
+              title: 'Resource Allocation',
+              description: 'Manage engineer assignments',
+              icon: Users,
+              color: 'from-blue-500 to-cyan-600',
+              bgColor: 'bg-blue-500/20',
+              borderColor: 'border-blue-500/30',
+              action: () => setActiveView('allocation'),
+              isExternal: false
+            },
+            {
+              id: 'project-dashboard',
+              title: 'Project Dashboard',
+              description: 'Full project management suite',
+              icon: Target,
+              color: 'from-green-500 to-emerald-600',
+              bgColor: 'bg-green-500/20',
+              borderColor: 'border-green-500/30',
+              href: '/projects',
+              isExternal: true
+            },
+            {
+              id: 'travel-booking',
+              title: 'Travel & Expenses',
+              description: 'Book flights and track costs',
+              icon: Plane,
+              color: 'from-purple-500 to-pink-600',
+              bgColor: 'bg-purple-500/20',
+              borderColor: 'border-purple-500/30',
+              action: () => setShowFlightModal(true),
+              isExternal: false
+            },
+            {
+              id: 'engineer-profiles',
+              title: 'Engineer Profiles',
+              description: 'View skills and availability',
+              icon: Award,
+              color: 'from-yellow-500 to-orange-600',
+              bgColor: 'bg-yellow-500/20',
+              borderColor: 'border-yellow-500/30',
+              action: () => setActiveView('engineers'),
+              isExternal: false
+            }
+          ].map((card, index) => (
+            <motion.div
+              key={card.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 * index }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              {card.isExternal ? (
+                <Link href={card.href!} className="block h-full">
+                  <Card className={`bg-slate-800/50 border-slate-700 hover:${card.borderColor} transition-all duration-300 cursor-pointer group h-full`}>
+                    <CardContent className="p-6 text-center space-y-4">
+                      <div className={`inline-flex p-4 rounded-xl ${card.bgColor} border ${card.borderColor} group-hover:scale-110 transition-transform duration-300`}>
+                        <card.icon className="h-8 w-8 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-white mb-2">{card.title}</h3>
+                        <p className="text-sm text-slate-400 leading-relaxed">{card.description}</p>
+                      </div>
+                      <div className="flex items-center justify-center text-blue-400 group-hover:text-blue-300 transition-colors">
+                        <span className="text-sm font-medium">Open</span>
+                        <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ) : (
+                <Card 
+                  className={`bg-slate-800/50 border-slate-700 hover:${card.borderColor} transition-all duration-300 cursor-pointer group h-full`}
+                  onClick={card.action}
+                >
+                  <CardContent className="p-6 text-center space-y-4">
+                    <div className={`inline-flex p-4 rounded-xl ${card.bgColor} border ${card.borderColor} group-hover:scale-110 transition-transform duration-300`}>
+                      <card.icon className="h-8 w-8 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-white mb-2">{card.title}</h3>
+                      <p className="text-sm text-slate-400 leading-relaxed">{card.description}</p>
+                    </div>
+                    <div className="flex items-center justify-center text-blue-400 group-hover:text-blue-300 transition-colors">
+                      <span className="text-sm font-medium">Open</span>
+                      <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Live Project Status Integration */}
+        <Card className="bg-gradient-to-r from-slate-800/50 to-blue-800/20 border-slate-700">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-white flex items-center space-x-2">
+                  <div className="h-3 w-3 bg-green-400 rounded-full animate-pulse" />
+                  <span>Live Project Status</span>
+                </CardTitle>
+                <CardDescription>Real-time updates from your project management system</CardDescription>
+              </div>
+              <Link href="/projects">
+                <Button size="sm" className="bg-blue-500 hover:bg-blue-600">
+                  <Briefcase className="h-4 w-4 mr-1" />
+                  View All Projects
+                </Button>
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {activeProjects.slice(0, 3).map((project, index) => (
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.1 * index }}
+                  className="bg-slate-700/50 rounded-lg p-4 border border-slate-600 hover:border-blue-500/50 transition-all"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-2">
+                      <div className={`h-2 w-2 rounded-full ${
+                        project.urgency === 'High' ? 'bg-red-400' :
+                        project.urgency === 'Medium' ? 'bg-yellow-400' : 'bg-green-400'
+                      }`} />
+                      <span className="text-sm font-medium text-white truncate">{project.client}</span>
+                    </div>
+                    <Badge variant="outline" className="text-xs">
+                      {project.status}
+                    </Badge>
+                  </div>
+                  <h4 className="text-white font-medium text-sm mb-2 line-clamp-2">{project.name}</h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-slate-400">Progress</span>
+                      <span className="text-xs font-medium text-white">{project.progress}%</span>
+                    </div>
+                    <div className="w-full bg-slate-600 rounded-full h-1.5">
+                      <div 
+                        className={`h-1.5 rounded-full transition-all duration-300 ${
+                          project.urgency === 'High' ? 'bg-gradient-to-r from-red-500 to-orange-500' :
+                          project.urgency === 'Medium' ? 'bg-gradient-to-r from-yellow-500 to-orange-500' :
+                          'bg-gradient-to-r from-green-500 to-blue-500'
+                        }`}
+                        style={{ width: `${project.progress}%` }}
+                      />
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-slate-400">Budget Used</span>
+                      <span className="text-xs font-medium text-white">
+                        {((project.spent / project.budget) * 100).toFixed(0)}%
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-600">
+                      <div className="flex items-center space-x-1">
+                        <Users className="h-3 w-3 text-slate-400" />
+                        <span className="text-xs text-slate-400">
+                          {Object.values(project.engineersNeeded).reduce((a, b) => a + b, 0)} needed
+                        </span>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedProject(project)
+                          setShowAllocationModal(true)
+                        }}
+                        className="text-xs px-2 py-1 h-auto"
+                      >
+                        Staff
+                      </Button>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Quick Actions Bar */}
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <h3 className="text-lg font-semibold text-white">Quick Actions</h3>
+                <div className="h-6 w-px bg-slate-600" />
+                <span className="text-sm text-slate-400">Streamline your workflow</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Button
+                  size="sm"
+                  onClick={() => setShowAllocationModal(true)}
+                  className="bg-blue-500 hover:bg-blue-600"
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  New Assignment
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setShowFlightModal(true)}
+                  className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                >
+                  <Plane className="h-4 w-4 mr-1" />
+                  Book Travel
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setShowExpenseModal(true)}
+                  className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                >
+                  <DollarSign className="h-4 w-4 mr-1" />
+                  Add Expense
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {/* Modals */}
       <EngineerAllocationModal

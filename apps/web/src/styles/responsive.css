@@ -1,0 +1,296 @@
+/* Global Responsive Design System */
+
+/* Mobile-First Approach - Base styles for mobile */
+/* Improve touch targets */
+button, 
+a, 
+input, 
+select, 
+textarea {
+  min-height: 44px; /* iOS recommended touch target */
+  @apply touch-manipulation;
+}
+
+/* Better mobile typography */
+body {
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Component styles */
+/* Responsive containers */
+.container-responsive {
+  @apply w-full px-4 sm:px-6 lg:px-8 mx-auto;
+  max-width: 100%;
+}
+
+/* Responsive grids */
+.grid-responsive {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6;
+}
+
+/* Responsive cards */
+.card-responsive {
+  @apply p-4 sm:p-6 rounded-lg;
+}
+
+/* Responsive tables */
+.table-responsive {
+  @apply overflow-x-auto -mx-4 sm:mx-0;
+}
+
+.table-responsive table {
+  @apply min-w-full sm:min-w-0;
+}
+
+/* Mobile-optimized forms */
+.form-responsive {
+  @apply space-y-4 sm:space-y-6;
+}
+
+.form-responsive input,
+.form-responsive select,
+.form-responsive textarea {
+  @apply w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base;
+}
+
+/* Responsive modals */
+.modal-responsive {
+  @apply w-full max-w-lg mx-4 sm:mx-auto;
+}
+
+/* Responsive navigation */
+.nav-responsive {
+  @apply flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4;
+}
+
+/* Responsive buttons */
+.btn-responsive {
+  @apply px-3 py-2 sm:px-4 sm:py-2.5 text-sm sm:text-base w-full sm:w-auto;
+}
+
+/* Responsive text utilities */
+.text-responsive-xs {
+  @apply text-xs sm:text-sm;
+}
+
+.text-responsive-sm {
+  @apply text-sm sm:text-base;
+}
+
+.text-responsive-base {
+  @apply text-base sm:text-lg;
+}
+
+.text-responsive-lg {
+  @apply text-lg sm:text-xl lg:text-2xl;
+}
+
+.text-responsive-xl {
+  @apply text-xl sm:text-2xl lg:text-3xl;
+}
+
+.text-responsive-2xl {
+  @apply text-2xl sm:text-3xl lg:text-4xl;
+}
+
+.text-responsive-3xl {
+  @apply text-3xl sm:text-4xl lg:text-5xl;
+}
+
+/* Responsive breakpoints utilities */
+/* Hide on specific breakpoints */
+.mobile-only {
+  @apply block sm:hidden;
+}
+
+.tablet-only {
+  @apply hidden sm:block lg:hidden;
+}
+
+.desktop-only {
+  @apply hidden lg:block;
+}
+
+/* Responsive padding */
+.p-responsive {
+  @apply p-4 sm:p-6 lg:p-8;
+}
+
+.px-responsive {
+  @apply px-4 sm:px-6 lg:px-8;
+}
+
+.py-responsive {
+  @apply py-4 sm:py-6 lg:py-8;
+}
+
+/* Responsive margins */
+.m-responsive {
+  @apply m-4 sm:m-6 lg:m-8;
+}
+
+.mx-responsive {
+  @apply mx-4 sm:mx-6 lg:mx-8;
+}
+
+.my-responsive {
+  @apply my-4 sm:my-6 lg:my-8;
+}
+
+/* Responsive gaps */
+.gap-responsive {
+  @apply gap-4 sm:gap-6 lg:gap-8;
+}
+
+/* Responsive rounded corners */
+.rounded-responsive {
+  @apply rounded-lg sm:rounded-xl;
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  /* Increase tap targets on touch devices */
+  button,
+  a,
+  .clickable {
+    min-height: 48px;
+    min-width: 48px;
+  }
+  
+  /* Remove hover effects on touch devices */
+  .hover\:bg-slate-700:hover {
+    background-color: transparent;
+  }
+  
+  /* Add active states for touch feedback */
+  button:active,
+  a:active,
+  .clickable:active {
+    @apply scale-95 opacity-90;
+  }
+}
+
+/* Landscape mobile optimizations */
+@media (max-height: 500px) and (orientation: landscape) {
+  .sidebar {
+    @apply h-full overflow-y-auto;
+  }
+  
+  .modal {
+    @apply max-h-[90vh] overflow-y-auto;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    @apply bg-white text-black;
+  }
+  
+  .print-break {
+    page-break-after: always;
+  }
+}
+
+/* Scrollbar styles for responsive tables */
+.overflow-x-auto::-webkit-scrollbar {
+  height: 8px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+  @apply bg-slate-800 rounded-full;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  @apply bg-slate-600 rounded-full hover:bg-slate-500;
+}
+
+/* Safe area insets for mobile devices */
+@supports (padding: max(0px)) {
+  .safe-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+  
+  .safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  
+  .safe-left {
+    padding-left: max(1rem, env(safe-area-inset-left));
+  }
+  
+  .safe-right {
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+}
+
+/* Responsive animations */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Dark mode responsive adjustments */
+@media (prefers-color-scheme: dark) {
+  /* Already using dark theme by default */
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .border {
+    border-width: 2px;
+  }
+  
+  .text-slate-400 {
+    @apply text-slate-200;
+  }
+}
+
+/* Responsive loading states */
+.skeleton-responsive {
+  @apply animate-pulse bg-slate-700 rounded;
+  min-height: 20px;
+}
+
+/* Mobile keyboard optimization */
+@media (max-width: 768px) {
+  input:focus,
+  textarea:focus,
+  select:focus {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+}
+
+/* Responsive chart container */
+.chart-responsive {
+  @apply w-full h-64 sm:h-80 lg:h-96;
+}
+
+/* Responsive video embeds */
+.video-responsive {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  overflow: hidden;
+}
+
+.video-responsive iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}

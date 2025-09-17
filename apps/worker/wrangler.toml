@@ -270,8 +270,6 @@ bucket_name = "humber-documents"
 [[vectorize]]
 binding = "VECTORIZE_INDEX"
 index_name = "humber-knowledge-base"
-# Use remote binding for local development
-remote = true
 
 # Enable local development for Vectorize
 [dev]

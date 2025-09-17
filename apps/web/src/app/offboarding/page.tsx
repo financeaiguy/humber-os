@@ -21,7 +21,7 @@ import {
   User,
   Building2
 } from 'lucide-react'
-import { OptimizedLink } from '@/components/optimized-link'
+import Link from 'next/link'
 
 // Off-boarding types and statuses
 export type OffboardingType = 
@@ -246,12 +246,12 @@ export default function OffboardingPage() {
           </p>
         </div>
         <div className="flex gap-3">
-          <OptimizedLink href="/offboarding/new">
+          <Link href="/offboarding/new">
             <Button className="bg-blue-600 hover:bg-blue-700">
               <UserMinus className="h-4 w-4 mr-2" />
               New Off-boarding Request
             </Button>
-          </OptimizedLink>
+          </Link>
         </div>
       </div>
 
@@ -400,7 +400,7 @@ export default function OffboardingPage() {
                 </div>
                 
                 <div className="flex flex-col gap-2">
-                  <OptimizedLink href={`/offboarding/${request.id}`}>
+                  <Link href={`/offboarding/${request.id}`}>
                     <Button 
                       variant="outline" 
                       size="sm" 
@@ -409,7 +409,7 @@ export default function OffboardingPage() {
                       View Details
                       <ArrowRight className="h-4 w-4 ml-2" />
                     </Button>
-                  </OptimizedLink>
+                  </Link>
                   
                   {request.status === 'PENDING' && (
                     <Button size="sm" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
@@ -458,9 +458,9 @@ export default function OffboardingPage() {
                 : 'There are currently no off-boarding requests to display.'
               }
             </p>
-            <OptimizedLink href="/offboarding/new">
+            <Link href="/offboarding/new">
               <Button>Create New Request</Button>
-            </OptimizedLink>
+            </Link>
           </CardContent>
         </Card>
       )}

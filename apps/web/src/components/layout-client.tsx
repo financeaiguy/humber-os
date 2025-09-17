@@ -116,12 +116,14 @@ export function LayoutClient({ children }: LayoutClientProps) {
       {/* Session Manager - handles persistent login */}
       <SessionManager />
       
-      <div className="flex flex-1">
+      <div className="flex flex-1 relative">
         {shouldShowSidebar && <Sidebar />}
-        <main className={`flex-1 flex flex-col ${shouldShowSidebar ? 'lg:ml-64' : ''}`}>
+        <main className={`flex-1 flex flex-col min-w-0 ${shouldShowSidebar ? 'lg:ml-64' : ''}`}>
           {isEmployee && <EmployeeHeader />}
-          <div className="flex-1 p-4 sm:p-6 lg:p-8 !bg-slate-950">
-            {children}
+          <div className="flex-1 p-4 sm:p-6 lg:p-8 xl:p-10 !bg-slate-950 overflow-x-hidden">
+            <div className="max-w-[1920px] mx-auto">
+              {children}
+            </div>
           </div>
         </main>
       </div>
@@ -206,31 +208,31 @@ export function LayoutClient({ children }: LayoutClientProps) {
           </div>
           
           {/* Legal links */}
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-2 border-t border-slate-700/30 text-xs">
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 pt-2 border-t border-slate-700/30 text-xs">
             <Link href="/privacy" className="text-slate-500 hover:text-blue-400 transition-colors">
               Privacy Policy
             </Link>
-            <span className="text-slate-700">•</span>
+            <span className="text-slate-700 hidden sm:inline">•</span>
             <Link href="/terms" className="text-slate-500 hover:text-blue-400 transition-colors">
               Terms & Conditions
             </Link>
-            <span className="text-slate-700">•</span>
+            <span className="text-slate-700 hidden sm:inline">•</span>
             <Link href="/biometric-consent" className="text-slate-500 hover:text-blue-400 transition-colors">
               Biometric Consent
             </Link>
-            <span className="text-slate-700">•</span>
+            <span className="text-slate-700 hidden sm:inline">•</span>
             <Link href="/employee-handbook" className="text-slate-500 hover:text-blue-400 transition-colors">
               Employee Handbook
             </Link>
-            <span className="text-slate-700">•</span>
+            <span className="text-slate-700 hidden sm:inline">•</span>
             <Link href="/compliance" className="text-slate-500 hover:text-blue-400 transition-colors">
               Compliance
             </Link>
-            <span className="text-slate-700">•</span>
+            <span className="text-slate-700 hidden sm:inline">•</span>
             <Link href="/licensing" className="text-slate-500 hover:text-blue-400 transition-colors">
               Licensing
             </Link>
-            <span className="text-slate-700">•</span>
+            <span className="text-slate-700 hidden sm:inline">•</span>
             <a href="mailto:legal@humberops.com" className="text-slate-500 hover:text-blue-400 transition-colors">
               Legal Contact
             </a>

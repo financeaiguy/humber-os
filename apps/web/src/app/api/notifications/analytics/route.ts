@@ -3,12 +3,12 @@ import { NextRequest, NextResponse } from 'next/server'
 export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
 
-const WORKER_URL = process.env.WORKER_URL || 'http://localhost:8787'
+const WORKER_URL = process.env.WORKER_URL || 'http://localhost:8788'
 
-async function proxyToWorker(request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url)
-    const workerUrl = `${WORKER_URL}${url.pathname}${url.search}`
+    const workerUrl = `${WORKER_URL}/notifications/analytics${url.search}`
     
     const headers = new Headers()
     // Copy relevant headers
@@ -29,9 +29,8 @@ async function proxyToWorker(request: NextRequest) {
     }
 
     const response = await fetch(workerUrl, {
-      method: request.method,
+      method: 'GET',
       headers,
-      body: request.method !== 'GET' ? await request.text() : undefined,
     })
 
     const responseData = await response.text()
@@ -53,8 +52,4 @@ async function proxyToWorker(request: NextRequest) {
       { status: 500 }
     )
   }
-}
-
-export async function GET(request: NextRequest) {
-  return proxyToWorker(request)
 }
