@@ -51,14 +51,8 @@ export async function authMiddleware(c: Context<{ Bindings: AuthEnv; Variables: 
       // /financial/* - SECURITY RISK: Contains financial information
     ];
     
-    // Also allow document operations and candidate timesheets for testing
-    const documentEndpointPattern = /^\/documents\/[^\/]+(?:\/download)?$/;
-    const timesheetCandidatePattern = /^\/timesheets\/candidate\/[^\/]+$/;
-    
-    if (publicEndpoints.includes(c.req.path) || 
-        documentEndpointPattern.test(c.req.path) ||
-        timesheetCandidatePattern.test(c.req.path) ||
-        (c.req.method === 'DELETE' && /^\/documents\/[^\/]+$/.test(c.req.path))) {
+    // SECURITY: Only allow truly public endpoints - NO EXCEPTIONS
+    if (publicEndpoints.includes(c.req.path)) {
       return next();
     }
 

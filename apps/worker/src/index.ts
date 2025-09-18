@@ -43,20 +43,29 @@ app.use('/operations/*', authMiddleware);
 app.use('/timesheets/*', authMiddleware);
 app.use('/reconciliation/*', authMiddleware);
 // Documents and chat endpoints need authentication in production
-const isDevelopment = true; // Set to false in production
-if (!isDevelopment) {
-  app.use('/documents/*', authMiddleware);
-  app.use('/chat/*', authMiddleware);
-  app.use('/bull-pen/*', authMiddleware);
-  app.use('/engineers/*', authMiddleware);
-  app.use('/docs', authMiddleware);
-  app.use('/metrics', authMiddleware);
-} // Protect metrics
+// SECURITY: Always require authentication for sensitive endpoints
+app.use('/documents/*', authMiddleware);
+app.use('/chat/*', authMiddleware);
+app.use('/bull-pen/*', authMiddleware);
+app.use('/engineers/*', authMiddleware);
+app.use('/api-test', authMiddleware); // Protect API testing interface
+app.use('/metrics', authMiddleware);
 
-// Apply rate limiting after authentication
-app.use('/operations/*', rateLimitMiddleware);
-app.use('/timesheets/*', rateLimitMiddleware);
-app.use('/reconciliation/*', rateLimitMiddleware);
+// INTEGRATE COMPREHENSIVE SECURITY MIDDLEWARE
+import { globalRateLimit, authRateLimit, apiRateLimit, uploadRateLimit, financialRateLimit } from './middleware/rate-limiter'
+import { productionCSRF } from './middleware/csrf-protection'
+
+// Apply comprehensive rate limiting
+app.use('/auth/*', authRateLimit);
+app.use('/operations/*', apiRateLimit);
+app.use('/timesheets/*', apiRateLimit);
+app.use('/reconciliation/*', apiRateLimit);
+app.use('/documents/upload', uploadRateLimit);
+app.use('/reports/*', financialRateLimit);
+app.use('*', globalRateLimit); // Global rate limit for all endpoints
+
+// Apply CSRF protection to state-changing operations
+app.use('*', productionCSRF);
 app.use('/engineers/*', rateLimitMiddleware);
 
 // Apply multi-tenant middleware after authentication on ALL tenant-scoped routes
@@ -641,8 +650,9 @@ curl -X POST http://localhost:8787/documents/search \\
   return c.html(html);
 });
 
-// Interactive API Testing Interface (like Swagger)
+// SECURE API Testing Interface (requires authentication)
 app.get('/api-test', (c) => {
+  // This endpoint now requires authentication due to middleware above
   const baseUrl = new URL(c.req.url).origin;
   
   // Add cache-busting headers
