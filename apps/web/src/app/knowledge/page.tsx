@@ -43,6 +43,7 @@ import { ContinuousLearningPanel } from '@/components/knowledge-base/continuous-
 import { DocumentViewer } from '@/components/knowledge-base/document-viewer'
 import { continuousLearning } from '@/lib/continuous-learning'
 import { knowledgeNervousSystem, askAI, learnFromUserAction, addDocument } from '@/lib/knowledge-nervous-system'
+import { api, useAPIService } from '@/lib/api-integration-service'
 
 const mockDocuments = [
   {
@@ -221,26 +222,23 @@ export default function KnowledgeBasePage() {
 
   const loadKnowledgeData = async () => {
     try {
+      // Use integrated API service for better tracking and AI insights
       const stats = await knowledgeNervousSystem.getKnowledgeStats()
       setKnowledgeStats(stats)
       
-      const insights = await knowledgeNervousSystem.getInsights({
-        sessionId: 'current-session',
+      // Get AI insights using the integrated API service
+      const insights = await api.knowledge.insights({
         currentPage: 'knowledge',
         currentFeature: 'knowledge-management',
-        userRole: 'engineer',
-        timestamp: new Date().toISOString(),
-        environment: 'development'
+        userRole: 'engineer'
       })
       setAiInsights(insights)
       
-      const recs = await knowledgeNervousSystem.getRecommendations({
-        sessionId: 'current-session',
+      // Get recommendations using the integrated API service
+      const recs = await api.knowledge.recommendations({
         currentPage: 'knowledge',
-        currentFeature: 'knowledge-management',
-        userRole: 'engineer',
-        timestamp: new Date().toISOString(),
-        environment: 'development'
+        currentFeature: 'knowledge-management', 
+        userRole: 'engineer'
       })
       setRecommendations(recs)
     } catch (error) {

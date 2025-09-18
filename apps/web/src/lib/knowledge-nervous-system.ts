@@ -75,11 +75,31 @@ class KnowledgeNervousSystem {
   private learningQueue: Array<{ data: any; context: LearningContext; priority: number }> = []
   private contextCache: Map<string, any> = new Map()
   private subscribers: Map<string, Array<(data: any) => void>> = new Map()
+  private modelUsageStats: Map<string, {
+    totalRequests: number
+    successRate: number
+    averageLatency: number
+    tokenUsage: number
+    lastUsed: string
+    costAccumulated: number
+  }> = new Map()
+  private modelTrainingJobs: Map<string, {
+    id: string
+    modelId: string
+    status: 'queued' | 'running' | 'completed' | 'failed'
+    progress: number
+    startTime: string
+    endTime?: string
+    trainingData: any[]
+    hyperparameters: any
+    performance: any
+  }> = new Map()
 
   constructor() {
     this.initializeDefaultModels()
     this.startLearningProcessor()
     this.initializeKnowledgeGraph()
+    this.startModelMonitoring()
   }
 
   private initializeDefaultModels() {

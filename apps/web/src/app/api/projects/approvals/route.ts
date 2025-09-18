@@ -10,19 +10,46 @@ import {
   createValidationResponse 
 } from '@/lib/validation-schemas'
 import { generateApprovalId } from '@/lib/secure-token-generator'
+import { withKnowledgeSystem, KnowledgeEnhancedResponse } from '@/lib/knowledge-middleware'
+
+const knowledgeMiddleware = withKnowledgeSystem({
+  enableLearning: true,
+  trackUserActions: true,
+  enableAIInsights: true,
+  logLevel: 'detailed'
+})
 
 // Mock storage - replace with actual database
 const projectApprovals = new Map<string, ProjectApproval[]>()
 const approvalWorkflows = new Map<string, ApproverType[]>()
 
 export async function POST(request: NextRequest) {
+  const context = await knowledgeMiddleware.processRequest(
+    request,
+    'project-approvals',
+    'approval_request_creation',
+    {}
+  )
+
   try {
     const requestData = await request.json()
+    
+    // Track approval request initiation
+    await knowledgeMiddleware.trackUserAction('approval_request_initiated', requestData, context)
     
     // Validate approval request
     const validationResult = validateRequestBody(projectApprovalRequestSchema, requestData)
     if (!validationResult.success) {
-      return NextResponse.json(createValidationResponse(validationResult.errors), { status: 400 })
+      const errorResponse: KnowledgeEnhancedResponse = {
+        success: false,
+        ...createValidationResponse(validationResult.errors),
+        _metadata: {
+          processedAt: new Date().toISOString(),
+          sessionId: context.sessionId,
+          knowledgeSystem: 'humber-nervous-system-v1'
+        }
+      }
+      return NextResponse.json(errorResponse, { status: 400 })
     }
 
     const { projectId, requestType, requesterId, requesterName, budgetAmount, deploymentDetails } = validationResult.data
@@ -62,18 +89,59 @@ export async function POST(request: NextRequest) {
       deploymentDetails
     })
 
-    return NextResponse.json({
+    // Analyze approval workflow efficiency
+    await knowledgeMiddleware.analyzeBusinessProcess(
+      'project_approval_workflow',
+      {
+        projectId,
+        requestType,
+        budgetAmount,
+        requiredApprovers,
+        approvalCount: approvals.length
+      },
+      context
+    )
+
+    // Track successful approval workflow creation
+    await knowledgeMiddleware.trackUserAction('approval_workflow_created', {
+      projectId,
+      approvalCount: approvals.length,
+      requiredApprovers
+    }, context)
+
+    const baseResponse = {
       success: true,
       approvals,
       message: `Approval requests sent to ${requiredApprovers.join(', ')}`
-    })
+    }
+
+    // Enrich response with workflow optimization insights
+    const enrichedResponse = await knowledgeMiddleware.enrichResponse(
+      baseResponse,
+      context,
+      'approval_workflow_creation'
+    )
+
+    return NextResponse.json(enrichedResponse)
 
   } catch (error) {
     console.error('Approval request error:', error)
-    return NextResponse.json(
-      { error: 'Failed to create approval request' },
-      { status: 500 }
-    )
+    
+    // Track approval workflow failure
+    await knowledgeMiddleware.trackUserAction('approval_workflow_failed', { error: error.message }, context)
+    
+    const errorResponse: KnowledgeEnhancedResponse = {
+      success: false,
+      error: 'Failed to create approval request',
+      message: error instanceof Error ? error.message : 'Unknown error',
+      _metadata: {
+        processedAt: new Date().toISOString(),
+        sessionId: context.sessionId,
+        knowledgeSystem: 'humber-nervous-system-v1'
+      }
+    }
+    
+    return NextResponse.json(errorResponse, { status: 500 })
   }
 }
 
