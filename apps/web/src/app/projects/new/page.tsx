@@ -25,7 +25,7 @@ export default function NewProjectPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // Handle form submission
-    console.log('Project data:', formData)
+    // SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('Project data:', formData)
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {

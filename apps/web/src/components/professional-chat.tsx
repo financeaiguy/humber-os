@@ -300,7 +300,7 @@ export function ProfessionalChat({ isOpen, onToggle }: ProfessionalChatProps) {
         throw new Error('Failed to get response')
       }
     } catch (error) {
-      console.error('Chat error:', error)
+      // SECURITY: Removed console.error('Chat error:', error)
       
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
@@ -1249,7 +1249,7 @@ export function ProfessionalChat({ isOpen, onToggle }: ProfessionalChatProps) {
                   whileTap={{ scale: 0.98 }}
                   onClick={() => {
                     // Here you would normally send the share request to your backend
-                    console.log('Sharing with:', selectedShareUsers, 'Message:', shareMessage)
+                    // SECURITY: Removed // SECURITY: Removed console.log('Sharing with:', selectedShareUsers, 'Message:', shareMessage)
                     alert(`Conversation shared with ${selectedShareUsers.length} team member${selectedShareUsers.length === 1 ? '' : 's'}!`)
                     setShowShareModal(false)
                     setSelectedShareUsers([])
@@ -1439,7 +1439,7 @@ export function ProfessionalChat({ isOpen, onToggle }: ProfessionalChatProps) {
                     // Save settings
                     setShowSettings(false)
                     // Show success message
-                    console.log('Settings saved')
+                    // SECURITY: Removed // SECURITY: Removed console.log('Settings saved')
                   }}
                   className="w-full px-4 py-2.5 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all flex items-center justify-center space-x-2"
                 >

@@ -3,6 +3,8 @@ import { logger } from 'hono/logger';
 import type { Env } from '@humber/types';
 import { multiTenantMiddleware } from './middleware/multi-tenant';
 import { authMiddleware, rateLimitMiddleware } from './middleware/auth';
+import { globalRateLimit, authRateLimit, apiRateLimit, uploadRateLimit, financialRateLimit } from './middleware/rate-limiter';
+import { productionCSRF } from './middleware/csrf-protection';
 import { securityHeaders, corsMiddleware, requestSizeLimit } from './middleware/security';
 import { operationsRouter } from './routes/operations';
 import { timesheetsRouter } from './routes/timesheets';
@@ -52,8 +54,6 @@ app.use('/api-test', authMiddleware); // Protect API testing interface
 app.use('/metrics', authMiddleware);
 
 // INTEGRATE COMPREHENSIVE SECURITY MIDDLEWARE
-import { globalRateLimit, authRateLimit, apiRateLimit, uploadRateLimit, financialRateLimit } from './middleware/rate-limiter'
-import { productionCSRF } from './middleware/csrf-protection'
 
 // Apply comprehensive rate limiting
 app.use('/auth/*', authRateLimit);
@@ -2083,22 +2083,22 @@ app.get('/api-test', (c) => {
             }
             
             try {
-                console.log('🚀 Making request to:', baseUrl + endpoint);
-                console.log('📦 Request options:', JSON.stringify(options, null, 2));
+                // SECURITY: Removed console.log('🚀 Making request to:', baseUrl + endpoint);
+                // SECURITY: Removed console.log('📦 Request options:', JSON.stringify(options, null, 2));
                 
                 const response = await fetch(baseUrl + endpoint, options);
-                console.log('📡 Response received:', response.status, response.statusText);
+                // SECURITY: Removed console.log('📡 Response received:', response.status, response.statusText);
                 
                 const responseData = await response.text();
-                console.log('📄 Response data length:', responseData.length);
+                // SECURITY: Removed console.log('📄 Response data length:', responseData.length);
                 
                 let formattedResponse;
                 try {
                     const parsed = JSON.parse(responseData);
                     formattedResponse = JSON.stringify(parsed, null, 2);
-                    console.log('✅ JSON parsed successfully');
+                    // SECURITY: Removed console.log('✅ JSON parsed successfully');
                 } catch (parseError) {
-                    console.log('⚠️ JSON parse failed, using raw text');
+                    // SECURITY: Removed console.log('⚠️ JSON parse failed, using raw text');
                     formattedResponse = responseData;
                 }
                 
@@ -2110,7 +2110,7 @@ app.get('/api-test', (c) => {
                     timestamp: new Date().toISOString()
                 };
             } catch (error) {
-                console.error('❌ Request failed:', error);
+                // SECURITY: Removed console.error('❌ Request failed:', error);
                 const errorMessage = error instanceof Error ? error.message : String(error);
                 const errorDetails = \`Error: \${errorMessage}
 URL: \${baseUrl + endpoint}
@@ -2624,8 +2624,8 @@ Timestamp: \${new Date().toISOString()}\`;
         // Auto-test health on page load
         window.onload = () => {
             executeHealth();
-            console.log('🧪 Interactive API Testing Interface Loaded!');
-            console.log('Click any "Test" button to try endpoints');
+            // SECURITY: Removed console.log('🧪 Interactive API Testing Interface Loaded!');
+            // SECURITY: Removed console.log('Click any "Test" button to try endpoints');
         };
     </script>
 </body>
@@ -2655,7 +2655,7 @@ app.route('/api/recruits', recruitsRouter);
 
 app.onError((err, c) => {
   // Log full error internally
-  console.error(`Error in ${c.req.path}:`, err);
+  // SECURITY: Removed console.error(`Error in ${c.req.path}:`, err);
   
   // Return sanitized error to prevent information leakage
   const sanitized = {
@@ -2676,10 +2676,10 @@ export default {
   async queue(batch: MessageBatch<any>, _env: Env): Promise<void> {
     for (const message of batch.messages) {
       try {
-        console.log('Processing queue message:', message.body);
+        // SECURITY: Removed console.log('Processing queue message:', message.body);
         message.ack();
       } catch (error) {
-        console.error('Queue processing error:', error);
+        // SECURITY: Removed console.error('Queue processing error:', error);
         message.retry();
       }
     }

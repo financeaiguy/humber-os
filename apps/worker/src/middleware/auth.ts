@@ -211,7 +211,7 @@ export async function authMiddleware(c: Context<{ Bindings: AuthEnv; Variables: 
 
     await next();
   } catch (error) {
-    console.error('Auth middleware error:', error);
+    // SECURITY: Removed console.error('Auth middleware error:', error);
     const sanitized = sanitizeError(error, 'authentication middleware');
     return c.json({ 
       ...sanitized,
@@ -296,7 +296,7 @@ export async function rateLimitMiddleware(c: Context, next: Next) {
       c.header('X-RateLimit-Reset', entry.resetTime.toString());
     }
   } catch (error) {
-    console.error('Rate limiting error:', error);
+    // SECURITY: Removed console.error('Rate limiting error:', error);
     // Continue without rate limiting if there's an error
   }
 
@@ -330,7 +330,7 @@ async function validateApiKey(db: D1Database, apiKey: string): Promise<{ id: str
       permissions: result.permissions ? JSON.parse(result.permissions) : []
     };
   } catch (error) {
-    console.error('API key validation error:', error);
+    // SECURITY: Removed console.error('API key validation error:', error);
     return null;
   }
 }
@@ -346,7 +346,7 @@ async function updateApiKeyUsage(db: D1Database, keyId: string, ip: string): Pro
       WHERE id = ?
     `).bind(new Date().toISOString(), ip, keyId).run();
   } catch (error) {
-    console.error('Failed to update API key usage:', error);
+    // SECURITY: Removed console.error('Failed to update API key usage:', error);
   }
 }
 
@@ -368,7 +368,7 @@ async function getUserStatus(db: D1Database, userId: string) {
     
     return result;
   } catch (error) {
-    console.error('User status lookup error:', error);
+    // SECURITY: Removed console.error('User status lookup error:', error);
     return null;
   }
 }
@@ -394,7 +394,7 @@ async function verifyTenantAccess(db: D1Database, userId: string, tenantId: stri
     
     return true;
   } catch (error) {
-    console.error('Tenant access verification error:', error);
+    // SECURITY: Removed console.error('Tenant access verification error:', error);
     return false;
   }
 }
@@ -410,7 +410,7 @@ async function updateUserActivity(db: D1Database, userId: string, ip: string, us
       WHERE id = ?
     `).bind(new Date().toISOString(), ip, userAgent, userId).run();
   } catch (error) {
-    console.error('Failed to update user activity:', error);
+    // SECURITY: Removed console.error('Failed to update user activity:', error);
   }
 }
 

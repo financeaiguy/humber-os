@@ -15,11 +15,11 @@ const execAsync = promisify(exec);
  * Initialize authentication tables and create default users
  */
 async function initializeAuth() {
-  console.log('🔐 Initializing Humber OS Authentication System...\n');
+  // SECURITY: Removed // SECURITY: Removed console.log('🔐 Initializing Humber OS Authentication System...\n');
   
   try {
     // 1. Run auth migration on master database
-    console.log('📦 Creating authentication tables...');
+    // SECURITY: Removed // SECURITY: Removed console.log('📦 Creating authentication tables...');
     
     const authMigration = readFileSync(
       join(__dirname, '..', 'migrations', '003_create_auth_tables.sql'), 
@@ -33,14 +33,14 @@ async function initializeAuth() {
     const { stdout, stderr } = await execAsync(command);
     
     if (stderr && !stderr.includes('warning')) {
-      console.error('❌ Error creating auth tables:', stderr);
+      // SECURITY: Removed console.error('❌ Error creating auth tables:', stderr);
       throw new Error(stderr);
     }
     
-    console.log('✅ Authentication tables created successfully\n');
+    // SECURITY: Removed // SECURITY: Removed console.log('✅ Authentication tables created successfully\n');
     
     // 2. Create additional test users
-    console.log('👥 Creating test users...');
+    // SECURITY: Removed // SECURITY: Removed console.log('👥 Creating test users...');
     
     const testUsers = [
       {
@@ -102,59 +102,59 @@ async function initializeAuth() {
       const userCommand = `echo "${escapedUserSql}" | npx wrangler d1 execute humber_os_master --local`;
       
       await execAsync(userCommand);
-      console.log(`   ✅ Created ${user.role}: ${user.email}`);
+      // SECURITY: Removed // SECURITY: Removed console.log(`   ✅ Created ${user.role}: ${user.email}`);
     }
     
-    console.log('\n🔑 Test Authentication Credentials:');
-    console.log('┌─────────────────────────────────────────────────────────┐');
-    console.log('│                    🧪 TEST USERS                       │');
-    console.log('├─────────────────────────────────────────────────────────┤');
-    console.log('│ ADMIN:    admin@humber-operations.com    / admin123     │');
-    console.log('│ MANAGER:  manager@humber-operations.com  / manager123   │');
-    console.log('│ ENGINEER: engineer@humber-operations.com / engineer123  │');
-    console.log('│ VIEWER:   viewer@humber-operations.com   / viewer123    │');
-    console.log('└─────────────────────────────────────────────────────────┘');
+    // SECURITY: Removed // SECURITY: Removed console.log('\n🔑 Test Authentication Credentials:');
+    // SECURITY: Removed // SECURITY: Removed console.log('┌─────────────────────────────────────────────────────────┐');
+    // SECURITY: Removed // SECURITY: Removed console.log('│                    🧪 TEST USERS                       │');
+    // SECURITY: Removed // SECURITY: Removed console.log('├─────────────────────────────────────────────────────────┤');
+    // SECURITY: Removed // SECURITY: Removed console.log('│ ADMIN:    admin@humber-operations.com    / admin123     │');
+    // SECURITY: Removed // SECURITY: Removed console.log('│ MANAGER:  manager@humber-operations.com  / manager123   │');
+    // SECURITY: Removed // SECURITY: Removed console.log('│ ENGINEER: engineer@humber-operations.com / engineer123  │');
+    // SECURITY: Removed // SECURITY: Removed console.log('│ VIEWER:   viewer@humber-operations.com   / viewer123    │');
+    // SECURITY: Removed // SECURITY: Removed console.log('└─────────────────────────────────────────────────────────┘');
     
-    console.log('\n🛡️  Security Features Enabled:');
-    console.log('✅ JWT-based authentication');
-    console.log('✅ Role-based access control (RBAC)');
-    console.log('✅ Token blacklisting');
-    console.log('✅ Rate limiting');
-    console.log('✅ Multi-factor authentication support');
-    console.log('✅ IP binding (optional)');
-    console.log('✅ Comprehensive audit logging');
-    console.log('✅ API key authentication');
-    console.log('✅ Session management');
-    console.log('✅ Password security');
+    // SECURITY: Removed // SECURITY: Removed console.log('\n🛡️  Security Features Enabled:');
+    // SECURITY: Removed // SECURITY: Removed console.log('✅ JWT-based authentication');
+    // SECURITY: Removed // SECURITY: Removed console.log('✅ Role-based access control (RBAC)');
+    // SECURITY: Removed // SECURITY: Removed console.log('✅ Token blacklisting');
+    // SECURITY: Removed // SECURITY: Removed console.log('✅ Rate limiting');
+    // SECURITY: Removed // SECURITY: Removed console.log('✅ Multi-factor authentication support');
+    // SECURITY: Removed // SECURITY: Removed console.log('✅ IP binding (optional)');
+    // SECURITY: Removed // SECURITY: Removed console.log('✅ Comprehensive audit logging');
+    // SECURITY: Removed // SECURITY: Removed console.log('✅ API key authentication');
+    // SECURITY: Removed // SECURITY: Removed console.log('✅ Session management');
+    // SECURITY: Removed // SECURITY: Removed console.log('✅ Password security');
     
-    console.log('\n📚 Authentication Endpoints:');
-    console.log('• POST /auth/login     - User login');
-    console.log('• POST /auth/refresh   - Refresh access token');
-    console.log('• POST /auth/logout    - User logout');
+    // SECURITY: Removed // SECURITY: Removed console.log('\n📚 Authentication Endpoints:');
+    // SECURITY: Removed // SECURITY: Removed console.log('• POST /auth/login     - User login');
+    // SECURITY: Removed // SECURITY: Removed console.log('• POST /auth/refresh   - Refresh access token');
+    // SECURITY: Removed // SECURITY: Removed console.log('• POST /auth/logout    - User logout');
     
-    console.log('\n🧪 Test Authentication:');
-    console.log('curl -X POST https://your-worker.workers.dev/auth/login \\');
-    console.log('  -H "Content-Type: application/json" \\');
-    console.log('  -d \'{"email": "admin@humber-operations.com", "password": "admin123", "tenantId": "tenant_humber_001"}\'');
+    // SECURITY: Removed // SECURITY: Removed console.log('\n🧪 Test Authentication:');
+    // SECURITY: Removed // SECURITY: Removed console.log('curl -X POST https://your-worker.workers.dev/auth/login \\');
+    // SECURITY: Removed // SECURITY: Removed console.log('  -H "Content-Type: application/json" \\');
+    // SECURITY: Removed // SECURITY: Removed console.log('  -d \'{"email": "admin@humber-operations.com", "password": "admin123", "tenantId": "tenant_humber_001"}\'');
     
-    console.log('\n⚠️  IMPORTANT SECURITY NOTES:');
-    console.log('🔸 Change all default passwords immediately in production');
-    console.log('🔸 Use proper password hashing (bcrypt) in production');
-    console.log('🔸 Set strong JWT secrets using wrangler secrets');
-    console.log('🔸 Enable MFA for admin accounts');
-    console.log('🔸 Monitor security audit logs regularly');
-    console.log('🔸 Implement proper key rotation policies');
+    // SECURITY: Removed // SECURITY: Removed console.log('\n⚠️  IMPORTANT SECURITY NOTES:');
+    // SECURITY: Removed // SECURITY: Removed console.log('🔸 Change all default passwords immediately in production');
+    // SECURITY: Removed // SECURITY: Removed console.log('🔸 Use proper password hashing (bcrypt) in production');
+    // SECURITY: Removed // SECURITY: Removed console.log('🔸 Set strong JWT secrets using wrangler secrets');
+    // SECURITY: Removed // SECURITY: Removed console.log('🔸 Enable MFA for admin accounts');
+    // SECURITY: Removed // SECURITY: Removed console.log('🔸 Monitor security audit logs regularly');
+    // SECURITY: Removed // SECURITY: Removed console.log('🔸 Implement proper key rotation policies');
     
-    console.log('\n🎉 Authentication system initialized successfully!');
+    // SECURITY: Removed // SECURITY: Removed console.log('\n🎉 Authentication system initialized successfully!');
     
   } catch (error) {
-    console.error('\n❌ Authentication initialization failed:', error);
+    // SECURITY: Removed console.error('\n❌ Authentication initialization failed:', error);
     process.exit(1);
   }
 }
 
 // Run the initialization
-main().catch(console.error);
+main().catch(// SECURITY: Removed console.error);
 
 async function main() {
   await initializeAuth();

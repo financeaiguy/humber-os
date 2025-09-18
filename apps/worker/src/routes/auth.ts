@@ -362,7 +362,7 @@ async function validateUserCredentials(db: D1Database, email: string, password: 
       engineerId: result.engineer_id
     };
   } catch (error) {
-    console.error('User validation error:', error);
+    // SECURITY: Removed console.error('User validation error:', error);
     return null;
   }
 }
@@ -383,7 +383,7 @@ async function getUserRole(db: D1Database, userId: string, tenantId?: string) {
     
     return result?.role || 'viewer';
   } catch (error) {
-    console.error('Role lookup error:', error);
+    // SECURITY: Removed console.error('Role lookup error:', error);
     return 'viewer';
   }
 }

@@ -232,7 +232,7 @@ export class AdvancedRateLimiter {
    * Log security event
    */
   private static async logSecurityEvent(c: Context, eventType: string, details: any): Promise<void> {
-    console.log(JSON.stringify({
+    // SECURITY: Removed // SECURITY: Removed console.log(JSON.stringify({
       timestamp: new Date().toISOString(),
       type: 'SECURITY_EVENT',
       eventType,

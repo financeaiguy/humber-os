@@ -96,7 +96,7 @@ export const POST = withAuditLog('GDPR_CONSENT_RECORD')(
       consentRecords.set(consentId, consentRecord)
 
       // Log consent action
-      console.log(`📋 GDPR Consent ${consentGiven ? 'Given' : 'Denied'}:`, {
+      // SECURITY: Removed // SECURITY: Removed console.log(`📋 GDPR Consent ${consentGiven ? 'Given' : 'Denied'}:`, {
         consentId,
         userId,
         email,
@@ -117,7 +117,7 @@ export const POST = withAuditLog('GDPR_CONSENT_RECORD')(
       })
 
     } catch (error) {
-      console.error('Consent recording error:', error)
+      // SECURITY: Removed console.error('Consent recording error:', error)
       return NextResponse.json(
         { error: 'Failed to record consent' },
         { status: 500 }
@@ -167,7 +167,7 @@ export const GET = withAuditLog('GDPR_CONSENT_VIEW')(
       })
 
     } catch (error) {
-      console.error('Consent retrieval error:', error)
+      // SECURITY: Removed console.error('Consent retrieval error:', error)
       return NextResponse.json(
         { error: 'Failed to retrieve consent records' },
         { status: 500 }
@@ -224,7 +224,7 @@ export const PUT = withAuditLog('GDPR_CONSENT_WITHDRAWAL')(
       // Execute data processing changes based on withdrawal
       await processConsentWithdrawal(consentRecord, withdrawal)
 
-      console.log(`🚫 GDPR Consent Withdrawn:`, {
+      // SECURITY: Removed // SECURITY: Removed console.log(`🚫 GDPR Consent Withdrawn:`, {
         consentId,
         userId: consentRecord.userId,
         email: consentRecord.email,
@@ -241,7 +241,7 @@ export const PUT = withAuditLog('GDPR_CONSENT_WITHDRAWAL')(
       })
 
     } catch (error) {
-      console.error('Consent withdrawal error:', error)
+      // SECURITY: Removed console.error('Consent withdrawal error:', error)
       return NextResponse.json(
         { error: 'Failed to withdraw consent' },
         { status: 500 }
@@ -276,7 +276,7 @@ export const DELETE = withAuditLog('GDPR_CONSENT_DELETE')(
       consentRecords.delete(consentId)
       consentWithdrawals.delete(consentId)
 
-      console.log(`🗑️ GDPR Consent Record Deleted:`, {
+      // SECURITY: Removed // SECURITY: Removed console.log(`🗑️ GDPR Consent Record Deleted:`, {
         consentId,
         userId: consentRecord.userId,
         email: consentRecord.email,
@@ -289,7 +289,7 @@ export const DELETE = withAuditLog('GDPR_CONSENT_DELETE')(
       })
 
     } catch (error) {
-      console.error('Consent deletion error:', error)
+      // SECURITY: Removed console.error('Consent deletion error:', error)
       return NextResponse.json(
         { error: 'Failed to delete consent record' },
         { status: 500 }
@@ -368,17 +368,17 @@ function getDataProcessingChanges(consentType: string): string[] {
 }
 
 async function stopMarketingCommunications(email: string) {
-  console.log(`📧 Stopping marketing communications for ${email}`)
+  // SECURITY: Removed // SECURITY: Removed console.log(`📧 Stopping marketing communications for ${email}`)
 }
 
 async function disableAnalyticsTracking(userId: string) {
-  console.log(`📊 Disabling analytics tracking for user ${userId}`)
+  // SECURITY: Removed // SECURITY: Removed console.log(`📊 Disabling analytics tracking for user ${userId}`)
 }
 
 async function deleteUserProfile(userId: string) {
-  console.log(`👤 Deleting user profile data for ${userId}`)
+  // SECURITY: Removed // SECURITY: Removed console.log(`👤 Deleting user profile data for ${userId}`)
 }
 
 async function deleteBiometricData(userId: string) {
-  console.log(`🔒 Deleting biometric data for user ${userId}`)
+  // SECURITY: Removed // SECURITY: Removed console.log(`🔒 Deleting biometric data for user ${userId}`)
 }

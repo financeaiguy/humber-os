@@ -31,7 +31,7 @@ export function UserAnalyticsProvider({
       initializeUserAnalytics(userId, sessionId.current, userRole)
       initialized.current = true
       
-      console.log('🔍 User Analytics initialized for:', {
+      // SECURITY: Removed // SECURITY: Removed console.log('🔍 User Analytics initialized for:', {
         userId,
         userRole,
         sessionId: sessionId.current
@@ -167,7 +167,7 @@ export function AnalyticsDebugPanel() {
 
   const handleViewReport = () => {
     const report = userAnalytics.generateBusinessReport()
-    console.table(report)
+    // SECURITY: Removed console.table(report)
     alert('Analytics report logged to console')
   }
 

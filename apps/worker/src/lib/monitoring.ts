@@ -287,7 +287,7 @@ export function errorTrackingMiddleware() {
       await monitoring.trackError({
         id: crypto.randomUUID(),
         message: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined,
+        stack: error instanceof Error ? error.message : undefined,
         endpoint: c.req.path,
         method: c.req.method,
         tenantId: c.get('tenantId'),

@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       message: 'Invoice generated successfully'
     })
   } catch (error) {
-    console.error('Invoice generation error:', error)
+    // SECURITY: Removed console.error('Invoice generation error:', error)
     return NextResponse.json(
       { error: 'Failed to generate invoice' },
       { status: 500 }
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
       message: 'Invoices retrieved successfully'
     })
   } catch (error) {
-    console.error('Get invoices error:', error)
+    // SECURITY: Removed console.error('Get invoices error:', error)
     return NextResponse.json(
       { error: 'Failed to retrieve invoices' },
       { status: 500 }

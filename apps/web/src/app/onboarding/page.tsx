@@ -463,7 +463,7 @@ export default function OnboardingPage() {
       isOpen={showCustomerOnboarding}
       onClose={() => setShowCustomerOnboarding(false)}
       onComplete={(customerData) => {
-        console.log('Customer onboarding completed:', customerData)
+        // SECURITY: Removed // SECURITY: Removed console.log('Customer onboarding completed:', customerData)
         // In production, this would create customer account and redirect to purchase interface
         alert(`Welcome ${customerData.companyName}! Your account has been created. You can now purchase engineer time from our bull pen.`)
       }}

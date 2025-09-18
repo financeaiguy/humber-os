@@ -240,19 +240,19 @@ export default function ProjectDetailModal({
                   <ProjectActionPanel
                     project={project}
                     onUpdateStatus={(projectId, status) => {
-                      console.log('Update status:', projectId, status)
+                      // SECURITY: Removed // SECURITY: Removed console.log('Update status:', projectId, status)
                       onUpdateProject?.(projectId, { status })
                     }}
                     onSubmitBid={(projectId, bidData) => {
-                      console.log('Submit bid:', projectId, bidData)
+                      // SECURITY: Removed // SECURITY: Removed console.log('Submit bid:', projectId, bidData)
                       onUpdateProject?.(projectId, { bidData, status: 'planning' })
                     }}
                     onStartProject={(projectId) => {
-                      console.log('Start project:', projectId)
+                      // SECURITY: Removed // SECURITY: Removed console.log('Start project:', projectId)
                       onUpdateProject?.(projectId, { status: 'in_progress', startedAt: new Date().toISOString() })
                     }}
                     onCompleteProject={(projectId) => {
-                      console.log('Complete project:', projectId)
+                      // SECURITY: Removed // SECURITY: Removed console.log('Complete project:', projectId)
                       onUpdateProject?.(projectId, { status: 'completed', completedAt: new Date().toISOString() })
                     }}
                   />

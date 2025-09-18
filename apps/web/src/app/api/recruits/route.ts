@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { InputValidator } from '@/lib/input-validator'
 import { withKnowledgeSystem, KnowledgeEnhancedResponse } from '@/lib/knowledge-middleware'
 
 // Using nodejs runtime for development to allow localhost connections
@@ -81,7 +82,7 @@ async function proxyToWorker(request: NextRequest, method: string) {
       },
     })
   } catch (error) {
-    console.error('Error proxying to worker:', error)
+    // SECURITY: Removed console.error('Error proxying to worker:', error)
     
     const errorResponse: KnowledgeEnhancedResponse = {
       success: false,

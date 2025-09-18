@@ -721,7 +721,7 @@ async function createAuditTrail(db: D1Database, data: {
     ).run();
   } catch (error) {
     // If table doesn't exist, just log it
-    console.log('Audit trail table not yet created, skipping audit log');
+    // SECURITY: Removed console.log('Audit trail table not yet created, skipping audit log');
   }
 }
 

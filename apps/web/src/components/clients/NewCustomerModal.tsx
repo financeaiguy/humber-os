@@ -172,7 +172,7 @@ export function NewCustomerModal({ isOpen, onClose, onSubmit }: NewCustomerModal
         }
       })
     } catch (error) {
-      console.error('Error creating customer:', error)
+      // SECURITY: Removed console.error('Error creating customer:', error)
       alert('Failed to create customer. Please try again.')
     } finally {
       setIsSubmitting(false)

@@ -112,7 +112,7 @@ export function useFormValidation(): UseFormValidationReturn {
       const fieldSchema = OnboardingValidationSchema.shape[field as keyof typeof OnboardingValidationSchema.shape]
       
       if (!fieldSchema) {
-        console.warn(`No validation schema found for field: ${field}`)
+        // SECURITY: Removed console.warn(`No validation schema found for field: ${field}`)
         return null
       }
 

@@ -28,9 +28,9 @@ class OCRService {
     try {
       this.worker = await createWorker(language);
       this.isInitialized = true;
-      console.log('OCR Worker initialized successfully');
+      // SECURITY: Removed // SECURITY: Removed console.log('OCR Worker initialized successfully');
     } catch (error) {
-      console.error('Failed to initialize OCR worker:', error);
+      // SECURITY: Removed console.error('Failed to initialize OCR worker:', error);
       throw new Error('OCR service initialization failed');
     }
   }
@@ -83,7 +83,7 @@ class OCRService {
       return ocrData;
 
     } catch (error) {
-      console.error('OCR processing error:', error);
+      // SECURITY: Removed console.error('OCR processing error:', error);
       throw new Error(`OCR processing failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }

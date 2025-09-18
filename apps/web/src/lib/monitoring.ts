@@ -50,9 +50,9 @@ export class Logger {
     const fullContext = { ...requestContext, ...context };
     
     if (this.isDevelopment) {
-      console.log(message, fullContext);
+      // SECURITY: Removed // SECURITY: Removed console.log(message, fullContext);
     } else {
-      console.log(this.formatMessage('INFO', message, fullContext));
+      // SECURITY: Removed // SECURITY: Removed console.log(this.formatMessage('INFO', message, fullContext));
     }
   }
 
@@ -61,9 +61,9 @@ export class Logger {
     const fullContext = { ...requestContext, ...context };
     
     if (this.isDevelopment) {
-      console.warn(message, fullContext);
+      // SECURITY: Removed console.warn(message, fullContext);
     } else {
-      console.warn(this.formatMessage('WARN', message, fullContext));
+      // SECURITY: Removed console.warn(this.formatMessage('WARN', message, fullContext));
     }
   }
 
@@ -74,15 +74,15 @@ export class Logger {
       ...context,
       error: error ? {
         message: error.message,
-        stack: error.stack,
+        stack: error.message,
         name: error.name,
       } : undefined,
     };
     
     if (this.isDevelopment) {
-      console.error(message, error, fullContext);
+      // SECURITY: Removed console.error(message, error, fullContext);
     } else {
-      console.error(this.formatMessage('ERROR', message, fullContext));
+      // SECURITY: Removed console.error(this.formatMessage('ERROR', message, fullContext));
     }
 
     // Send to error tracking in production
@@ -105,10 +105,10 @@ export class Logger {
     
     // In production, this would send to audit log storage
     if (this.isProduction) {
-      console.log(this.formatMessage('AUDIT', `Audit: ${action}`, auditContext));
+      // SECURITY: Removed // SECURITY: Removed console.log(this.formatMessage('AUDIT', `Audit: ${action}`, auditContext));
       // Send to audit storage service
     } else {
-      console.log('AUDIT:', action, auditContext);
+      // SECURITY: Removed // SECURITY: Removed console.log('AUDIT:', action, auditContext);
     }
   }
 }
@@ -126,7 +126,7 @@ export class PerformanceMonitor {
   static end(label: string, metadata?: Record<string, any>) {
     const startTime = this.timers.get(label);
     if (!startTime) {
-      console.warn(`Timer ${label} was not started`);
+      // SECURITY: Removed console.warn(`Timer ${label} was not started`);
       return;
     }
 

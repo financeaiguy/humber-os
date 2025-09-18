@@ -78,7 +78,7 @@ export function ChatWidget({ isOpen, onToggle, className = '' }: ChatWidgetProps
           setConnectionStatus('disconnected')
         }
       } catch (error) {
-        console.error('AI connection check failed:', error)
+        // SECURITY: Removed console.error('AI connection check failed:', error)
         setIsConnected(false)
         setConnectionStatus('disconnected')
       }
@@ -211,7 +211,7 @@ export function ChatWidget({ isOpen, onToggle, className = '' }: ChatWidgetProps
         throw new Error('Failed to get response')
       }
     } catch (error) {
-      console.error('Chat error:', error)
+      // SECURITY: Removed console.error('Chat error:', error)
       
       // Fallback response based on connection status
       const errorContent = !isConnected 

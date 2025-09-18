@@ -54,7 +54,7 @@ reportsRouter.post('/generate', async (c) => {
       }
     });
   } catch (error) {
-    console.error('Generate report error:', error);
+    // SECURITY: Removed console.error('Generate report error:', error);
     return c.json({ 
       success: false, 
       error: 'Failed to generate report' 
@@ -107,7 +107,7 @@ reportsRouter.get('/history', async (c) => {
       })) || []
     });
   } catch (error) {
-    console.error('Get report history error:', error);
+    // SECURITY: Removed console.error('Get report history error:', error);
     return c.json({ 
       success: false, 
       error: 'Failed to fetch report history' 
@@ -160,7 +160,7 @@ reportsRouter.get('/download/:reportId', async (c) => {
       }
     });
   } catch (error) {
-    console.error('Download report error:', error);
+    // SECURITY: Removed console.error('Download report error:', error);
     return c.json({ 
       success: false, 
       error: 'Failed to download report' 
@@ -193,7 +193,7 @@ reportsRouter.post('/timesheet-summary', async (c) => {
       downloadUrl: result.downloadUrl
     });
   } catch (error) {
-    console.error('Generate timesheet summary error:', error);
+    // SECURITY: Removed console.error('Generate timesheet summary error:', error);
     return c.json({ success: false, error: 'Failed to generate report' }, 500);
   }
 });
@@ -223,7 +223,7 @@ reportsRouter.post('/engineer-performance', async (c) => {
       downloadUrl: result.downloadUrl
     });
   } catch (error) {
-    console.error('Generate engineer performance error:', error);
+    // SECURITY: Removed console.error('Generate engineer performance error:', error);
     return c.json({ success: false, error: 'Failed to generate report' }, 500);
   }
 });
@@ -252,7 +252,7 @@ reportsRouter.post('/financial-summary', async (c) => {
       downloadUrl: result.downloadUrl
     });
   } catch (error) {
-    console.error('Generate financial summary error:', error);
+    // SECURITY: Removed console.error('Generate financial summary error:', error);
     return c.json({ success: false, error: 'Failed to generate report' }, 500);
   }
 });
@@ -283,7 +283,7 @@ reportsRouter.get('/scheduled', async (c) => {
       })) || []
     });
   } catch (error) {
-    console.error('Get scheduled reports error:', error);
+    // SECURITY: Removed console.error('Get scheduled reports error:', error);
     return c.json({ 
       success: false, 
       error: 'Failed to fetch scheduled reports' 
@@ -307,7 +307,7 @@ reportsRouter.post('/scheduled', async (c) => {
       scheduleId
     });
   } catch (error) {
-    console.error('Create scheduled report error:', error);
+    // SECURITY: Removed console.error('Create scheduled report error:', error);
     return c.json({ 
       success: false, 
       error: 'Failed to create scheduled report' 
@@ -340,7 +340,7 @@ reportsRouter.put('/scheduled/:scheduleId', async (c) => {
     
     return c.json({ success: true });
   } catch (error) {
-    console.error('Update scheduled report error:', error);
+    // SECURITY: Removed console.error('Update scheduled report error:', error);
     return c.json({ 
       success: false, 
       error: 'Failed to update scheduled report' 
@@ -360,7 +360,7 @@ reportsRouter.delete('/scheduled/:scheduleId', async (c) => {
     
     return c.json({ success: true });
   } catch (error) {
-    console.error('Delete scheduled report error:', error);
+    // SECURITY: Removed console.error('Delete scheduled report error:', error);
     return c.json({ 
       success: false, 
       error: 'Failed to delete scheduled report' 
@@ -400,7 +400,7 @@ reportsRouter.get('/templates', async (c) => {
       })) || []
     });
   } catch (error) {
-    console.error('Get report templates error:', error);
+    // SECURITY: Removed console.error('Get report templates error:', error);
     return c.json({ 
       success: false, 
       error: 'Failed to fetch report templates' 
@@ -440,7 +440,7 @@ reportsRouter.post('/templates', async (c) => {
       templateId
     });
   } catch (error) {
-    console.error('Create report template error:', error);
+    // SECURITY: Removed console.error('Create report template error:', error);
     return c.json({ 
       success: false, 
       error: 'Failed to create report template' 
@@ -517,7 +517,7 @@ reportsRouter.get('/analytics', async (c) => {
       }
     });
   } catch (error) {
-    console.error('Get report analytics error:', error);
+    // SECURITY: Removed console.error('Get report analytics error:', error);
     return c.json({ 
       success: false, 
       error: 'Failed to fetch report analytics' 

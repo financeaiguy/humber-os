@@ -24,7 +24,7 @@ const clients = [
     location: 'Detroit, MI',
     contact: {
       name: 'Demo Contact',
-      email: 'contact@example.com',
+      email: 'demo@example.com',
       phone: '+1 (555) 000-0000'
     },
     projects: {

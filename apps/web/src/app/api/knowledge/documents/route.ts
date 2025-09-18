@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Document search error:', error)
+    // SECURITY: Removed console.error('Document search error:', error)
     return NextResponse.json(
       { 
         success: false, 
@@ -185,7 +185,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Document upload error:', error)
+    // SECURITY: Removed console.error('Document upload error:', error)
     return NextResponse.json(
       { 
         success: false, 

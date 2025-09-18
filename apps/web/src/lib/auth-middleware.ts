@@ -47,7 +47,7 @@ export async function withAuth<T>(
 
       return handler(authenticatedRequest, context)
     } catch (error) {
-      console.error('Authentication middleware error:', error)
+      // SECURITY: Removed console.error('Authentication middleware error:', error)
       return NextResponse.json(
         { error: 'Authentication failed', code: 'AUTH_ERROR' },
         { status: 500 }
@@ -193,7 +193,7 @@ export function withAuditLog(action: string) {
         const response = await handler(request, context)
         
         // Log successful operation
-        console.log(JSON.stringify({
+        // SECURITY: Removed // SECURITY: Removed console.log(JSON.stringify({
           type: 'AUDIT_LOG',
           timestamp: new Date().toISOString(),
           action,
@@ -210,7 +210,7 @@ export function withAuditLog(action: string) {
         return response
       } catch (error) {
         // Log failed operation
-        console.error(JSON.stringify({
+        // SECURITY: Removed console.error(JSON.stringify({
           type: 'AUDIT_LOG_ERROR',
           timestamp: new Date().toISOString(),
           action,

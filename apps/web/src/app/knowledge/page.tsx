@@ -242,7 +242,7 @@ export default function KnowledgeBasePage() {
       })
       setRecommendations(recs)
     } catch (error) {
-      console.error('Failed to load knowledge data:', error)
+      // SECURITY: Removed console.error('Failed to load knowledge data:', error)
     }
   }
 
@@ -416,7 +416,7 @@ export default function KnowledgeBasePage() {
       alert('Document uploaded successfully!')
       
     } catch (error) {
-      console.error('Upload failed:', error)
+      // SECURITY: Removed console.error('Upload failed:', error)
       alert('Upload failed. Please try again.')
     } finally {
       setIsUploading(false)
@@ -464,7 +464,7 @@ export default function KnowledgeBasePage() {
         timestamp: new Date().toISOString()
       }, 'interaction')
     } catch (error) {
-      console.error('AI query failed:', error)
+      // SECURITY: Removed console.error('AI query failed:', error)
       // Fallback response
       const fallbackResponse = {
         id: (Date.now() + 1).toString(),

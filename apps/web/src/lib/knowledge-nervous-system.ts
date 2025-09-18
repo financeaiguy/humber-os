@@ -599,7 +599,7 @@ User query: ${prompt}`
       try {
         await this.processLearningItem(item)
       } catch (error) {
-        console.error('Learning processing error:', error)
+        // SECURITY: Removed console.error('Learning processing error:', error)
       }
     }
   }
@@ -773,7 +773,7 @@ User query: ${prompt}`
       try {
         callback(data)
       } catch (error) {
-        console.error('Subscriber callback error:', error)
+        // SECURITY: Removed console.error('Subscriber callback error:', error)
       }
     })
   }
@@ -915,7 +915,7 @@ User query: ${prompt}`
 
       this.modelUsageStats.set(modelId, stats)
     } catch (error) {
-      console.error(`Failed to update metrics for model ${modelId}:`, error)
+      // SECURITY: Removed console.error(`Failed to update metrics for model ${modelId}:`, error)
     }
   }
 

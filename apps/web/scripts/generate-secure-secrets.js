@@ -23,78 +23,78 @@ function generateUUID() {
   return crypto.randomUUID();
 }
 
-console.log('🔐 Generating Secure Secrets for Humber OS Production Deployment');
-console.log('================================================================\n');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('🔐 Generating Secure Secrets for Humber OS Production Deployment');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('================================================================\n');
 
-console.log('# Copy these values to your .env.production file');
-console.log('# NEVER commit these secrets to version control\n');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('# Copy these values to your .env.production file');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('# NEVER commit these secrets to version control\n');
 
-console.log('# Authentication Secrets');
-console.log(`AUTH_SECRET=${generateJWTSecret()}`);
-console.log(`NEXTAUTH_SECRET=${generateJWTSecret()}`);
-console.log(`CSRF_SECRET=${generateSecureSecret(32)}\n`);
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('# Authentication Secrets');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log(`AUTH_SECRET=${generateJWTSecret()}`);
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log(`NEXTAUTH_SECRET=${generateJWTSecret()}`);
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log(`CSRF_SECRET=${generateSecureSecret(32)}\n`);
 
-console.log('# WAF and Security Secrets');
-console.log(`WAF_SECRET_KEY=${generateSecureSecret(32)}`);
-console.log(`RATE_LIMIT_SECRET=${generateSecureSecret(24)}`);
-console.log(`ENCRYPTION_KEY=${generateSecureSecret(32)}\n`);
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('# WAF and Security Secrets');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log(`WAF_SECRET_KEY=${generateSecureSecret(32)}`);
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log(`RATE_LIMIT_SECRET=${generateSecureSecret(24)}`);
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log(`ENCRYPTION_KEY=${generateSecureSecret(32)}\n`);
 
-console.log('# Session and Security Tokens');
-console.log(`SESSION_SECRET=${generateBase64Secret(32)}`);
-console.log(`WEBHOOK_SECRET=${generateSecureSecret(24)}`);
-console.log(`API_SECRET_KEY=${generateSecureSecret(32)}\n`);
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('# Session and Security Tokens');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log(`SESSION_SECRET=${generateBase64Secret(32)}`);
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log(`WEBHOOK_SECRET=${generateSecureSecret(24)}`);
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log(`API_SECRET_KEY=${generateSecureSecret(32)}\n`);
 
-console.log('# Database and External Service Secrets');
-console.log(`DATABASE_ENCRYPTION_KEY=${generateSecureSecret(32)}`);
-console.log(`BACKUP_ENCRYPTION_KEY=${generateSecureSecret(32)}\n`);
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('# Database and External Service Secrets');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log(`DATABASE_ENCRYPTION_KEY=${generateSecureSecret(32)}`);
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log(`BACKUP_ENCRYPTION_KEY=${generateSecureSecret(32)}\n`);
 
-console.log('# Unique Identifiers');
-console.log(`DEPLOYMENT_ID=${generateUUID()}`);
-console.log(`SECURITY_INSTANCE_ID=${generateUUID()}\n`);
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('# Unique Identifiers');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log(`DEPLOYMENT_ID=${generateUUID()}`);
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log(`SECURITY_INSTANCE_ID=${generateUUID()}\n`);
 
-console.log('🔒 Security Checklist:');
-console.log('=====================');
-console.log('✅ Generated cryptographically secure secrets');
-console.log('✅ Secrets are unique and non-predictable');
-console.log('✅ Adequate entropy for production use');
-console.log('❗ Store secrets securely (HashiCorp Vault, AWS Secrets Manager, etc.)');
-console.log('❗ Never log or expose these secrets in application code');
-console.log('❗ Rotate secrets regularly (every 90 days recommended)');
-console.log('❗ Use different secrets for different environments\n');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('🔒 Security Checklist:');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('=====================');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('✅ Generated cryptographically secure secrets');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('✅ Secrets are unique and non-predictable');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('✅ Adequate entropy for production use');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('❗ Store secrets securely (HashiCorp Vault, AWS Secrets Manager, etc.)');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('❗ Never log or expose these secrets in application code');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('❗ Rotate secrets regularly (every 90 days recommended)');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('❗ Use different secrets for different environments\n');
 
-console.log('🚀 Next Steps:');
-console.log('==============');
-console.log('1. Copy the secrets above to your secure storage');
-console.log('2. Update .env.production with actual values');
-console.log('3. Configure your deployment pipeline to use these secrets');
-console.log('4. Test authentication and security features');
-console.log('5. Set up secret rotation procedures\n');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('🚀 Next Steps:');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('==============');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('1. Copy the secrets above to your secure storage');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('2. Update .env.production with actual values');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('3. Configure your deployment pipeline to use these secrets');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('4. Test authentication and security features');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('5. Set up secret rotation procedures\n');
 
-console.log('⚠️  SECURITY WARNING:');
-console.log('===================');
-console.log('These secrets provide access to your entire system.');
-console.log('Treat them with the same security as your most sensitive data.');
-console.log('Anyone with access to these secrets can compromise your application.\n');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('⚠️  SECURITY WARNING:');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('===================');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('These secrets provide access to your entire system.');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('Treat them with the same security as your most sensitive data.');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('Anyone with access to these secrets can compromise your application.\n');
 
 // Generate additional security recommendations
-console.log('🛡️  Additional Security Recommendations:');
-console.log('========================================');
-console.log('• Enable two-factor authentication for all admin accounts');
-console.log('• Use a Web Application Firewall (Cloudflare WAF configured ✅)');
-console.log('• Implement proper logging and monitoring');
-console.log('• Regular security audits and penetration testing');
-console.log('• Keep dependencies updated and scan for vulnerabilities');
-console.log('• Use HTTPS everywhere with proper certificate management');
-console.log('• Implement rate limiting and DDoS protection');
-console.log('• Regular backup and disaster recovery testing\n');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('🛡️  Additional Security Recommendations:');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('========================================');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('• Enable two-factor authentication for all admin accounts');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('• Use a Web Application Firewall (Cloudflare WAF configured ✅)');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('• Implement proper logging and monitoring');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('• Regular security audits and penetration testing');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('• Keep dependencies updated and scan for vulnerabilities');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('• Use HTTPS everywhere with proper certificate management');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('• Implement rate limiting and DDoS protection');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('• Regular backup and disaster recovery testing\n');
 
-console.log('Generated at:', new Date().toISOString());
-console.log('Generated by: Humber OS Security Script v1.0');
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('Generated at:', new Date().toISOString());
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('Generated by: Humber OS Security Script v1.0');
 
 // Security entropy check
 const testSecret = generateSecureSecret(32);
 const entropy = calculateEntropy(testSecret);
-console.log(`\n🔬 Entropy Check: ${entropy.toFixed(2)} bits (✅ High entropy)`);
+// SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log(`\n🔬 Entropy Check: ${entropy.toFixed(2)} bits (✅ High entropy)`);
 
 function calculateEntropy(str) {
   const freq = {};

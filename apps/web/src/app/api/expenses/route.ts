@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { TravelExpense, MiscExpense, TravelExpenseType, ExpenseCategory } from '@/types/invoicing'
 import { withAuth, withRole, withAuditLog, AuthenticatedRequest } from '@/lib/auth-middleware'
+import { InputValidator } from '@/lib/input-validator'
+import { SecureErrorHandler } from '@/lib/secure-error-handler'
 import { 
   travelExpenseSchema, 
   miscExpenseSchema, 
@@ -17,7 +19,18 @@ const miscExpenses = new Map<string, MiscExpense[]>()
 
 export async function POST(request: NextRequest) {
   try {
-    const expenseData = await request.json()
+    const rawData = await request.json()
+    
+    // SECURITY: Validate and sanitize all input
+    const validation = InputValidator.validateObject(rawData)
+    if (!validation.isValid) {
+      return NextResponse.json({ 
+        error: 'Invalid input detected',
+        securityThreats: validation.securityThreats 
+      }, { status: 400 })
+    }
+    
+    const expenseData = validation.sanitizedData
     const { type } = expenseData
     
     // Validate input based on expense type
@@ -58,7 +71,7 @@ export async function POST(request: NextRequest) {
       await sendForApproval(savedExpense, type, projectId)
     }
 
-    console.log(`💰 ${type} expense created:`, savedExpense.id, savedExpense.amount)
+    // SECURITY: Removed // SECURITY: Removed console.log(`💰 ${type} expense created:`, savedExpense.id, savedExpense.amount)
 
     return NextResponse.json({
       success: true,
@@ -68,11 +81,11 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Create expense error:', error)
-    return NextResponse.json(
-      { error: 'Failed to create expense' },
-      { status: 500 }
-    )
+    // SECURITY: Use secure error handling
+    const requestId = crypto.randomUUID()
+    SecureErrorHandler.logError(error, { requestId, operation: 'create_expense' })
+    const sanitizedError = SecureErrorHandler.sanitizeError(error, requestId)
+    return NextResponse.json(sanitizedError, { status: 500 })
   }
 }
 
@@ -153,7 +166,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Get expenses error:', error)
+    // SECURITY: Removed console.error('Get expenses error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch expenses' },
       { status: 500 }
@@ -186,13 +199,13 @@ export async function PUT(request: NextRequest) {
       expense.approvedBy = approverId
       expense.approvedAt = new Date().toISOString()
       
-      console.log(`✅ Expense approved: ${expenseId} by ${approverId}`)
+      // SECURITY: Removed // SECURITY: Removed console.log(`✅ Expense approved: ${expenseId} by ${approverId}`)
       
     } else if (action === 'reject') {
       expense.approved = false
       // Add rejection reason to notes or separate field
       
-      console.log(`❌ Expense rejected: ${expenseId} by ${approverId}`)
+      // SECURITY: Removed // SECURITY: Removed console.log(`❌ Expense rejected: ${expenseId} by ${approverId}`)
     }
 
     return NextResponse.json({
@@ -202,7 +215,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Update expense error:', error)
+    // SECURITY: Removed console.error('Update expense error:', error)
     return NextResponse.json(
       { error: 'Failed to update expense' },
       { status: 500 }
@@ -299,7 +312,7 @@ async function checkAutoApproval(expense: TravelExpense | MiscExpense, type: str
 
 async function sendForApproval(expense: TravelExpense | MiscExpense, type: string, projectId: string) {
   // Mock approval notification - replace with actual notification service
-  console.log(`📧 Sending expense for approval:`, {
+  // SECURITY: Removed // SECURITY: Removed console.log(`📧 Sending expense for approval:`, {
     expenseId: expense.id,
     type,
     amount: expense.amount,

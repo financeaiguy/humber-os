@@ -58,10 +58,10 @@ export async function POST(request: NextRequest) {
 
     if (isDemoMode) {
       // Demo mode: Just return success without actual storage
-      console.log(`🎭 DEMO: ${type} submitted for employee ${metadata.employeeId}`)
-      console.log(`📸 Photo size: ${(photoSizeBytes / 1024).toFixed(1)}KB`)
-      console.log(`📍 Location: ${metadata.location ? `${metadata.location.lat}, ${metadata.location.lng}` : 'Not available'}`)
-      console.log(`🔐 Biometric verified: ${metadata.biometricVerified}`)
+      // SECURITY: Removed // SECURITY: Removed console.log(`🎭 DEMO: ${type} submitted for employee ${metadata.employeeId}`)
+      // SECURITY: Removed // SECURITY: Removed console.log(`📸 Photo size: ${(photoSizeBytes / 1024).toFixed(1)}KB`)
+      // SECURITY: Removed // SECURITY: Removed console.log(`📍 Location: ${metadata.location ? `${metadata.location.lat}, ${metadata.location.lng}` : 'Not available'}`)
+      // SECURITY: Removed // SECURITY: Removed console.log(`🔐 Biometric verified: ${metadata.biometricVerified}`)
       
       return NextResponse.json({
         success: true,
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
       createdAt: new Date().toISOString()
     }
 
-    console.log('Time entry recorded:', {
+    // SECURITY: Removed // SECURITY: Removed console.log('Time entry recorded:', {
       id: entryId,
       employeeId: metadata.employeeId,
       type,
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Time tracking API error:', error)
+    // SECURITY: Removed console.error('Time tracking API error:', error)
     
     return NextResponse.json(
       { 

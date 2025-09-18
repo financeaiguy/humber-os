@@ -158,11 +158,11 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
             
             if (assertion) {
               setBiometricVerified(true)
-              console.log('Biometric authentication successful')
+              // SECURITY: Removed // SECURITY: Removed console.log('Biometric authentication successful')
               return true
             }
           } catch (getError) {
-            console.log('No existing credentials, attempting registration')
+            // SECURITY: Removed // SECURITY: Removed console.log('No existing credentials, attempting registration')
             
             // If no existing credentials, try to create new ones (registration)
             const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions = {
@@ -196,11 +196,11 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
               
               if (credential) {
                 setBiometricVerified(true)
-                console.log('Biometric registration and authentication successful')
+                // SECURITY: Removed // SECURITY: Removed console.log('Biometric registration and authentication successful')
                 return true
               }
             } catch (createError) {
-              console.error('Biometric registration failed:', createError)
+              // SECURITY: Removed console.error('Biometric registration failed:', createError)
             }
           }
         }
@@ -244,7 +244,7 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
       
       return false
     } catch (error) {
-      console.error('Biometric authentication error:', error)
+      // SECURITY: Removed console.error('Biometric authentication error:', error)
       
       // Even errors should require fallback verification
       const proceed = window.confirm(
@@ -306,7 +306,7 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
       setIsClockingIn(false)
       
     } catch (error) {
-      console.error('Clock in preparation error:', error)
+      // SECURITY: Removed console.error('Clock in preparation error:', error)
       alert('An error occurred preparing clock in. Please try again.')
       setIsClockingIn(false)
     }
@@ -389,7 +389,7 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
       setIsClockingOut(false)
       
     } catch (error) {
-      console.error('Clock out preparation error:', error)
+      // SECURITY: Removed console.error('Clock out preparation error:', error)
       alert('An error occurred preparing clock out. Please try again.')
       setIsClockingOut(false)
     }
@@ -470,12 +470,12 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
       
       // Check if within radius (accounting for GPS accuracy)
       if (distance <= (workSite.radius + location.accuracy)) {
-        console.log(`Location verified at ${workSite.name}: ${distance.toFixed(0)}m away`)
+        // SECURITY: Removed // SECURITY: Removed console.log(`Location verified at ${workSite.name}: ${distance.toFixed(0)}m away`)
         return true
       }
     }
     
-    console.warn('Location verification failed: Not at any authorized work site')
+    // SECURITY: Removed console.warn('Location verification failed: Not at any authorized work site')
     return false
   }
 
@@ -486,7 +486,7 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
     // Scenario 1: First attempt (clock in) - SUCCESS
     if (currentAttempts === 0) {
       localStorage.setItem('demoLocationAttempts', '1')
-      console.log('🎭 DEMO: Clock in successful - authorized location')
+      // SECURITY: Removed // SECURITY: Removed console.log('🎭 DEMO: Clock in successful - authorized location')
       showDemoNotification('✅ Location Verified', 'You are at an authorized work site', 'success')
       return true
     }
@@ -494,7 +494,7 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
     // Scenario 2: Second attempt (clock out) - FAIL
     if (currentAttempts === 1) {
       localStorage.setItem('demoLocationAttempts', '2')
-      console.log('🎭 DEMO: Clock out failed - location verification failed')
+      // SECURITY: Removed // SECURITY: Removed console.log('🎭 DEMO: Clock out failed - location verification failed')
       showDemoNotification('❌ Location Verification Failed', 'You are not within the authorized work location.\n\nPlease ensure you are at the work site and try again.', 'error')
       return false
     }
@@ -502,7 +502,7 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
     // Scenario 3: Third attempt - SUCCESS (after moving back to work site)
     if (currentAttempts === 2) {
       localStorage.setItem('demoLocationAttempts', '3')
-      console.log('🎭 DEMO: Clock out successful - back at authorized location')
+      // SECURITY: Removed // SECURITY: Removed console.log('🎭 DEMO: Clock out successful - back at authorized location')
       showDemoNotification('✅ Location Verified', 'Successfully verified work site location', 'success')
       return true
     }
@@ -632,7 +632,7 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
       setPendingAction(null)
 
     } catch (error: any) {
-      console.error('Camera capture submission error:', error)
+      // SECURITY: Removed console.error('Camera capture submission error:', error)
       alert(`Failed to submit ${pendingAction}: ${error.message}`)
     }
   }

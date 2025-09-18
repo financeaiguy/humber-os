@@ -19,7 +19,7 @@ export async function GET(
       message: 'Offboarding request retrieved successfully'
     })
   } catch (error) {
-    console.error('Get offboarding error:', error)
+    // SECURITY: Removed console.error('Get offboarding error:', error)
     return NextResponse.json(
       { error: 'Failed to retrieve offboarding request' },
       { status: 500 }
@@ -46,7 +46,7 @@ export async function PUT(
       message: 'Offboarding request updated successfully'
     })
   } catch (error) {
-    console.error('Update offboarding error:', error)
+    // SECURITY: Removed console.error('Update offboarding error:', error)
     return NextResponse.json(
       { error: 'Failed to update offboarding request' },
       { status: 500 }

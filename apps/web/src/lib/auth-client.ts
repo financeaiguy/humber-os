@@ -2,7 +2,7 @@
 
 export async function signIn(email: string, password: string) {
   try {
-    console.log('Attempting sign in for:', email)
+    // SECURITY: Removed // SECURITY: Removed console.log('Attempting sign in for:', email)
     
     const response = await fetch('/api/auth/signin', {
       method: 'POST',
@@ -17,7 +17,7 @@ export async function signIn(email: string, password: string) {
 
     const result = await response.json()
     
-    console.log('Sign in result:', result)
+    // SECURITY: Removed // SECURITY: Removed console.log('Sign in result:', result)
 
     if (response.ok && result.success) {
       // Redirect on successful authentication
@@ -27,7 +27,7 @@ export async function signIn(email: string, password: string) {
 
     return { success: false, error: result.error || 'Authentication failed' }
   } catch (error) {
-    console.error('Sign in error:', error)
+    // SECURITY: Removed console.error('Sign in error:', error)
     return { success: false, error: 'Something went wrong' }
   }
 }

@@ -165,8 +165,8 @@ app.get('/secure-api-test', (c) => {
 
         // Security warning on load
         window.onload = () => {
-            console.warn('🔒 SECURE API TESTING INTERFACE');
-            console.warn('All API calls are authenticated and logged for security auditing');
+            // SECURITY: Removed console.warn('🔒 SECURE API TESTING INTERFACE');
+            // SECURITY: Removed console.warn('All API calls are authenticated and logged for security auditing');
             
             if (!localStorage.getItem('authToken')) {
                 alert('⚠️ No authentication token found. Please log in first.');

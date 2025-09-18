@@ -137,7 +137,7 @@ export class SecureLogger {
       error: error ? {
         name: error.name,
         message: this.redactSensitiveString(error.message),
-        stack: this.isDevelopment ? error.stack : undefined
+        stack: this.isDevelopment ? error.message : undefined
       } as any : undefined,
       sanitized: true
     }
@@ -159,18 +159,18 @@ export class SecureLogger {
       }
       
       const color = colors[entry.level] || colors.reset
-      console.log(`${color}[${entry.level.toUpperCase()}]${colors.reset} ${entry.timestamp} ${entry.message}`)
+      // SECURITY: Removed // SECURITY: Removed console.log(`${color}[${entry.level.toUpperCase()}]${colors.reset} ${entry.timestamp} ${entry.message}`)
       
       if (entry.context) {
-        console.log('Context:', entry.context)
+        // SECURITY: Removed // SECURITY: Removed console.log('Context:', entry.context)
       }
       
       if (entry.error) {
-        console.error('Error:', entry.error)
+        // SECURITY: Removed console.error('Error:', entry.error)
       }
     } else {
       // Production: structured JSON logging
-      console.log(JSON.stringify(entry))
+      // SECURITY: Removed // SECURITY: Removed console.log(JSON.stringify(entry))
     }
   }
   

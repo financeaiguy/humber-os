@@ -123,7 +123,7 @@ let localIndex: LocalVectorizeIndex | null = null
 export function getLocalVectorizeIndex(): LocalVectorizeIndex {
   if (!localIndex) {
     localIndex = new LocalVectorizeIndex()
-    console.log('🎯 Local Vectorize Index initialized (in-memory)')
+    // SECURITY: Removed console.log('🎯 Local Vectorize Index initialized (in-memory)')
   }
   return localIndex
 }

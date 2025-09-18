@@ -148,7 +148,7 @@ export default function RecruitsPage() {
       const response = await recruitsApi.getRecruits({ limit: 20 })
       setRecruits(response.recruits || [])
     } catch (error) {
-      console.error('Error fetching recruits:', error)
+      // SECURITY: Removed console.error('Error fetching recruits:', error)
     } finally {
       setIsLoading(false)
     }
@@ -169,7 +169,7 @@ export default function RecruitsPage() {
       // Show success message (you could use a toast here)
       alert('Recruit successfully moved to onboarding!')
     } catch (error) {
-      console.error('Error moving recruit to onboarding:', error)
+      // SECURITY: Removed console.error('Error moving recruit to onboarding:', error)
       alert('Failed to move recruit to onboarding. Please try again.')
     } finally {
       setMovingToOnboarding(null)

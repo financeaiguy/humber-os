@@ -85,7 +85,7 @@ class ContinuousLearningSystem extends EventEmitter {
     // Initialize pattern recognition
     this.initializePatternRecognition();
     
-    console.log('🧠 Continuous Learning System initialized');
+    // SECURITY: Removed // SECURITY: Removed console.log('🧠 Continuous Learning System initialized');
   }
 
   // Collect data from various sources
@@ -185,7 +185,7 @@ class ContinuousLearningSystem extends EventEmitter {
       }
     } catch (error) {
       // Silently handle learning errors to prevent disrupting the app
-      console.debug('Learning error:', error);
+      // SECURITY: Removed console.debug('Learning error:', error);
     }
   }
 
@@ -210,7 +210,7 @@ class ContinuousLearningSystem extends EventEmitter {
       // Emit batch processed event
       this.emit('batch_processed', { count: batch.length });
     } catch (error) {
-      console.error('Error processing learning batch:', error);
+      // SECURITY: Removed console.error('Error processing learning batch:', error);
       this.emit('error', error);
     } finally {
       this.isProcessing = false;
@@ -683,7 +683,7 @@ class ContinuousLearningSystem extends EventEmitter {
         }
       } catch (error) {
         // If URL parsing fails, try to extract meaningful info
-        console.warn('Invalid URL in continuous learning:', data.url);
+        // SECURITY: Removed console.warn('Invalid URL in continuous learning:', data.url);
         if (typeof data.url === 'string' && data.url.includes('/')) {
           // Return the last part of the path-like string
           return data.url.split('/').pop() || 'unknown';
@@ -1116,7 +1116,7 @@ class ContinuousLearningSystem extends EventEmitter {
         patterns: imported.patterns?.length || 0
       });
     } catch (error) {
-      console.error('Error importing knowledge:', error);
+      // SECURITY: Removed console.error('Error importing knowledge:', error);
       throw error;
     }
   }

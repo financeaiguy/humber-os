@@ -34,7 +34,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo)
+    // SECURITY: Removed console.error('ErrorBoundary caught an error:', error, errorInfo)
     this.setState({ errorInfo })
     
     // Send error to monitoring service in production

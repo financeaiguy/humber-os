@@ -52,7 +52,7 @@ export default function CustomerPortalPage() {
         setError(data.error || 'Session validation failed')
       }
     } catch (error) {
-      console.error('Session validation error:', error)
+      // SECURITY: Removed console.error('Session validation error:', error)
       setError('Failed to validate session')
     } finally {
       setLoading(false)
@@ -169,7 +169,7 @@ export default function CustomerPortalPage() {
       
       setInvoices(mockInvoices)
     } catch (error) {
-      console.error('Error fetching invoices:', error)
+      // SECURITY: Removed console.error('Error fetching invoices:', error)
     }
   }
 
@@ -202,7 +202,7 @@ export default function CustomerPortalPage() {
         alert('Failed to create payment: ' + data.error)
       }
     } catch (error) {
-      console.error('Payment initiation error:', error)
+      // SECURITY: Removed console.error('Payment initiation error:', error)
       alert('Failed to initiate payment')
     }
   }

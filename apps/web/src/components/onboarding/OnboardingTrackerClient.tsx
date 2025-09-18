@@ -110,7 +110,7 @@ export function OnboardingTrackerClient() {
 
   const handleUpdateCandidate = async (candidateId: string, updates: Partial<OnboardingCandidate>) => {
     if (!updateCandidate || typeof updateCandidate !== 'function') {
-      console.warn('updateCandidate is not available')
+      // SECURITY: Removed console.warn('updateCandidate is not available')
       return
     }
     try {
@@ -120,7 +120,7 @@ export function OnboardingTrackerClient() {
         setSelectedCandidate(prev => prev ? { ...prev, ...updates } : null)
       }
     } catch (error) {
-      console.error('Failed to update candidate:', error)
+      // SECURITY: Removed console.error('Failed to update candidate:', error)
       throw error
     }
   }

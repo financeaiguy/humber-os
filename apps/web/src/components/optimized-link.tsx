@@ -36,7 +36,7 @@ export function OptimizedLink({
   const handleClick = useCallback((e: React.MouseEvent) => {
     // Validate href is a string
     if (typeof href !== 'string') {
-      console.warn('OptimizedLink: href must be a string, received:', typeof href, href)
+      // SECURITY: Removed console.warn('OptimizedLink: href must be a string, received:', typeof href, href)
       e.preventDefault()
       return
     }

@@ -252,7 +252,7 @@ export function DocumentViewer({ isOpen, onClose, document: initialDocument, doc
   const handleDownload = () => {
     if (currentDocument) {
       // Mock download
-      console.log('Downloading:', currentDocument.title)
+      // SECURITY: Removed // SECURITY: Removed console.log('Downloading:', currentDocument.title)
       // In real implementation, would trigger actual download
       const link = document.createElement('a')
       link.href = currentDocument.url

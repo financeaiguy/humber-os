@@ -175,7 +175,7 @@ export default function OptimizedKPIDashboard() {
     try {
       return generateOptimizedData();
     } catch (error) {
-      console.error('Error generating initial data:', error);
+      // SECURITY: Removed console.error('Error generating initial data:', error);
       return null;
     }
   });
@@ -191,7 +191,7 @@ export default function OptimizedKPIDashboard() {
         try {
           setData(generateOptimizedData());
         } catch (error) {
-          console.error('Error refreshing data:', error);
+          // SECURITY: Removed console.error('Error refreshing data:', error);
         } finally {
           setIsLoading(false);
         }
@@ -201,7 +201,7 @@ export default function OptimizedKPIDashboard() {
         try {
           setData(generateOptimizedData());
         } catch (error) {
-          console.error('Error refreshing data:', error);
+          // SECURITY: Removed console.error('Error refreshing data:', error);
         } finally {
           setIsLoading(false);
         }
@@ -253,7 +253,7 @@ export default function OptimizedKPIDashboard() {
       try {
         setData(generateOptimizedData());
       } catch (error) {
-        console.error('Error changing time range:', error);
+        // SECURITY: Removed console.error('Error changing time range:', error);
       } finally {
         setIsLoading(false);
       }

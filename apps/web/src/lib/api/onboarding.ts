@@ -114,7 +114,7 @@ async function withRetry<T>(
         config.maxDelay
       )
       
-      console.warn(`API attempt ${attempt} failed, retrying in ${delay}ms:`, error.message)
+      // SECURITY: Removed console.warn(`API attempt ${attempt} failed, retrying in ${delay}ms:`, error.message)
       await new Promise(resolve => setTimeout(resolve, delay))
     }
   }
@@ -155,7 +155,7 @@ async function apiRequest<T>(
     // Validate response schema
     const result = schema.safeParse(data)
     if (!result.success) {
-      console.error('Invalid API response schema:', result.error)
+      // SECURITY: Removed console.error('Invalid API response schema:', result.error)
       throw new ApiServerError('Invalid response format from server', 500)
     }
 

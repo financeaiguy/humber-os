@@ -73,7 +73,7 @@ export default function SignUpPage() {
 
     try {
       // TODO: Implement actual signup API call
-      console.log('Sign up data:', formData)
+      // // SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('Sign up data:', formData)
       
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000))
@@ -90,7 +90,7 @@ export default function SignUpPage() {
       router.push('/auth/signin')
       
     } catch (error) {
-      console.error('Signup error:', error)
+      // SECURITY: Removed // SECURITY: Removed console.error('Signup error:', error)
       setError(error instanceof Error ? error.message : 'Something went wrong')
     } finally {
       setLoading(false)

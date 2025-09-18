@@ -68,7 +68,7 @@ app.post('/initialize', async (c) => {
       message: 'Vectorize index ready for production use'
     })
   } catch (error) {
-    console.error('Initialization error:', error)
+    // SECURITY: Removed console.error('Initialization error:', error)
     return c.json({
       success: false,
       error: 'Failed to initialize vector index'
@@ -147,7 +147,7 @@ app.post('/documents', async (c) => {
       message: 'Document added to knowledge base'
     })
   } catch (error) {
-    console.error('Error adding document:', error)
+    // SECURITY: Removed console.error('Error adding document:', error)
     return c.json({
       success: false,
       error: 'Failed to add document to knowledge base'
@@ -216,7 +216,7 @@ app.post('/search', async (c) => {
       count: formattedResults.length
     })
   } catch (error) {
-    console.error('Search error:', error)
+    // SECURITY: Removed console.error('Search error:', error)
     return c.json({
       success: false,
       error: 'Failed to search knowledge base'
@@ -286,7 +286,7 @@ app.get('/documents/:id/similar', async (c) => {
       count: formattedResults.length
     })
   } catch (error) {
-    console.error('Error finding similar documents:', error)
+    // SECURITY: Removed console.error('Error finding similar documents:', error)
     return c.json({
       success: false,
       error: 'Failed to find similar documents'
@@ -317,7 +317,7 @@ app.delete('/documents/:id', async (c) => {
       message: 'Document deleted from knowledge base'
     })
   } catch (error) {
-    console.error('Error deleting document:', error)
+    // SECURITY: Removed console.error('Error deleting document:', error)
     return c.json({
       success: false,
       error: 'Failed to delete document'
@@ -407,7 +407,7 @@ app.post('/bulk-import', async (c) => {
       documentIds: vectors.map(v => v.id)
     })
   } catch (error) {
-    console.error('Bulk import error:', error)
+    // SECURITY: Removed console.error('Bulk import error:', error)
     return c.json({
       success: false,
       error: 'Failed to bulk import documents'

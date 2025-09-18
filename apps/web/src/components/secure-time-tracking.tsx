@@ -136,7 +136,7 @@ export function SecureTimeTracking() {
       return overallTrustScore >= 60 // Minimum 60% trust score required
 
     } catch (error) {
-      console.error('Security verification failed:', error)
+      // SECURITY: Removed console.error('Security verification failed:', error)
       return false
     } finally {
       setIsVerifying(false)
@@ -647,7 +647,7 @@ export function SecureTimeTracking() {
                 <button
                   onClick={async () => {
                     const result = await biometricAuth.registerBiometric('user123', 'Sarah Johnson')
-                    console.log('Biometric registration:', result)
+                    // SECURITY: Removed // SECURITY: Removed console.log('Biometric registration:', result)
                   }}
                   className="w-full p-4 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-xl text-left hover:border-purple-400/50 transition-colors"
                 >
@@ -663,7 +663,7 @@ export function SecureTimeTracking() {
                 <button
                   onClick={async () => {
                     const result = await faceRecognition.recognizeFace(new ImageData(1, 1))
-                    console.log('Face recognition test:', result)
+                    // SECURITY: Removed // SECURITY: Removed console.log('Face recognition test:', result)
                   }}
                   className="w-full p-4 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-xl text-left hover:border-blue-400/50 transition-colors"
                 >

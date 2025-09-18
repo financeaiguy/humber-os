@@ -39,7 +39,7 @@ export function RetryError({
     try {
       await onRetry()
     } catch (err) {
-      console.error('Retry failed:', err)
+      // SECURITY: Removed console.error('Retry failed:', err)
     } finally {
       setIsRetrying(false)
     }
@@ -128,7 +128,7 @@ export function RetryError({
           <p className="text-red-400 font-medium">Error Loading Data</p>
           <p className="text-sm text-slate-400 mt-1">{errorMessage}</p>
           
-          {showDetails && error instanceof Error && error.stack && (
+          {showDetails && error instanceof Error && error.message && (
             <>
               <button
                 onClick={() => setShowErrorDetails(!showErrorDetails)}
@@ -144,7 +144,7 @@ export function RetryError({
                     exit={{ height: 0, opacity: 0 }}
                     className="text-xs text-slate-500 mt-2 overflow-x-auto bg-slate-900/50 rounded p-2"
                   >
-                    {error.stack}
+                    {error.message}
                   </motion.pre>
                 )}
               </AnimatePresence>

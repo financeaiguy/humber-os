@@ -66,7 +66,7 @@ export class BiometricAuthService {
         capabilities.camera = devices.some(device => device.kind === 'videoinput');
         capabilities.microphone = devices.some(device => device.kind === 'audioinput');
       } catch (error) {
-        console.warn('Could not enumerate media devices:', error);
+        // SECURITY: Removed console.warn('Could not enumerate media devices:', error);
       }
     }
 
@@ -487,7 +487,7 @@ export class FaceRecognitionService {
   async loadModel(): Promise<void> {
     // In production, would load actual face recognition model
     // Example: @tensorflow-models/face-landmarks-detection
-    console.log('Loading face recognition model...');
+    // SECURITY: Removed // SECURITY: Removed console.log('Loading face recognition model...');
     
     // Mock model loading
     await new Promise(resolve => setTimeout(resolve, 2000));

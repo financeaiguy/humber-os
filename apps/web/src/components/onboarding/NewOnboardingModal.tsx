@@ -129,7 +129,7 @@ export default function NewOnboardingModal({
       
       setRetryCount(0)
     } catch (error) {
-      console.error('Error fetching recruitment data:', error)
+      // SECURITY: Removed console.error('Error fetching recruitment data:', error)
       
       if (error instanceof ApiNetworkError) {
         setNetworkError(true)
@@ -248,7 +248,7 @@ export default function NewOnboardingModal({
         setOfferDetails({...offerDetails, contractAddress})
       }
     } catch (error) {
-      console.error('Error generating offer letter:', error)
+      // SECURITY: Removed console.error('Error generating offer letter:', error)
       setApiError('Failed to generate offer letter. Please try again.')
     } finally {
       setIsGenerating(false)
@@ -288,7 +288,7 @@ export default function NewOnboardingModal({
         phase: currentPhase
       })
       
-      console.log('Onboarding submission successful:', response)
+      // SECURITY: Removed // SECURITY: Removed console.log('Onboarding submission successful:', response)
       setSubmitSuccess(true)
       
       // Close modal after success delay
@@ -298,7 +298,7 @@ export default function NewOnboardingModal({
       }, 2000)
       
     } catch (error) {
-      console.error('Error submitting onboarding:', error)
+      // SECURITY: Removed console.error('Error submitting onboarding:', error)
       
       if (error instanceof ApiValidationError) {
         // Set field-specific errors

@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(enrichedResponse)
 
   } catch (error) {
-    console.error('Approval request error:', error)
+    // SECURITY: Removed console.error('Approval request error:', error)
     
     // Track approval workflow failure
     await knowledgeMiddleware.trackUserAction('approval_workflow_failed', { error: error.message }, context)
@@ -200,7 +200,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Log approval action
-    console.log(`📋 Approval ${action} by ${approval.approverName} for project ${approval.projectId}`)
+    // SECURITY: Removed // SECURITY: Removed console.log(`📋 Approval ${action} by ${approval.approverName} for project ${approval.projectId}`)
 
     return NextResponse.json({
       success: true,
@@ -211,7 +211,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Approval action error:', error)
+    // SECURITY: Removed console.error('Approval action error:', error)
     return NextResponse.json(
       { error: 'Failed to process approval' },
       { status: 500 }
@@ -274,7 +274,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Get approvals error:', error)
+    // SECURITY: Removed console.error('Get approvals error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch approvals' },
       { status: 500 }
@@ -372,7 +372,7 @@ function getApprovalConditions(requestType: string, budgetAmount: number): strin
 async function sendApprovalNotifications(approvals: ProjectApproval[], requestDetails: any) {
   // Mock notification sending - replace with actual email/SMS service
   for (const approval of approvals) {
-    console.log(`📧 Sending approval request to ${approval.approverEmail}`, {
+    // SECURITY: Removed // SECURITY: Removed console.log(`📧 Sending approval request to ${approval.approverEmail}`, {
       approvalId: approval.id,
       projectId: approval.projectId,
       requestType: requestDetails.requestType,
@@ -390,7 +390,7 @@ async function findApprovalById(approvalId: string): Promise<ProjectApproval | n
 }
 
 async function initiateProjectDeployment(projectId: string) {
-  console.log(`🚀 Initiating project deployment for project ${projectId}`)
+  // SECURITY: Removed // SECURITY: Removed console.log(`🚀 Initiating project deployment for project ${projectId}`)
   // Implement project deployment logic here
 }
 

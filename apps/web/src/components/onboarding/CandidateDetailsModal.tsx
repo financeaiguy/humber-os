@@ -91,7 +91,7 @@ export function CandidateDetailsModal({ candidate, isOpen, onClose, onUpdate }: 
       setIsEditing(false)
       setEditedCandidate({})
     } catch (error) {
-      console.error('Failed to update candidate:', error)
+      // SECURITY: Removed console.error('Failed to update candidate:', error)
     } finally {
       setLoading(false)
     }

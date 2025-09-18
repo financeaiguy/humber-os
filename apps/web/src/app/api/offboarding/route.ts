@@ -101,7 +101,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error fetching off-boarding requests:', error)
+    // SECURITY: Removed console.error('Error fetching off-boarding requests:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -182,7 +182,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (error) {
-    console.error('Error creating off-boarding request:', error)
+    // SECURITY: Removed console.error('Error creating off-boarding request:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

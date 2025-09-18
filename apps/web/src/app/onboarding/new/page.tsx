@@ -149,7 +149,7 @@ export default function NewOnboardingPage() {
         throw new Error(result.error || 'OCR processing failed')
       }
     } catch (error) {
-      console.error('OCR processing failed:', error)
+      // SECURITY: Removed console.error('OCR processing failed:', error)
       // Show error to user
       alert('OCR processing failed. Please try again or enter information manually.')
     }
@@ -787,7 +787,7 @@ export default function NewOnboardingPage() {
             <Button
               onClick={() => {
                 // TODO: Submit form
-                console.log('Submitting onboarding form:', formData)
+                // SECURITY: Removed // SECURITY: Removed console.log('Submitting onboarding form:', formData)
               }}
               className="bg-green-500 text-white hover:bg-green-600"
             >

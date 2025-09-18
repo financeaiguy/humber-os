@@ -111,7 +111,7 @@ export class APIIntegrationService {
       }
 
     } catch (error) {
-      console.error('API call failed:', error)
+      // SECURITY: Removed console.error('API call failed:', error)
 
       // Track API call error
       if (enableLearning) {
@@ -241,7 +241,7 @@ export class APIIntegrationService {
         context: fullContext
       })
     } catch (error) {
-      console.error('Failed to get AI insights:', error)
+      // SECURITY: Removed console.error('Failed to get AI insights:', error)
       return []
     }
   }
@@ -260,7 +260,7 @@ export class APIIntegrationService {
 
       return await knowledgeNervousSystem.getRecommendations(fullContext)
     } catch (error) {
-      console.error('Failed to get recommendations:', error)
+      // SECURITY: Removed console.error('Failed to get recommendations:', error)
       return []
     }
   }
@@ -273,7 +273,7 @@ export class APIIntegrationService {
         timestamp: new Date().toISOString()
       }, context)
     } catch (error) {
-      console.error('Failed to track API call:', error)
+      // SECURITY: Removed console.error('Failed to track API call:', error)
     }
   }
 

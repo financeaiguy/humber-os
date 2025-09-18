@@ -57,7 +57,7 @@ export default function SignInPage() {
         setError(result.error || 'Invalid credentials')
       }
     } catch (error) {
-      console.error('Signin error:', error)
+      // SECURITY: Removed // SECURITY: Removed console.error('Signin error:', error)
       setError(error instanceof Error ? error.message : 'Something went wrong')
     } finally {
       setLoading(false)
@@ -80,7 +80,7 @@ export default function SignInPage() {
         setError(result.error || 'Invalid credentials')
       }
     } catch (error) {
-      console.error('Signin error:', error)
+      // SECURITY: Removed // SECURITY: Removed console.error('Signin error:', error)
       setError(error instanceof Error ? error.message : 'Something went wrong')
     } finally {
       setLoading(false)

@@ -119,7 +119,7 @@ export const config: NextAuthConfig = {
         token.partnerId = user.partnerId
         token.partnerName = user.partnerName
         
-        console.log('✅ JWT created for user:', user.email)
+        // SECURITY: Removed // SECURITY: Removed console.log('✅ JWT created for user:', user.email)
       }
       
       return token
@@ -137,7 +137,7 @@ export const config: NextAuthConfig = {
     },
     signIn({ user }) {
       // Log successful sign-ins
-      console.log('✅ User signed in:', user.email)
+      // SECURITY: Removed // SECURITY: Removed console.log('✅ User signed in:', user.email)
       return true
     },
   },

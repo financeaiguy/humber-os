@@ -55,7 +55,7 @@ export function ExpenseTracker({ engineerId, engineerName, projectId }: ExpenseT
         setSummary(data.summary)
       }
     } catch (error) {
-      console.error('Error fetching expenses:', error)
+      // SECURITY: Removed console.error('Error fetching expenses:', error)
     } finally {
       setLoading(false)
     }
@@ -82,12 +82,12 @@ export function ExpenseTracker({ engineerId, engineerName, projectId }: ExpenseT
       if (result.success) {
         await fetchExpenses() // Refresh the list
         setShowNewExpense(false)
-        console.log('✅ Expense submitted successfully')
+        // SECURITY: Removed // SECURITY: Removed console.log('✅ Expense submitted successfully')
       } else {
-        console.error('Failed to submit expense:', result.error)
+        // SECURITY: Removed console.error('Failed to submit expense:', result.error)
       }
     } catch (error) {
-      console.error('Error submitting expense:', error)
+      // SECURITY: Removed console.error('Error submitting expense:', error)
     } finally {
       setLoading(false)
     }

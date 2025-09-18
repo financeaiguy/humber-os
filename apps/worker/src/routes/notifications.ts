@@ -17,7 +17,7 @@ notificationsRouter.post('/send', async (c) => {
       message: success ? 'Notification sent successfully' : 'Failed to send notification'
     });
   } catch (error) {
-    console.error('Send notification error:', error);
+    // SECURITY: Removed console.error('Send notification error:', error);
     return c.json({ 
       success: false, 
       error: 'Failed to send notification' 
@@ -48,7 +48,7 @@ notificationsRouter.post('/send-bulk', async (c) => {
       failedCount: request.notifications.length - successCount
     });
   } catch (error) {
-    console.error('Send bulk notifications error:', error);
+    // SECURITY: Removed console.error('Send bulk notifications error:', error);
     return c.json({ 
       success: false, 
       error: 'Failed to send bulk notifications' 
@@ -71,7 +71,7 @@ notificationsRouter.post('/timesheet-submitted', async (c) => {
     
     return c.json({ success });
   } catch (error) {
-    console.error('Timesheet notification error:', error);
+    // SECURITY: Removed console.error('Timesheet notification error:', error);
     return c.json({ success: false, error: 'Failed to send notification' }, 500);
   }
 });
@@ -90,7 +90,7 @@ notificationsRouter.post('/discrepancy-detected', async (c) => {
     
     return c.json({ success });
   } catch (error) {
-    console.error('Discrepancy notification error:', error);
+    // SECURITY: Removed console.error('Discrepancy notification error:', error);
     return c.json({ success: false, error: 'Failed to send notification' }, 500);
   }
 });
@@ -109,7 +109,7 @@ notificationsRouter.post('/compliance-violation', async (c) => {
     
     return c.json({ success });
   } catch (error) {
-    console.error('Compliance notification error:', error);
+    // SECURITY: Removed console.error('Compliance notification error:', error);
     return c.json({ success: false, error: 'Failed to send notification' }, 500);
   }
 });
@@ -193,7 +193,7 @@ notificationsRouter.get('/history', async (c) => {
       offset
     });
   } catch (error) {
-    console.error('Get notification history error:', error);
+    // SECURITY: Removed console.error('Get notification history error:', error);
     return c.json({ 
       success: false, 
       error: 'Failed to fetch notification history' 
@@ -304,7 +304,7 @@ notificationsRouter.get('/analytics', async (c) => {
       analytics: mockAnalytics
     });
   } catch (error) {
-    console.error('Get notification analytics error:', error);
+    // SECURITY: Removed console.error('Get notification analytics error:', error);
     return c.json({ 
       success: false, 
       error: 'Failed to fetch notification analytics' 
@@ -349,7 +349,7 @@ notificationsRouter.get('/templates', async (c) => {
       })) || []
     });
   } catch (error) {
-    console.error('Get notification templates error:', error);
+    // SECURITY: Removed console.error('Get notification templates error:', error);
     return c.json({ 
       success: false, 
       error: 'Failed to fetch notification templates' 
@@ -395,7 +395,7 @@ notificationsRouter.get('/settings/:userId', async (c) => {
       }
     });
   } catch (error) {
-    console.error('Get notification settings error:', error);
+    // SECURITY: Removed console.error('Get notification settings error:', error);
     return c.json({ 
       success: false, 
       error: 'Failed to fetch notification settings' 
@@ -437,7 +437,7 @@ notificationsRouter.put('/settings/:userId', async (c) => {
     
     return c.json({ success: true });
   } catch (error) {
-    console.error('Update notification settings error:', error);
+    // SECURITY: Removed console.error('Update notification settings error:', error);
     return c.json({ 
       success: false, 
       error: 'Failed to update notification settings' 

@@ -1338,7 +1338,7 @@ export default function BullPenDashboard() {
                       compact={true}
                       showDetails={false}
                       onAlertClick={(alert) => {
-                        console.log('Alert clicked:', alert)
+                        // SECURITY: Removed // SECURITY: Removed console.log('Alert clicked:', alert)
                         // Handle alert click - could open modal or navigate to details
                       }}
                     />
@@ -1480,11 +1480,11 @@ export default function BullPenDashboard() {
         }}
         onMessage={(engineer) => {
           // Handle message functionality
-          console.log('Message engineer:', engineer.name)
+          // SECURITY: Removed // SECURITY: Removed console.log('Message engineer:', engineer.name)
         }}
         onVideoCall={(engineer) => {
           // Handle video call functionality
-          console.log('Video call engineer:', engineer.name)
+          // SECURITY: Removed // SECURITY: Removed console.log('Video call engineer:', engineer.name)
         }}
         currentProjectPO={selectedEngineer && selectedEngineer.availability === 'On Project' ? 
           mockPurchaseOrders.find(po => 

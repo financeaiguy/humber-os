@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
       message: 'Customer authenticated successfully'
     })
   } catch (error) {
-    console.error('Customer portal auth error:', error)
+    // SECURITY: Removed console.error('Customer portal auth error:', error)
     return NextResponse.json(
       { error: 'Failed to authenticate customer' },
       { status: 500 }

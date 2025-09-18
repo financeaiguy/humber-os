@@ -43,7 +43,7 @@ async function proxyToWorker(request: NextRequest) {
       },
     })
   } catch (error) {
-    console.error('Error proxying to worker:', error)
+    // SECURITY: Removed console.error('Error proxying to worker:', error)
     return NextResponse.json(
       {
         success: false,

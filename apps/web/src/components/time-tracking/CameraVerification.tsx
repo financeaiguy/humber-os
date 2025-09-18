@@ -105,7 +105,7 @@ export default function CameraVerification({
       // Update permission state
       setCameraPermission('granted')
     } catch (err: any) {
-      console.error('Camera access error:', err)
+      // SECURITY: Removed console.error('Camera access error:', err)
       setError(err.message || 'Failed to access camera')
       setIsLoading(false)
       setCameraPermission('denied')
@@ -230,7 +230,7 @@ export default function CameraVerification({
         throw new Error(validation.error)
       }
       
-      console.log(`Photo captured: ${validation.sizeKB}KB at ${Math.round(quality * 100)}% quality`)
+      // SECURITY: Removed // SECURITY: Removed console.log(`Photo captured: ${validation.sizeKB}KB at ${Math.round(quality * 100)}% quality`)
       setCapturedImage(imageData)
 
       // Prepare metadata
@@ -255,7 +255,7 @@ export default function CameraVerification({
 
       return { imageData, metadata }
     } catch (err: any) {
-      console.error('Photo capture error:', err)
+      // SECURITY: Removed console.error('Photo capture error:', err)
       setError('Failed to capture photo')
       return null
     }
@@ -347,7 +347,7 @@ export default function CameraVerification({
       await onCapture(capturedImage, metadata)
       onClose()
     } catch (err: any) {
-      console.error('Failed to submit photo:', err)
+      // SECURITY: Removed console.error('Failed to submit photo:', err)
       setError('Failed to submit photo. Please try again.')
     } finally {
       setIsProcessing(false)

@@ -644,7 +644,7 @@ export class PDFReportService {
       };
       
     } catch (error) {
-      console.error('Report generation failed:', error);
+      // SECURITY: Removed console.error('Report generation failed:', error);
       throw error;
     }
   }

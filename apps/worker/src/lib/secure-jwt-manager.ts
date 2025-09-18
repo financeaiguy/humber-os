@@ -176,7 +176,7 @@ export class SecureJWTManager {
       // IP address validation (optional - can be disabled for mobile users)
       if (payload.ipAddress !== currentIP) {
         // Log suspicious activity but don't reject (mobile users change IPs)
-        console.warn('IP address mismatch for token', {
+        // SECURITY: Removed console.warn('IP address mismatch for token', {
           tokenIP: payload.ipAddress,
           currentIP,
           userId: payload.userId
@@ -186,7 +186,7 @@ export class SecureJWTManager {
       // User agent validation (detect session hijacking)
       if (payload.userAgent !== currentUserAgent) {
         // This is more suspicious - different browser/device
-        console.error('User agent mismatch - possible session hijacking', {
+        // SECURITY: Removed console.error('User agent mismatch - possible session hijacking', {
           tokenUA: payload.userAgent,
           currentUA: currentUserAgent,
           userId: payload.userId
@@ -203,7 +203,7 @@ export class SecureJWTManager {
       return payload
       
     } catch (error) {
-      console.error('Token verification failed:', error.message)
+      // SECURITY: Removed console.error('Token verification failed:', error.message)
       return null
     }
   }
@@ -232,7 +232,7 @@ export class SecureJWTManager {
       )
       
     } catch (error) {
-      console.error('Token refresh failed:', error.message)
+      // SECURITY: Removed console.error('Token refresh failed:', error.message)
       return null
     }
   }

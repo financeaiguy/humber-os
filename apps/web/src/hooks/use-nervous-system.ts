@@ -83,7 +83,7 @@ export function useNervousSystem(options: UseNervousSystemOptions) {
         timestamp: new Date().toISOString()
       }, context)
     } catch (error) {
-      console.error('Failed to track action:', error)
+      // SECURITY: Removed console.error('Failed to track action:', error)
     }
   }, [enableLearning, page, feature, userRole])
 
@@ -101,7 +101,7 @@ export function useNervousSystem(options: UseNervousSystemOptions) {
       
       return response
     } catch (error) {
-      console.error('Failed to query AI:', error)
+      // SECURITY: Removed console.error('Failed to query AI:', error)
       return null
     }
   }, [trackAction, page, feature, userRole])
@@ -119,7 +119,7 @@ export function useNervousSystem(options: UseNervousSystemOptions) {
 
       return analysis
     } catch (error) {
-      console.error('Failed to analyze process:', error)
+      // SECURITY: Removed console.error('Failed to analyze process:', error)
       return null
     }
   }, [trackAction, page, feature, userRole])
@@ -133,7 +133,7 @@ export function useNervousSystem(options: UseNervousSystemOptions) {
       
       return optimization
     } catch (error) {
-      console.error('Failed to optimize workflow:', error)
+      // SECURITY: Removed console.error('Failed to optimize workflow:', error)
       return null
     }
   }, [trackAction, page, feature, userRole])
@@ -148,7 +148,7 @@ export function useNervousSystem(options: UseNervousSystemOptions) {
       // Reload data to get updated insights
       await loadData()
     } catch (error) {
-      console.error('Failed to add knowledge:', error)
+      // SECURITY: Removed console.error('Failed to add knowledge:', error)
     }
   }, [loadData, trackAction])
 
@@ -161,7 +161,7 @@ export function useNervousSystem(options: UseNervousSystemOptions) {
       
       return suggestions
     } catch (error) {
-      console.error('Failed to get suggestions:', error)
+      // SECURITY: Removed console.error('Failed to get suggestions:', error)
       return []
     }
   }, [trackAction, page, feature, userRole])
@@ -175,7 +175,7 @@ export function useNervousSystem(options: UseNervousSystemOptions) {
       
       return prediction
     } catch (error) {
-      console.error('Failed to predict outcome:', error)
+      // SECURITY: Removed console.error('Failed to predict outcome:', error)
       return null
     }
   }, [trackAction, page, feature, userRole])

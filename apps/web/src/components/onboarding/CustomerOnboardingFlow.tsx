@@ -198,7 +198,7 @@ export default function CustomerOnboardingFlow({ isOpen, onClose, onComplete }: 
       onComplete(customerData)
       onClose()
     } catch (error) {
-      console.error('Error submitting customer onboarding:', error)
+      // SECURITY: Removed console.error('Error submitting customer onboarding:', error)
       setErrors({ submit: 'Failed to create customer account. Please try again.' })
     } finally {
       setIsSubmitting(false)
