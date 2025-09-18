@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { withKnowledgeSystem, KnowledgeEnhancedResponse } from '@/lib/knowledge-middleware'
 
 // Using nodejs runtime for development to allow localhost connections
 // export const runtime = 'edge'  
 export const dynamic = 'force-dynamic'
 
 const WORKER_URL = 'http://localhost:8787'
+const knowledgeMiddleware = withKnowledgeSystem({
+  enableLearning: true,
+  trackUserActions: true,
+  enableAIInsights: true,
+  logLevel: 'basic'
+})
 
 async function proxyToWorker(request: NextRequest) {
   try {

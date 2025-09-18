@@ -1,8 +1,31 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
+import { auth } from "@/auth"
 
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
+export default auth((req) => {
+  const { pathname } = req.nextUrl
+  
+  // Public routes that don't require authentication
+  const publicRoutes = [
+    '/',
+    '/auth/signin',
+    '/auth/signup', 
+    '/auth/error',
+    '/privacy',
+    '/terms',
+    '/_next',
+    '/favicon.ico'
+  ]
+  
+  // Check if route is public
+  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route))
+  
+  // If not authenticated and trying to access protected route
+  if (!req.auth && !isPublicRoute) {
+    const signInUrl = new URL('/auth/signin', req.url)
+    signInUrl.searchParams.set('callbackUrl', pathname)
+    return NextResponse.redirect(signInUrl)
+  }
   
   // Add security headers to all responses
   const response = NextResponse.next()

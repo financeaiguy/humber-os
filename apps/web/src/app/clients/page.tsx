@@ -23,9 +23,9 @@ const clients = [
     industry: 'Automotive Manufacturing',
     location: 'Detroit, MI',
     contact: {
-      name: 'John Smith',
-      email: 'john.smith@gm.com',
-      phone: '+1 (313) 555-0123'
+      name: 'Demo Contact',
+      email: 'contact@example.com',
+      phone: '+1 (555) 000-0000'
     },
     projects: {
       active: 2,
