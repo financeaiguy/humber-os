@@ -503,7 +503,7 @@ export default function ProjectsPage() {
                   compact={true}
                   showDetails={true}
                   onAlertClick={(alert) => {
-                    // SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('Alert clicked:', alert)
+                    // SECURITY: Removed console.log('Alert clicked:', alert)
                     // Handle alert click - could open modal or navigate to details
                   }}
                 />
@@ -535,15 +535,15 @@ export default function ProjectsPage() {
         }}
         onUpdateProject={(projectId, updates) => {
           // Handle project updates
-          // SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('Update project:', projectId, updates)
+          // SECURITY: Removed console.log('Update project:', projectId, updates)
         }}
         onAssignEngineer={(projectId, engineerId) => {
           // Handle engineer assignment
-          // SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('Assign engineer:', projectId, engineerId)
+          // SECURITY: Removed console.log('Assign engineer:', projectId, engineerId)
         }}
         onCreateTask={(projectId, task) => {
           // Handle task creation
-          // SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('Create task:', projectId, task)
+          // SECURITY: Removed console.log('Create task:', projectId, task)
         }}
       />
     </div>

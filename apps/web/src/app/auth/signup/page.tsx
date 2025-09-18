@@ -73,7 +73,7 @@ export default function SignUpPage() {
 
     try {
       // TODO: Implement actual signup API call
-      // // SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('Sign up data:', formData)
+      // // SECURITY: Removed console.log('Sign up data:', formData)
       
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000))

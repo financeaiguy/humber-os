@@ -184,7 +184,7 @@ async function standardizeImports(filePath) {
 }
 
 async function runCleanup() {
-  // SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('🧹 Starting Zero-Risk Tech Debt Cleanup...\n');
+  // SECURITY: Removed console.log('🧹 Starting Zero-Risk Tech Debt Cleanup...\n');
   
   const stats = {
     filesProcessed: 0,
@@ -196,7 +196,7 @@ async function runCleanup() {
   const srcPath = path.join(process.cwd(), 'src');
   
   for await (const filePath of walk(srcPath)) {
-    // SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log(`Processing: ${path.relative(process.cwd(), filePath)}`);
+    // SECURITY: Removed console.log(`Processing: ${path.relative(process.cwd(), filePath)}`);
     stats.filesProcessed++;
 
     if (SAFE_CLEANUPS.removeUnusedImports) {
@@ -218,29 +218,29 @@ async function runCleanup() {
     }
   }
 
-  // SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('\n✅ Cleanup Complete!\n');
-  // SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('📊 Statistics:');
-  // SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log(`  Files Processed: ${stats.filesProcessed}`);
-  // SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log(`  Unused Variables Fixed: ${stats.unusedVarsFixed}`);
-  // SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log(`  Commented Code Removed: ${stats.commentsRemoved}`);
-  // SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log(`  Imports Standardized: ${stats.importsStandardized}`);
+  // SECURITY: Removed console.log('\n✅ Cleanup Complete!\n');
+  // SECURITY: Removed console.log('📊 Statistics:');
+  // SECURITY: Removed console.log(`  Files Processed: ${stats.filesProcessed}`);
+  // SECURITY: Removed console.log(`  Unused Variables Fixed: ${stats.unusedVarsFixed}`);
+  // SECURITY: Removed console.log(`  Commented Code Removed: ${stats.commentsRemoved}`);
+  // SECURITY: Removed console.log(`  Imports Standardized: ${stats.importsStandardized}`);
 
   // Run TypeScript check to verify no new errors
-  // SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('\n🔍 Running TypeScript verification...');
+  // SECURITY: Removed console.log('\n🔍 Running TypeScript verification...');
   try {
     const { stdout, stderr } = await execPromise('npx tsc --noEmit --skipLibCheck');
-    // SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('✅ TypeScript check passed!');
+    // SECURITY: Removed console.log('✅ TypeScript check passed!');
   } catch (error) {
-    // SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('⚠️  Some TypeScript errors remain (this is expected for complex issues)');
+    // SECURITY: Removed console.log('⚠️  Some TypeScript errors remain (this is expected for complex issues)');
   }
 
   // Run Prettier for consistent formatting
-  // SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('\n💅 Running Prettier for consistent formatting...');
+  // SECURITY: Removed console.log('\n💅 Running Prettier for consistent formatting...');
   try {
     await execPromise('npx prettier --write "src/**/*.{ts,tsx,js,jsx}"');
-    // SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('✅ Code formatting complete!');
+    // SECURITY: Removed console.log('✅ Code formatting complete!');
   } catch (error) {
-    // SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('⚠️  Prettier not configured, skipping formatting');
+    // SECURITY: Removed console.log('⚠️  Prettier not configured, skipping formatting');
   }
 }
 

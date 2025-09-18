@@ -217,7 +217,7 @@ export default function NewOffboardingPage() {
           }))
       }
 
-      // SECURITY: Removed // SECURITY: Removed // SECURITY: Removed console.log('Submitting off-boarding request:', submissionData)
+      // SECURITY: Removed console.log('Submitting off-boarding request:', submissionData)
 
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000))
