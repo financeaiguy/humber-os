@@ -2,13 +2,18 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, DollarSign, Calendar, FileText, Camera, Plus, Trash2 } from 'lucide-react'
+import { X, DollarSign, Calendar, FileText, Camera, Plus, Trash2, TrendingUp, AlertTriangle } from 'lucide-react'
+import { BurnRateCalculator, PurchaseOrder, EngineerTimeEntry } from '@/lib/burn-rate-calculator'
+import { Progress } from '@/components/ui/progress'
+import { Badge } from '@/components/ui/badge'
 
 interface ExpenseTrackingModalProps {
   isOpen: boolean
   onClose: () => void
   selectedEngineer?: any
   selectedProject?: any
+  currentProjectPO?: PurchaseOrder | null
+  projectTimeEntries?: EngineerTimeEntry[]
 }
 
 interface Expense {
@@ -24,7 +29,9 @@ export default function ExpenseTrackingModal({
   isOpen,
   onClose,
   selectedEngineer,
-  selectedProject
+  selectedProject,
+  currentProjectPO,
+  projectTimeEntries = []
 }: ExpenseTrackingModalProps) {
   const [expenses, setExpenses] = useState<Expense[]>([
     {
@@ -150,6 +157,130 @@ export default function ExpenseTrackingModal({
                 </div>
               </div>
             </div>
+
+            {/* PO Burn Rate Analysis */}
+            {currentProjectPO && (
+              <div className="p-4 bg-gradient-to-r from-slate-800/50 to-blue-800/20 rounded-lg border border-slate-700">
+                <h3 className="font-medium text-white mb-4 flex items-center">
+                  <TrendingUp className="h-5 w-5 mr-2 text-orange-400" />
+                  Purchase Order Burn Rate
+                  <Badge variant="outline" className="ml-auto text-xs">
+                    {currentProjectPO.poNumber}
+                  </Badge>
+                </h3>
+                {(() => {
+                  const metrics = BurnRateCalculator.calculateBurnRate(
+                    currentProjectPO,
+                    projectTimeEntries
+                  )
+                  
+                  // Calculate expense impact on burn rate
+                  const expenseImpact = totalExpenses / currentProjectPO.totalBudget * 100
+                  const totalConsumed = metrics.percentConsumed + expenseImpact
+                  
+                  return (
+                    <div className="space-y-4">
+                      {/* Burn Rate Metrics */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div className="bg-slate-800/50 rounded-lg p-3">
+                          <div className="text-xs text-slate-400 mb-1">Labor Costs</div>
+                          <div className="text-lg font-semibold text-white">
+                            ${metrics.consumedBudget.toLocaleString()}
+                          </div>
+                          <div className="text-xs text-slate-500">
+                            {metrics.consumedHours.toFixed(0)} hrs
+                          </div>
+                        </div>
+                        
+                        <div className="bg-slate-800/50 rounded-lg p-3">
+                          <div className="text-xs text-slate-400 mb-1">Expenses</div>
+                          <div className="text-lg font-semibold text-white">
+                            ${totalExpenses.toFixed(2)}
+                          </div>
+                          <div className="text-xs text-slate-500">
+                            {expenseImpact.toFixed(1)}% of budget
+                          </div>
+                        </div>
+                        
+                        <div className="bg-slate-800/50 rounded-lg p-3">
+                          <div className="text-xs text-slate-400 mb-1">Total Impact</div>
+                          <div className="text-lg font-semibold text-white">
+                            {totalConsumed.toFixed(1)}%
+                          </div>
+                          <div className="text-xs text-slate-500">
+                            ${metrics.remainingBudget.toLocaleString()} left
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Combined Progress Bar */}
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs text-slate-400">Total Budget Consumption</span>
+                          <span className="text-sm font-medium text-white">
+                            ${(metrics.consumedBudget + totalExpenses).toLocaleString()} / ${currentProjectPO.totalBudget.toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="relative">
+                          <Progress value={totalConsumed} className="h-3" />
+                          <div className="absolute top-0 left-0 h-full flex">
+                            <div 
+                              className="bg-blue-500 h-full rounded-l"
+                              style={{ width: `${(metrics.percentConsumed / totalConsumed) * 100}%` }}
+                            />
+                            <div 
+                              className="bg-green-500 h-full"
+                              style={{ width: `${(expenseImpact / totalConsumed) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between mt-1">
+                          <div className="flex items-center space-x-4 text-xs">
+                            <div className="flex items-center">
+                              <div className="w-3 h-3 bg-blue-500 rounded mr-1" />
+                              <span className="text-slate-400">Labor</span>
+                            </div>
+                            <div className="flex items-center">
+                              <div className="w-3 h-3 bg-green-500 rounded mr-1" />
+                              <span className="text-slate-400">Expenses</span>
+                            </div>
+                          </div>
+                          <span className="text-xs text-slate-400">
+                            {metrics.weeksRemaining === Infinity ? '∞' : metrics.weeksRemaining.toFixed(1)} weeks left
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {/* Alerts with Expense Consideration */}
+                      {totalConsumed >= 75 && (
+                        <div className={`p-3 rounded-lg flex items-center space-x-2 ${
+                          totalConsumed >= 90 ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'
+                        }`}>
+                          <AlertTriangle className="h-4 w-4" />
+                          <span className="text-sm">
+                            {totalConsumed >= 90 ? 'Critical: ' : 'Warning: '}
+                            Total consumption (labor + expenses) at {totalConsumed.toFixed(1)}%
+                          </span>
+                        </div>
+                      )}
+                      
+                      {/* Recommendation */}
+                      <div className="p-3 bg-slate-800/30 rounded-lg border border-slate-700">
+                        <p className="text-xs text-slate-400">
+                          <strong className="text-white">Recommendation:</strong> 
+                          {totalConsumed < 50 ? 
+                            ' Spending on track. Continue monitoring weekly.' :
+                            totalConsumed < 75 ?
+                            ' Consider reviewing upcoming expenses to maintain budget.' :
+                            ' Limit non-essential expenses. Review with project manager.'
+                          }
+                        </p>
+                      </div>
+                    </div>
+                  )
+                })()}
+              </div>
+            )}
 
             {/* Add New Expense */}
             <div className="p-4 bg-slate-800/50 rounded-lg border border-slate-700">

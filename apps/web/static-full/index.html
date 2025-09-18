@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Humber OS - Engineering Operations Platform</title>
+    <script src="https://unpkg.com/react@19/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@19/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/framer-motion@11/dist/framer-motion.js"></script>
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.js"></script>
+    <style>
+        body { 
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .sidebar { width: 280px; }
+        .main-content { margin-left: 280px; }
+        .project-card { 
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .project-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+        @media (max-width: 768px) {
+            .sidebar { width: 100%; position: fixed; top: 0; left: -100%; z-index: 50; }
+            .main-content { margin-left: 0; }
+            .sidebar.open { left: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { motion } = Motion;
+        
+        // Mock data for the application
+        const projects = [
+            {
+                id: 1,
+                name: 'Tesla Gigafactory Expansion',
+                client: 'Tesla Inc.',
+                status: 'bidding',
+                priority: 'high',
+                completion: 0,
+                startDate: '2025-03-01',
+                endDate: '2025-12-31',
+                budget: 2500000,
+                spent: 0,
+                location: 'Austin, TX',
+                engineers: [],
+                description: 'Large-scale automation project for Tesla Gigafactory expansion including battery production line automation and quality control systems.'
+            },
+            {
+                id: 2,
+                name: 'SpaceX Starship Manufacturing',
+                client: 'SpaceX',
+                status: 'planning',
+                priority: 'high',
+                completion: 15,
+                startDate: '2025-01-15',
+                endDate: '2025-08-30',
+                budget: 1800000,
+                spent: 270000,
+                location: 'Hawthorne, CA',
+                engineers: ['John Doe', 'Jane Smith'],
+                description: 'Advanced manufacturing automation for Starship production line with robotic welding and quality assurance systems.'
+            },
+            {
+                id: 3,
+                name: 'Amazon Fulfillment Center',
+                client: 'Amazon',
+                status: 'in_progress',
+                priority: 'medium',
+                completion: 65,
+                startDate: '2024-11-01',
+                endDate: '2025-05-15',
+                budget: 1200000,
+                spent: 780000,
+                location: 'Seattle, WA',
+                engineers: ['Mike Johnson', 'Sarah Wilson', 'Alex Brown'],
+                description: 'Automated sorting and packaging system for high-volume fulfillment center operations.'
+            },
+            {
+                id: 4,
+                name: 'Ford Electric Vehicle Plant',
+                client: 'Ford Motor Company',
+                status: 'completed',
+                priority: 'high',
+                completion: 100,
+                startDate: '2024-06-01',
+                endDate: '2024-12-15',
+                budget: 2200000,
+                spent: 2150000,
+                location: 'Dearborn, MI',
+                engineers: ['Chris Davis', 'Emma Martinez', 'Ryan Taylor', 'Lisa Anderson'],
+                description: 'Complete automation solution for electric vehicle assembly line including battery installation and testing systems.'
+            }
+        ];
+
+        // Components
+        function Sidebar({ activeTab, setActiveTab, isMobileOpen, setIsMobileOpen }) {
+            const menuItems = [
+                { id: 'dashboard', label: 'Dashboard', icon: '🏠' },
+                { id: 'projects', label: 'Projects', icon: '📋' },
+                { id: 'bull-pen', label: 'Bull Pen', icon: '👥' },
+                { id: 'time-tracking', label: 'Time Tracking', icon: '⏰' },
+                { id: 'recruits', label: 'Recruiting', icon: '🔍' },
+                { id: 'clients', label: 'Clients', icon: '🏢' },
+                { id: 'offboarding', label: 'Offboarding', icon: '📤' },
+                { id: 'compliance', label: 'Compliance', icon: '🛡️' },
+                { id: 'analytics', label: 'Analytics', icon: '📊' },
+                { id: 'settings', label: 'Settings', icon: '⚙️' }
+            ];
+
+            return (
+                <div className={`sidebar fixed top-0 left-0 h-full bg-slate-900/95 backdrop-blur-xl border-r border-slate-700/50 z-40 transition-transform duration-300 ${isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+                    <div className="p-6">
+                        <div className="flex items-center justify-between mb-8">
+                            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                                Humber OS
+                            </h1>
+                            <button 
+                                className="md:hidden text-gray-400 hover:text-white"
+                                onClick={() => setIsMobileOpen(false)}
+                            >
+                                ✕
+                            </button>
+                        </div>
+                        
+                        <nav className="space-y-2">
+                            {menuItems.map(item => (
+                                <button
+                                    key={item.id}
+                                    onClick={() => {
+                                        setActiveTab(item.id);
+                                        setIsMobileOpen(false);
+                                    }}
+                                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                                        activeTab === item.id 
+                                            ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30' 
+                                            : 'text-gray-300 hover:text-white hover:bg-slate-800/50'
+                                    }`}
+                                >
+                                    <span className="text-xl">{item.icon}</span>
+                                    <span className="font-medium">{item.label}</span>
+                                </button>
+                            ))}
+                        </nav>
+                    </div>
+                </div>
+            );
+        }
+
+        function ProjectCard({ project, onClick }) {
+            const getStatusColor = (status) => {
+                switch (status) {
+                    case 'bidding': return 'bg-purple-500/20 text-purple-400';
+                    case 'planning': return 'bg-yellow-500/20 text-yellow-400';
+                    case 'in_progress': return 'bg-blue-500/20 text-blue-400';
+                    case 'completed': return 'bg-green-500/20 text-green-400';
+                    default: return 'bg-gray-500/20 text-gray-400';
+                }
+            };
+
+            const getPriorityColor = (priority) => {
+                switch (priority) {
+                    case 'high': return 'text-red-400';
+                    case 'medium': return 'text-yellow-400';
+                    case 'low': return 'text-green-400';
+                    default: return 'text-gray-400';
+                }
+            };
+
+            return (
+                <div 
+                    className="project-card rounded-2xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-6 hover:border-slate-600 hover:bg-slate-800/70"
+                    onClick={() => onClick(project)}
+                >
+                    <div className="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 className="text-xl font-semibold text-white mb-2">{project.name}</h3>
+                            <p className="text-gray-400 text-sm mb-2">{project.client}</p>
+                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
+                                {project.status.replace('_', ' ').toUpperCase()}
+                            </span>
+                        </div>
+                        <div className="text-right">
+                            <div className={`text-xs font-medium ${getPriorityColor(project.priority)}`}>
+                                {project.priority.toUpperCase()} PRIORITY
+                            </div>
+                            <div className="text-2xl font-bold text-white mt-1">
+                                {project.completion}%
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="mb-4">
+                        <div className="flex justify-between text-sm text-gray-400 mb-2">
+                            <span>Progress</span>
+                            <span>{project.completion}%</span>
+                        </div>
+                        <div className="w-full bg-slate-700 rounded-full h-2">
+                            <div 
+                                className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-300"
+                                style={{ width: `${project.completion}%` }}
+                            ></div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <div className="text-gray-400">Budget</div>
+                            <div className="text-white font-medium">${project.budget.toLocaleString()}</div>
+                        </div>
+                        <div>
+                            <div className="text-gray-400">Location</div>
+                            <div className="text-white font-medium">{project.location}</div>
+                        </div>
+                    </div>
+
+                    <div className="mt-4 flex items-center justify-between">
+                        <div className="flex -space-x-2">
+                            {project.engineers.slice(0, 3).map((engineer, index) => (
+                                <div 
+                                    key={index}
+                                    className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-slate-800"
+                                >
+                                    {engineer.split(' ').map(n => n[0]).join('')}
+                                </div>
+                            ))}
+                            {project.engineers.length > 3 && (
+                                <div className="w-8 h-8 bg-slate-700 rounded-full flex items-center justify-center text-gray-300 text-xs font-medium border-2 border-slate-800">
+                                    +{project.engineers.length - 3}
+                                </div>
+                            )}
+                        </div>
+                        <div className="text-xs text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                            View Details →
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function ProjectsView() {
+            const [selectedProject, setSelectedProject] = useState(null);
+
+            return (
+                <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h1 className="text-3xl font-bold text-white mb-2">Projects</h1>
+                            <p className="text-gray-400">Manage your engineering projects and track progress</p>
+                        </div>
+                        <button className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-medium transition-colors">
+                            + New Project
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                        {projects.map(project => (
+                            <ProjectCard 
+                                key={project.id} 
+                                project={project} 
+                                onClick={setSelectedProject}
+                            />
+                        ))}
+                    </div>
+
+                    {selectedProject && (
+                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                            <div className="bg-slate-800 rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+                                <div className="flex justify-between items-start mb-6">
+                                    <div>
+                                        <h2 className="text-2xl font-bold text-white mb-2">{selectedProject.name}</h2>
+                                        <p className="text-gray-400">{selectedProject.client}</p>
+                                    </div>
+                                    <button 
+                                        onClick={() => setSelectedProject(null)}
+                                        className="text-gray-400 hover:text-white"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                                
+                                <div className="space-y-4">
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-white mb-2">Description</h3>
+                                        <p className="text-gray-300">{selectedProject.description}</p>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <h4 className="font-medium text-white mb-1">Status</h4>
+                                            <p className="text-gray-300 capitalize">{selectedProject.status.replace('_', ' ')}</p>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-medium text-white mb-1">Priority</h4>
+                                            <p className="text-gray-300 capitalize">{selectedProject.priority}</p>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-medium text-white mb-1">Start Date</h4>
+                                            <p className="text-gray-300">{selectedProject.startDate}</p>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-medium text-white mb-1">End Date</h4>
+                                            <p className="text-gray-300">{selectedProject.endDate}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <h4 className="font-medium text-white mb-2">Team Members</h4>
+                                        <div className="flex flex-wrap gap-2">
+                                            {selectedProject.engineers.map((engineer, index) => (
+                                                <span key={index} className="bg-slate-700 px-3 py-1 rounded-full text-sm text-gray-300">
+                                                    {engineer}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        function Dashboard() {
+            return (
+                <div className="space-y-6">
+                    <div>
+                        <h1 className="text-3xl font-bold text-white mb-2">Dashboard</h1>
+                        <p className="text-gray-400">Welcome to Humber OS Engineering Operations Platform</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="text-2xl">📋</div>
+                                <div className="text-sm text-gray-400">Total</div>
+                            </div>
+                            <div className="text-2xl font-bold text-white mb-1">
+                                {projects.length}
+                            </div>
+                            <div className="text-gray-400 text-sm">Active Projects</div>
+                        </div>
+
+                        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="text-2xl">👥</div>
+                                <div className="text-sm text-gray-400">Available</div>
+                            </div>
+                            <div className="text-2xl font-bold text-white mb-1">24</div>
+                            <div className="text-gray-400 text-sm">Engineers</div>
+                        </div>
+
+                        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="text-2xl">💰</div>
+                                <div className="text-sm text-gray-400">Revenue</div>
+                            </div>
+                            <div className="text-2xl font-bold text-white mb-1">$7.7M</div>
+                            <div className="text-gray-400 text-sm">Total Budget</div>
+                        </div>
+
+                        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="text-2xl">⏰</div>
+                                <div className="text-sm text-gray-400">This Month</div>
+                            </div>
+                            <div className="text-2xl font-bold text-white mb-1">1,247</div>
+                            <div className="text-gray-400 text-sm">Hours Logged</div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6">
+                            <h3 className="text-xl font-semibold text-white mb-4">Recent Projects</h3>
+                            <div className="space-y-3">
+                                {projects.slice(0, 3).map(project => (
+                                    <div key={project.id} className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg">
+                                        <div>
+                                            <div className="font-medium text-white">{project.name}</div>
+                                            <div className="text-sm text-gray-400">{project.client}</div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="text-sm font-medium text-white">{project.completion}%</div>
+                                            <div className="text-xs text-gray-400 capitalize">{project.status.replace('_', ' ')}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6">
+                            <h3 className="text-xl font-semibold text-white mb-4">System Status</h3>
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-gray-300">Backend API</span>
+                                    <span className="text-green-400 flex items-center">
+                                        <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                                        Online
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-gray-300">Database</span>
+                                    <span className="text-green-400 flex items-center">
+                                        <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                                        Connected
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-gray-300">Time Tracking</span>
+                                    <span className="text-green-400 flex items-center">
+                                        <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                                        Active
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-gray-300">Bull Pen System</span>
+                                    <span className="text-green-400 flex items-center">
+                                        <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                                        Running
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function PlaceholderView({ title, description, icon }) {
+            return (
+                <div className="space-y-6">
+                    <div className="text-center py-12">
+                        <div className="text-6xl mb-4">{icon}</div>
+                        <h1 className="text-3xl font-bold text-white mb-2">{title}</h1>
+                        <p className="text-gray-400 mb-6">{description}</p>
+                        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 max-w-md mx-auto">
+                            <p className="text-gray-300 text-sm">
+                                This feature is connected to the backend API at:
+                            </p>
+                            <a 
+                                href="https://humber-operations-worker-prod.evafiai.workers.dev" 
+                                className="text-blue-400 hover:text-blue-300 text-sm font-mono mt-2 block"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                https://humber-operations-worker-prod.evafiai.workers.dev
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function App() {
+            const [activeTab, setActiveTab] = useState('dashboard');
+            const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+            const renderContent = () => {
+                switch (activeTab) {
+                    case 'dashboard':
+                        return <Dashboard />;
+                    case 'projects':
+                        return <ProjectsView />;
+                    case 'bull-pen':
+                        return <PlaceholderView title="Bull Pen" description="Engineer allocation and resource management system" icon="👥" />;
+                    case 'time-tracking':
+                        return <PlaceholderView title="Time Tracking" description="Biometric time tracking with geolocation verification" icon="⏰" />;
+                    case 'recruits':
+                        return <PlaceholderView title="Recruiting" description="Complete recruiting pipeline and candidate management" icon="🔍" />;
+                    case 'clients':
+                        return <PlaceholderView title="Clients" description="Client relationship and project management" icon="🏢" />;
+                    case 'offboarding':
+                        return <PlaceholderView title="Offboarding" description="Automated offboarding and transition processes" icon="📤" />;
+                    case 'compliance':
+                        return <PlaceholderView title="Compliance" description="SOC2 compliance and security management" icon="🛡️" />;
+                    case 'analytics':
+                        return <PlaceholderView title="Analytics" description="Performance metrics and business intelligence" icon="📊" />;
+                    case 'settings':
+                        return <PlaceholderView title="Settings" description="System configuration and user preferences" icon="⚙️" />;
+                    default:
+                        return <Dashboard />;
+                }
+            };
+
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+                    <Sidebar 
+                        activeTab={activeTab} 
+                        setActiveTab={setActiveTab}
+                        isMobileOpen={isMobileMenuOpen}
+                        setIsMobileOpen={setIsMobileMenuOpen}
+                    />
+                    
+                    <div className="main-content min-h-screen">
+                        <header className="bg-slate-900/50 backdrop-blur-xl border-b border-slate-700/50 px-6 py-4">
+                            <div className="flex items-center justify-between">
+                                <button 
+                                    className="md:hidden text-gray-400 hover:text-white"
+                                    onClick={() => setIsMobileMenuOpen(true)}
+                                >
+                                    ☰
+                                </button>
+                                
+                                <div className="flex items-center space-x-4">
+                                    <div className="text-sm text-gray-400">
+                                        Production Deployment
+                                    </div>
+                                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                                </div>
+                            </div>
+                        </header>
+                        
+                        <main className="p-6">
+                            {renderContent()}
+                        </main>
+                    </div>
+
+                    <div className="fixed bottom-4 right-4 space-y-2 z-30">
+                        <a 
+                            href="https://humber-operations-worker-prod.evafiai.workers.dev/api-test"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                        >
+                            🧪 Test APIs
+                        </a>
+                        <a 
+                            href="https://humber-operations-worker-prod.evafiai.workers.dev/docs"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                        >
+                            📚 Documentation
+                        </a>
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+    
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</body>
+</html>

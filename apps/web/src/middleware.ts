@@ -1,68 +1,8 @@
-import { auth } from "@/auth"
 import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
 
-export default auth((req) => {
-  const { pathname } = req.nextUrl
-  const isAuthenticated = !!req.auth
-  
-  // Public routes that don't require authentication
-  const publicRoutes = [
-    '/',
-    '/auth/signin',
-    '/auth/signup', 
-    '/auth/error',
-    '/privacy',
-    '/terms',
-    '/help-demo',
-    '/legal-contact',
-    '/dpia',
-    '/employee-handbook',
-    '/licensing',
-    '/joint-employment',
-    '/compliance',
-    '/biometric-consent'
-  ]
-  
-  // API routes that don't require authentication
-  const publicApiRoutes = [
-    '/api/auth/',
-    '/api/customer-portal/auth' // Customer portal has its own auth
-  ]
-  
-  // Check if current route is public
-  const isPublicRoute = publicRoutes.some(route => pathname === route || pathname.startsWith(route))
-  const isPublicApiRoute = publicApiRoutes.some(route => pathname.startsWith(route))
-  
-  // Allow public routes and public API routes
-  if (isPublicRoute || isPublicApiRoute) {
-    return NextResponse.next()
-  }
-  
-  // Protected routes - require authentication
-  const protectedRoutes = [
-    '/api/',
-    '/admin',
-    '/settings', 
-    '/dashboard',
-    '/security-dashboard',
-    '/projects',
-    '/clients',
-    '/recruits',
-    '/onboarding',
-    '/analytics',
-    '/time',
-    '/bull-pen',
-    '/knowledge'
-  ]
-  
-  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
-  
-  if (isProtectedRoute && !isAuthenticated) {
-    // Redirect to login for protected routes
-    const loginUrl = new URL('/auth/signin', req.url)
-    loginUrl.searchParams.set('callbackUrl', req.url)
-    return NextResponse.redirect(loginUrl)
-  }
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
   
   // Add security headers to all responses
   const response = NextResponse.next()
@@ -77,18 +17,18 @@ export default auth((req) => {
   // Add CSP header for extra protection
   const cspHeader = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // TODO: Remove unsafe-* in production
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https:",
     "font-src 'self' https:",
-    "connect-src 'self' https:",
+    "connect-src 'self' https: http://localhost:* ws://localhost:*",
     "frame-ancestors 'none'"
   ].join('; ')
   
   response.headers.set('Content-Security-Policy', cspHeader)
   
   return response
-})
+}
 
 export const config = {
   matcher: [

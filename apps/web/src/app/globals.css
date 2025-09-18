@@ -13,7 +13,7 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
+    --primary: 214 100% 50%;
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -36,8 +36,8 @@
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 214 100% 50%;
+    --primary-foreground: 210 40% 98%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
@@ -187,6 +187,34 @@ html {
 button {
   -webkit-appearance: none;
   appearance: none;
+}
+
+/* Fix for buttons with light backgrounds - ensure text is dark */
+button[class*="bg-white"],
+button[class*="bg-gray-1"],
+button[class*="bg-gray-2"],
+button[class*="bg-gray-3"],
+button[class*="bg-slate-1"],
+button[class*="bg-slate-2"],
+button[class*="bg-slate-3"],
+.bg-white button,
+.bg-gray-100 button,
+.bg-gray-200 button,
+.bg-gray-300 button,
+.bg-slate-100 button,
+.bg-slate-200 button,
+.bg-slate-300 button {
+  color: rgb(15 23 42) !important; /* slate-900 - dark text for light backgrounds */
+}
+
+/* Ensure modal close buttons and light buttons have dark text */
+.modal button[class*="bg-white"],
+.modal button[class*="bg-gray"],
+.modal button[class*="bg-slate"],
+button.close-button,
+button[aria-label*="Close"],
+button[aria-label*="close"] {
+  color: rgb(15 23 42) !important; /* slate-900 */
 }
 
 input[type="text"],

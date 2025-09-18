@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-export const runtime = 'edge'
+// export const runtime = 'edge'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Users, 
@@ -31,7 +31,10 @@ import {
   X,
   Edit3,
   Save,
-  ShoppingCart
+  ShoppingCart,
+  TrendingUp,
+  TrendingDown,
+  Activity
 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -39,21 +42,25 @@ import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
+import { BurnRateWidget } from '@/components/burn-rate-widget'
+import { BurnRateCalculator, PurchaseOrder, EngineerTimeEntry } from '@/lib/burn-rate-calculator'
+import { ProfitDashboard } from '@/components/profit-dashboard'
+import { ShopCharge } from '@/lib/profit-calculator'
 
 // Dynamically import modals with proper configuration
-const EngineerAllocationModal = dynamic(() => import('@/components/bull-pen/EngineerAllocationModal').then((mod) => ({ default: mod.default })), { 
+const EngineerAllocationModal = dynamic(() => import('@/components/bull-pen/EngineerAllocationModal'), { 
   ssr: false,
   loading: () => <div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div></div>
 })
-const FlightBookingModal = dynamic(() => import('@/components/bull-pen/FlightBookingModal').then((mod) => ({ default: mod.default })), { 
+const FlightBookingModal = dynamic(() => import('@/components/bull-pen/FlightBookingModal'), { 
   ssr: false,
   loading: () => <div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div></div>
 })
-const ExpenseTrackingModal = dynamic(() => import('@/components/bull-pen/ExpenseTrackingModal').then((mod) => ({ default: mod.default })), { 
+const ExpenseTrackingModal = dynamic(() => import('@/components/bull-pen/ExpenseTrackingModal'), { 
   ssr: false,
   loading: () => <div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div></div>
 })
-const EngineerProfileModal = dynamic(() => import('@/components/bull-pen/EngineerProfileModal').then((mod) => ({ default: mod.default })), { 
+const EngineerProfileModal = dynamic(() => import('@/components/bull-pen/EngineerProfileModal'), { 
   ssr: false,
   loading: () => <div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div></div>
 })
@@ -212,6 +219,193 @@ const availableEngineers = [
     certifications: ['AWS Certified', 'ROS Industrial'],
     languages: ['English', 'Korean']
   }
+]
+
+// Mock Purchase Order Data
+const mockPurchaseOrders: PurchaseOrder[] = [
+  {
+    id: 'po-001',
+    poNumber: 'PO-2024-GM-001',
+    clientName: 'General Motors',
+    projectName: 'GM Ultium Battery Plant',
+    totalBudget: 500000,
+    allocatedHours: 4000,
+    startDate: '2024-01-01',
+    endDate: '2024-06-30',
+    projectId: 'proj-001',
+    status: 'active'
+  },
+  {
+    id: 'po-002',
+    poNumber: 'PO-2024-FORD-002',
+    clientName: 'Ford Motor Company',
+    projectName: 'Ford F-150 Lightning Assembly',
+    totalBudget: 750000,
+    allocatedHours: 6000,
+    startDate: '2024-01-15',
+    endDate: '2024-07-15',
+    projectId: 'proj-002',
+    status: 'active'
+  },
+  {
+    id: 'po-003',
+    poNumber: 'PO-2024-TESLA-003',
+    clientName: 'Tesla',
+    projectName: 'Tesla Model Y Line Expansion',
+    totalBudget: 300000,
+    allocatedHours: 2400,
+    startDate: '2024-02-01',
+    endDate: '2024-05-31',
+    projectId: 'proj-003',
+    status: 'at_risk'
+  }
+]
+
+// Mock Shop Charges Data
+const mockShopCharges: ShopCharge[] = [
+  // GM Project Shop Charges
+  {
+    id: 'shop-gm-001',
+    poId: 'po-001',
+    category: 'materials',
+    description: 'Electrical components and wiring',
+    amount: 12500,
+    date: new Date(2024, 0, 15).toISOString(),
+    approved: true
+  },
+  {
+    id: 'shop-gm-002',
+    poId: 'po-001',
+    category: 'equipment',
+    description: 'Robotic arm rental',
+    amount: 8000,
+    date: new Date(2024, 0, 20).toISOString(),
+    approved: true
+  },
+  {
+    id: 'shop-gm-003',
+    poId: 'po-001',
+    category: 'tooling',
+    description: 'Specialized tooling for battery assembly',
+    amount: 5500,
+    date: new Date(2024, 1, 1).toISOString(),
+    approved: true
+  },
+  // Ford Project Shop Charges
+  {
+    id: 'shop-ford-001',
+    poId: 'po-002',
+    category: 'materials',
+    description: 'Steel and aluminum materials',
+    amount: 18000,
+    date: new Date(2024, 0, 25).toISOString(),
+    approved: true
+  },
+  {
+    id: 'shop-ford-002',
+    poId: 'po-002',
+    category: 'equipment',
+    description: 'CNC machine time',
+    amount: 12000,
+    date: new Date(2024, 1, 5).toISOString(),
+    approved: true
+  },
+  {
+    id: 'shop-ford-003',
+    poId: 'po-002',
+    category: 'utilities',
+    description: 'Power and compressed air usage',
+    amount: 3500,
+    date: new Date(2024, 1, 10).toISOString(),
+    approved: true
+  },
+  // Tesla Project Shop Charges
+  {
+    id: 'shop-tesla-001',
+    poId: 'po-003',
+    category: 'materials',
+    description: 'High-voltage electrical systems',
+    amount: 25000,
+    date: new Date(2024, 1, 15).toISOString(),
+    approved: true
+  },
+  {
+    id: 'shop-tesla-002',
+    poId: 'po-003',
+    category: 'equipment',
+    description: 'Testing equipment rental',
+    amount: 15000,
+    date: new Date(2024, 1, 20).toISOString(),
+    approved: true
+  },
+  {
+    id: 'shop-tesla-003',
+    poId: 'po-003',
+    category: 'consumables',
+    description: 'Welding consumables and safety equipment',
+    amount: 4500,
+    date: new Date(2024, 2, 1).toISOString(),
+    approved: true
+  }
+]
+
+// Mock Expenses Data
+const mockExpenses = [
+  { id: 'exp-001', poId: 'po-001', amount: 2500, category: 'travel', date: new Date(2024, 0, 10).toISOString() },
+  { id: 'exp-002', poId: 'po-001', amount: 1800, category: 'meals', date: new Date(2024, 0, 15).toISOString() },
+  { id: 'exp-003', poId: 'po-002', amount: 3200, category: 'travel', date: new Date(2024, 0, 20).toISOString() },
+  { id: 'exp-004', poId: 'po-002', amount: 950, category: 'meals', date: new Date(2024, 0, 25).toISOString() },
+  { id: 'exp-005', poId: 'po-003', amount: 4500, category: 'travel', date: new Date(2024, 1, 5).toISOString() },
+  { id: 'exp-006', poId: 'po-003', amount: 1200, category: 'lodging', date: new Date(2024, 1, 10).toISOString() },
+]
+
+// Mock Time Entry Data
+const mockTimeEntries: EngineerTimeEntry[] = [
+  // GM Project Time Entries
+  ...Array.from({ length: 50 }, (_, i) => {
+    const engineer = availableEngineers[i % availableEngineers.length]
+    return {
+      id: `time-gm-${i}`,
+      engineerId: engineer.id,
+      engineerName: engineer.name,
+      poId: 'po-001',
+      projectId: 'proj-001',
+      hours: 8 + Math.random() * 4,
+      date: new Date(2024, 0, 1 + i * 2).toISOString(),
+      rate: engineer.hourlyRate,
+      approved: true
+    }
+  }),
+  // Ford Project Time Entries
+  ...Array.from({ length: 80 }, (_, i) => {
+    const engineer = availableEngineers[i % availableEngineers.length]
+    return {
+      id: `time-ford-${i}`,
+      engineerId: engineer.id,
+      engineerName: engineer.name,
+      poId: 'po-002',
+      projectId: 'proj-002',
+      hours: 7 + Math.random() * 5,
+      date: new Date(2024, 0, 15 + i).toISOString(),
+      rate: engineer.hourlyRate,
+      approved: true
+    }
+  }),
+  // Tesla Project Time Entries (high burn rate)
+  ...Array.from({ length: 60 }, (_, i) => {
+    const engineer = availableEngineers[i % availableEngineers.length]
+    return {
+      id: `time-tesla-${i}`,
+      engineerId: engineer.id,
+      engineerName: engineer.name,
+      poId: 'po-003',
+      projectId: 'proj-003',
+      hours: 10 + Math.random() * 4,
+      date: new Date(2024, 1, 1 + i).toISOString(),
+      rate: engineer.hourlyRate,
+      approved: true
+    }
+  })
 ]
 
 // Active projects with resource needs
@@ -431,16 +625,16 @@ export default function BullPenDashboard() {
               <CardContent>
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-400">Available</span>
+                    <span className="text-sm text-slate-300">Available</span>
                     <span className="text-xl font-bold text-white">{category.available}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-slate-500">Deployed</span>
-                    <span className="text-sm text-slate-300">{category.deployed}</span>
+                    <span className="text-xs text-slate-400">Deployed</span>
+                    <span className="text-sm text-slate-200">{category.deployed}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-slate-500">Buffered</span>
-                    <span className="text-sm text-slate-300">{category.buffered}</span>
+                    <span className="text-xs text-slate-400">Buffered</span>
+                    <span className="text-sm text-slate-200">{category.buffered}</span>
                   </div>
                 </div>
               </CardContent>
@@ -1083,6 +1277,118 @@ export default function BullPenDashboard() {
           </CardContent>
         </Card>
 
+        {/* Burn Rate Tracking Section */}
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-white flex items-center space-x-2">
+                  <Activity className="h-5 w-5 text-orange-400" />
+                  <span>Purchase Order Burn Rate</span>
+                </CardTitle>
+                <CardDescription>Real-time tracking of PO utilization and projections</CardDescription>
+              </div>
+              <Link href="/projects">
+                <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
+                  View All POs
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {mockPurchaseOrders.map(po => {
+                const poTimeEntries = mockTimeEntries.filter(entry => 
+                  entry.poId === po.id
+                )
+                
+                return (
+                  <motion.div
+                    key={po.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-slate-900/50 rounded-lg border border-slate-700 overflow-hidden hover:border-blue-500/50 transition-all"
+                  >
+                    <div className="p-4 border-b border-slate-700">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-semibold text-white">
+                          {po.clientName}
+                        </h3>
+                        <span className={`
+                          px-2 py-1 rounded-full text-xs font-medium
+                          ${po.status === 'active' 
+                            ? 'bg-green-900/50 text-green-400 border border-green-500/30' 
+                            : po.status === 'at_risk'
+                            ? 'bg-red-900/50 text-red-400 border border-red-500/30'
+                            : 'bg-gray-900/50 text-gray-400 border border-gray-500/30'
+                          }
+                        `}>
+                          {po.status === 'at_risk' ? 'At Risk' : po.status}
+                        </span>
+                      </div>
+                      <p className="text-sm text-slate-400">
+                        {po.poNumber} • {po.projectName}
+                      </p>
+                    </div>
+                    
+                    <BurnRateWidget
+                      purchaseOrder={po}
+                      timeEntries={poTimeEntries}
+                      compact={true}
+                      showDetails={false}
+                      onAlertClick={(alert) => {
+                        console.log('Alert clicked:', alert)
+                        // Handle alert click - could open modal or navigate to details
+                      }}
+                    />
+                    
+                    <div className="px-4 py-3 bg-slate-900/30 border-t border-slate-700">
+                      <button className="text-sm text-blue-400 hover:text-blue-300 font-medium transition-colors">
+                        View Detailed Analysis →
+                      </button>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </div>
+            
+            {mockPurchaseOrders.length === 0 && (
+              <div className="bg-slate-900/30 rounded-lg p-8 text-center">
+                <p className="text-slate-400">
+                  No active purchase orders to track
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Profit & Cost Analysis Dashboard */}
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-white flex items-center space-x-2">
+                  <DollarSign className="h-5 w-5 text-green-400" />
+                  <span>Profit & Cost Analysis</span>
+                </CardTitle>
+                <CardDescription>Business profitability metrics with shop floor and manpower breakdown</CardDescription>
+              </div>
+              <Badge className="bg-green-500/20 text-green-400">
+                Live Metrics
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <ProfitDashboard 
+              purchaseOrders={mockPurchaseOrders}
+              timeEntries={mockTimeEntries}
+              shopCharges={mockShopCharges}
+              expenses={mockExpenses}
+            />
+          </CardContent>
+        </Card>
+
         {/* Quick Actions Bar */}
         <Card className="bg-slate-800/50 border-slate-700">
           <CardContent className="p-4">
@@ -1150,6 +1456,14 @@ export default function BullPenDashboard() {
         onClose={() => setShowExpenseModal(false)}
         selectedEngineer={selectedEngineer}
         selectedProject={selectedProject}
+        currentProjectPO={selectedProject ? 
+          mockPurchaseOrders.find(po => po.projectId === selectedProject.id.toString()) || null : 
+          null
+        }
+        projectTimeEntries={selectedProject ? 
+          mockTimeEntries.filter(entry => entry.projectId === selectedProject.id.toString()) : 
+          []
+        }
       />
 
       <EngineerProfileModal
@@ -1172,6 +1486,16 @@ export default function BullPenDashboard() {
           // Handle video call functionality
           console.log('Video call engineer:', engineer.name)
         }}
+        currentProjectPO={selectedEngineer && selectedEngineer.availability === 'On Project' ? 
+          mockPurchaseOrders.find(po => 
+            activeProjects.find(p => p.currentEngineers.includes(selectedEngineer.id) && p.id === po.projectId)
+          ) || null : 
+          null
+        }
+        engineerTimeEntries={selectedEngineer ? 
+          mockTimeEntries.filter(entry => entry.engineerId === selectedEngineer.id) : 
+          []
+        }
       />
     </div>
   )

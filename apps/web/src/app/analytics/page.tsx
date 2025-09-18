@@ -1,6 +1,6 @@
 'use client'
 
-export const runtime = 'edge'
+// export const runtime = 'edge'
 
 import { Suspense } from 'react'
 import dynamic from 'next/dynamic'

@@ -1,6 +1,6 @@
 'use client'
 
-export const runtime = 'edge'
+// export const runtime = 'edge'
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
@@ -22,6 +22,8 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import ProjectDetailModal from '@/components/projects/ProjectDetailModal'
+import { BurnRateWidget } from '@/components/burn-rate-widget'
+import { BurnRateCalculator, PurchaseOrder, EngineerTimeEntry } from '@/lib/burn-rate-calculator'
 
 const projects = [
   {
@@ -128,6 +130,86 @@ const projects = [
     ],
     description: 'Automated seating assembly line with robotic material handling and quality inspection.'
   }
+]
+
+// Mock Purchase Order Data for projects
+const mockPurchaseOrders: PurchaseOrder[] = [
+  {
+    id: 'po-gm-001',
+    poNumber: 'PO-2024-GM-001',
+    clientName: 'General Motors',
+    projectName: 'GM Assembly Line Automation',
+    totalBudget: 1200000,
+    allocatedHours: 9600,
+    startDate: '2024-10-15',
+    endDate: '2025-04-15',
+    projectId: '1',
+    status: 'active'
+  },
+  {
+    id: 'po-ford-001',
+    poNumber: 'PO-2024-FORD-001',
+    clientName: 'Ford Motor Company',
+    projectName: 'Ford Paint Shop Upgrade',
+    totalBudget: 950000,
+    allocatedHours: 7600,
+    startDate: '2024-11-01',
+    endDate: '2025-06-30',
+    projectId: '2',
+    status: 'active'
+  },
+  {
+    id: 'po-hirotec-001',
+    poNumber: 'PO-2024-HIRO-001',
+    clientName: 'HIROTEC America',
+    projectName: 'HIROTEC Welding System',
+    totalBudget: 680000,
+    allocatedHours: 5440,
+    startDate: '2024-09-01',
+    endDate: '2025-02-28',
+    projectId: '4',
+    status: 'at_risk'
+  }
+]
+
+// Mock Time Entry Data for projects
+const mockTimeEntries: EngineerTimeEntry[] = [
+  // GM Project Time Entries
+  ...Array.from({ length: 40 }, (_, i) => ({
+    id: `time-gm-${i}`,
+    engineerId: `eng-${i % 3 + 1}`,
+    engineerName: ['Sarah Johnson', 'Michael Chen', 'David Kim'][i % 3],
+    projectId: '1',
+    poId: 'po-gm-001',
+    hours: 8 + Math.random() * 4,
+    date: new Date(2024, 9, 15 + i * 3).toISOString(),
+    rate: 125,
+    approved: true
+  })),
+  // Ford Project Time Entries
+  ...Array.from({ length: 30 }, (_, i) => ({
+    id: `time-ford-${i}`,
+    engineerId: `eng-${i % 2 + 4}`,
+    engineerName: ['Emily Rodriguez', 'Lisa Thompson'][i % 2],
+    projectId: '2',
+    poId: 'po-ford-001',
+    hours: 7 + Math.random() * 5,
+    date: new Date(2024, 10, 1 + i * 2).toISOString(),
+    rate: 115,
+    approved: true
+  })),
+  // HIROTEC Project Time Entries (high burn rate)
+  ...Array.from({ length: 50 }, (_, i) => ({
+    id: `time-hirotec-${i}`,
+    engineerId: `eng-${i % 2 + 1}`,
+    engineerName: ['Michael Chen', 'Sarah Johnson'][i % 2],
+    projectId: '4',
+    poId: 'po-hirotec-001',
+    hours: 10 + Math.random() * 4,
+    date: new Date(2024, 8, 1 + i * 2).toISOString(),
+    rate: 130,
+    approved: true
+  }))
 ]
 
 const getStatusIcon = (status: string) => {
@@ -362,6 +444,86 @@ export default function ProjectsPage() {
           </motion.div>
         ))}
       </div>
+
+      {/* Purchase Order Burn Rate Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+        className="space-y-6"
+      >
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-white">Purchase Order Tracking</h2>
+          <span className="text-sm text-slate-400">Real-time PO utilization and projections</span>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          {mockPurchaseOrders.map((po, index) => {
+            const poTimeEntries = mockTimeEntries.filter(entry => 
+              entry.poId === po.id
+            )
+            const project = projects.find(p => p.id.toString() === po.projectId)
+            
+            return (
+              <motion.div
+                key={po.id}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.1 * index }}
+                className="rounded-2xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 overflow-hidden hover:border-blue-500/50 transition-all"
+              >
+                <div className="p-4 border-b border-slate-700/50">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-semibold text-white text-lg">
+                      {po.clientName}
+                    </h3>
+                    <span className={`
+                      px-3 py-1 rounded-full text-xs font-medium
+                      ${po.status === 'active' 
+                        ? 'bg-green-500/20 text-green-400' 
+                        : po.status === 'at_risk'
+                        ? 'bg-red-500/20 text-red-400'
+                        : 'bg-gray-500/20 text-gray-400'
+                      }
+                    `}>
+                      {po.status === 'at_risk' ? 'At Risk' : 'Active'}
+                    </span>
+                  </div>
+                  <p className="text-sm text-slate-400">
+                    {po.poNumber}
+                  </p>
+                  <p className="text-sm text-slate-500 mt-1">
+                    {po.projectName}
+                  </p>
+                </div>
+                
+                <BurnRateWidget
+                  purchaseOrder={po}
+                  timeEntries={poTimeEntries}
+                  compact={true}
+                  showDetails={true}
+                  onAlertClick={(alert) => {
+                    console.log('Alert clicked:', alert)
+                    // Handle alert click - could open modal or navigate to details
+                  }}
+                />
+                
+                <div className="px-4 py-3 bg-slate-900/30 border-t border-slate-700/50 flex items-center justify-between">
+                  <button 
+                    onClick={() => handleProjectClick(project)}
+                    className="text-sm text-blue-400 hover:text-blue-300 font-medium transition-colors"
+                  >
+                    View Project Details →
+                  </button>
+                  <button className="text-sm text-slate-400 hover:text-slate-300 transition-colors">
+                    Export Report
+                  </button>
+                </div>
+              </motion.div>
+            )
+          })}
+        </div>
+      </motion.div>
 
       {/* Project Detail Modal */}
       <ProjectDetailModal

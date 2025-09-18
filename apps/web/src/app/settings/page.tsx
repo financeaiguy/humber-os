@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-export const runtime = 'edge'
+// export const runtime = 'edge'
 import { motion } from 'framer-motion'
 import { useSession } from '@/components/session-context'
 import { 

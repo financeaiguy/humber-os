@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 
-export const runtime = 'edge'
+// export const runtime = 'edge'
 import { motion } from 'framer-motion'
 import { UserSearch, Target, Briefcase, Globe, DollarSign, FileText, Shield, Award, Clock, Users, UserPlus, ArrowRight, CheckCircle } from 'lucide-react'
 import NewRecruitModal from '@/components/recruiting/NewRecruitModal'

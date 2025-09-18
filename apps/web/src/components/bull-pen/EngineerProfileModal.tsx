@@ -36,6 +36,9 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import EngineerDeploymentSchedule from './EngineerDeploymentSchedule'
+import { BurnRateWidget } from '@/components/burn-rate-widget'
+import { BurnRateCalculator, PurchaseOrder, EngineerTimeEntry } from '@/lib/burn-rate-calculator'
+import { Progress } from '@/components/ui/progress'
 
 interface Engineer {
   id: string
@@ -76,6 +79,8 @@ interface EngineerProfileModalProps {
   onAssignToProject?: (engineer: Engineer) => void
   onMessage?: (engineer: Engineer) => void
   onVideoCall?: (engineer: Engineer) => void
+  currentProjectPO?: PurchaseOrder | null
+  engineerTimeEntries?: EngineerTimeEntry[]
 }
 
 export default function EngineerProfileModal({ 
@@ -84,7 +89,9 @@ export default function EngineerProfileModal({
   engineer, 
   onAssignToProject,
   onMessage,
-  onVideoCall
+  onVideoCall,
+  currentProjectPO,
+  engineerTimeEntries = []
 }: EngineerProfileModalProps) {
   const [activeTab, setActiveTab] = useState('deployment') // Default to deployment tab for rapid deployment focus
   const [isEditing, setIsEditing] = useState(false)
@@ -344,6 +351,105 @@ export default function EngineerProfileModal({
                     </Card>
                   </div>
 
+                  {/* PO Burn Rate Section - Only show if engineer is on a project with PO */}
+                  {currentProjectPO && engineer.availability === 'On Project' && (
+                    <Card className="bg-gradient-to-r from-slate-700/30 to-blue-700/20 border-slate-600">
+                      <CardHeader>
+                        <CardTitle className="text-white flex items-center space-x-2">
+                          <TrendingUp className="h-5 w-5 text-orange-400" />
+                          <span>Purchase Order Burn Rate</span>
+                          <Badge variant="outline" className="ml-auto text-xs">
+                            {currentProjectPO.poNumber}
+                          </Badge>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {(() => {
+                          const metrics = BurnRateCalculator.calculateBurnRate(
+                            currentProjectPO,
+                            engineerTimeEntries
+                          )
+                          const engineerMetrics = metrics.topEngineers.find(
+                            e => e.engineerId === engineer.id
+                          )
+                          
+                          return (
+                            <div className="space-y-4">
+                              {/* Engineer's Contribution */}
+                              <div className="p-3 bg-slate-800/50 rounded-lg">
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="text-sm text-slate-400">Your Contribution</span>
+                                  <span className="text-sm font-medium text-white">
+                                    {engineerMetrics ? 
+                                      `${engineerMetrics.totalHours.toFixed(0)} hrs / $${engineerMetrics.totalCost.toLocaleString()}` : 
+                                      '0 hrs / $0'
+                                    }
+                                  </span>
+                                </div>
+                                {engineerMetrics && (
+                                  <div className="text-xs text-slate-500">
+                                    Weekly Avg: {engineerMetrics.weeklyAverage.toFixed(1)} hrs
+                                  </div>
+                                )}
+                              </div>
+                              
+                              {/* Overall PO Status */}
+                              <div className="grid grid-cols-2 gap-3">
+                                <div className="bg-slate-800/50 rounded-lg p-3">
+                                  <div className="text-xs text-slate-400 mb-1">PO Consumed</div>
+                                  <div className="flex items-center space-x-2">
+                                    <Progress value={metrics.percentConsumed} className="flex-1 h-2" />
+                                    <span className="text-sm font-medium text-white">
+                                      {metrics.percentConsumed.toFixed(0)}%
+                                    </span>
+                                  </div>
+                                </div>
+                                
+                                <div className="bg-slate-800/50 rounded-lg p-3">
+                                  <div className="text-xs text-slate-400 mb-1">Time Remaining</div>
+                                  <div className="text-sm font-medium text-white">
+                                    {metrics.weeksRemaining === Infinity ? 
+                                      '∞ weeks' : 
+                                      `${metrics.weeksRemaining.toFixed(1)} weeks`
+                                    }
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              {/* Alerts */}
+                              {metrics.alerts.length > 0 && (
+                                <div className="space-y-2">
+                                  {metrics.alerts.map((alert, i) => (
+                                    <div key={i} className={`p-2 rounded-lg flex items-center space-x-2 ${
+                                      alert.alertType === 'critical' ? 'bg-red-500/20 text-red-400' :
+                                      alert.alertType === 'warning' ? 'bg-yellow-500/20 text-yellow-400' :
+                                      'bg-gray-500/20 text-gray-400'
+                                    }`}>
+                                      <AlertTriangle className="h-4 w-4" />
+                                      <span className="text-xs">{alert.message}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                              
+                              {/* View Full Report Link */}
+                              <div className="pt-2 border-t border-slate-700">
+                                <Button
+                                  variant="link"
+                                  size="sm"
+                                  className="text-blue-400 hover:text-blue-300 p-0"
+                                  onClick={() => setActiveTab('projects')}
+                                >
+                                  View Full PO Report →
+                                </Button>
+                              </div>
+                            </div>
+                          )
+                        })()}
+                      </CardContent>
+                    </Card>
+                  )}
+
                   {/* Skills Overview */}
                   <Card className="bg-slate-700/30 border-slate-600">
                     <CardHeader>
@@ -476,6 +582,172 @@ export default function EngineerProfileModal({
                             <p className="text-slate-300">{new Date(project.endDate).toLocaleDateString()}</p>
                           </div>
                         </div>
+                        {/* PO Burn Rate for this project */}
+                        {(() => {
+                          // Find matching PO for this project - check both client name and project name
+                          let projectPO = null
+                          
+                          // First try to match by client name
+                          if (currentProjectPO && (
+                            project.name.toLowerCase().includes(currentProjectPO.clientName.toLowerCase()) ||
+                            currentProjectPO.clientName.toLowerCase().includes(project.client.toLowerCase()) ||
+                            project.client.toLowerCase().includes(currentProjectPO.clientName.toLowerCase())
+                          )) {
+                            projectPO = currentProjectPO
+                          }
+                          
+                          // If no currentProjectPO, create a mock one for demo
+                          if (!projectPO && (project.client === 'Tesla Motors' || project.client === 'Ford Motor Company')) {
+                            projectPO = {
+                              id: `mock-po-${project.id}`,
+                              poNumber: project.client === 'Tesla Motors' ? 'PO-2024-TESLA-001' : 'PO-2024-FORD-001',
+                              clientName: project.client,
+                              projectName: project.name,
+                              totalBudget: project.client === 'Tesla Motors' ? 500000 : 750000,
+                              allocatedHours: project.client === 'Tesla Motors' ? 4000 : 6000,
+                              startDate: project.startDate,
+                              endDate: project.endDate,
+                              projectId: project.id.toString(),
+                              status: 'active' as const
+                            }
+                          }
+                          
+                          // Get engineer's time entries (create mock data for demo)
+                          let projectTimeEntries = engineerTimeEntries.filter(entry => 
+                            entry.engineerId === engineer.id
+                          )
+                          
+                          // If no real time entries, create mock data for demo
+                          if (projectTimeEntries.length === 0 && projectPO) {
+                            const mockHours = project.client === 'Tesla Motors' ? 120 : 80
+                            projectTimeEntries = [{
+                              id: `mock-entry-${engineer.id}-${project.id}`,
+                              engineerId: engineer.id,
+                              engineerName: engineer.name,
+                              projectId: project.id.toString(),
+                              poId: projectPO.id,
+                              hours: mockHours,
+                              date: new Date().toISOString(),
+                              rate: engineer.hourlyRate,
+                              approved: true
+                            }]
+                          }
+                          
+                          if (projectPO && projectTimeEntries.length > 0) {
+                            const metrics = BurnRateCalculator.calculateBurnRate(projectPO, projectTimeEntries)
+                            const engineerMetrics = metrics.topEngineers.find(e => e.engineerId === engineer.id)
+                            
+                            return (
+                              <div className="bg-gradient-to-r from-slate-800/50 to-orange-800/20 rounded-lg p-3 border border-orange-500/20">
+                                <div className="flex items-center justify-between mb-2">
+                                  <div className="flex items-center space-x-2">
+                                    <TrendingUp className="h-4 w-4 text-orange-400" />
+                                    <p className="text-xs font-medium text-orange-300">PO Burn Rate</p>
+                                  </div>
+                                  <Badge variant="outline" className="text-xs text-orange-400 border-orange-500/30">
+                                    {projectPO.poNumber}
+                                  </Badge>
+                                </div>
+                                
+                                <div className="grid grid-cols-3 gap-3 mb-3">
+                                  <div>
+                                    <p className="text-xs text-slate-400">Your Hours</p>
+                                    <p className="text-sm font-medium text-white">
+                                      {engineerMetrics ? engineerMetrics.totalHours.toFixed(0) : '0'}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs text-slate-400">Your Cost</p>
+                                    <p className="text-sm font-medium text-white">
+                                      ${engineerMetrics ? engineerMetrics.totalCost.toLocaleString() : '0'}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs text-slate-400">PO Status</p>
+                                    <p className={`text-sm font-medium ${
+                                      metrics.burnRateStatus === 'healthy' ? 'text-green-400' :
+                                      metrics.burnRateStatus === 'warning' ? 'text-yellow-400' :
+                                      metrics.burnRateStatus === 'critical' ? 'text-orange-400' :
+                                      'text-red-400'
+                                    }`}>
+                                      {metrics.percentConsumed.toFixed(0)}%
+                                    </p>
+                                  </div>
+                                </div>
+                                
+                                <div className="mb-2">
+                                  <div className="flex items-center justify-between mb-1">
+                                    <span className="text-xs text-slate-400">PO Consumption</span>
+                                    <span className="text-xs text-slate-300">{metrics.percentConsumed.toFixed(1)}%</span>
+                                  </div>
+                                  <Progress value={metrics.percentConsumed} className="h-1.5" />
+                                </div>
+                                
+                                {engineerMetrics && (
+                                  <div className="text-xs text-slate-400">
+                                    Weekly avg: {engineerMetrics.weeklyAverage.toFixed(1)} hrs • 
+                                    Remaining: {metrics.weeksRemaining === Infinity ? '∞' : metrics.weeksRemaining.toFixed(1)} weeks
+                                  </div>
+                                )}
+                                
+                                {metrics.alerts.length > 0 && (
+                                  <div className="mt-2 flex items-center space-x-1">
+                                    <AlertTriangle className="h-3 w-3 text-yellow-400" />
+                                    <span className="text-xs text-yellow-400">
+                                      {metrics.alerts[0].message}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            )
+                          }
+                          
+                          // Always show burn rate section for Tesla and Ford projects
+                          return (
+                            <div className="bg-gradient-to-r from-slate-800/50 to-blue-800/20 rounded-lg p-3 border border-blue-500/20">
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center space-x-2">
+                                  <TrendingUp className="h-4 w-4 text-blue-400" />
+                                  <p className="text-xs font-medium text-blue-300">
+                                    {projectPO ? 'PO Burn Rate' : 'Project Info'}
+                                  </p>
+                                </div>
+                                {projectPO && (
+                                  <Badge variant="outline" className="text-xs text-blue-400 border-blue-500/30">
+                                    {projectPO.poNumber}
+                                  </Badge>
+                                )}
+                              </div>
+                              
+                              {projectPO ? (
+                                <div>
+                                  <div className="grid grid-cols-3 gap-2 mb-2 text-xs">
+                                    <div>
+                                      <p className="text-slate-400">Budget</p>
+                                      <p className="text-white font-medium">${(projectPO.totalBudget / 1000).toFixed(0)}K</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-slate-400">Hours</p>
+                                      <p className="text-white font-medium">{projectPO.allocatedHours}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-slate-400">Status</p>
+                                      <p className="text-green-400 font-medium">Active</p>
+                                    </div>
+                                  </div>
+                                  <div className="text-xs text-slate-400">
+                                    Click "Assign to Project" to see full burn rate metrics
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="text-xs text-slate-400">
+                                  No active purchase order for this project
+                                </div>
+                              )}
+                            </div>
+                          )
+                        })()}
+                        
                         <div className="bg-slate-800/50 rounded-lg p-3">
                           <p className="text-xs text-slate-500 mb-1">Client Feedback</p>
                           <p className="text-slate-300 italic">"{project.feedback}"</p>

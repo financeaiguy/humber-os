@@ -185,4 +185,7 @@ export const config: NextAuthConfig = {
 }
 
 const nextAuth = NextAuth(config)
-export const { handlers, auth, signIn, signOut } = nextAuth
+export const handlers = nextAuth.handlers
+export const auth = nextAuth.auth
+export const signIn = nextAuth.signIn
+export const signOut = nextAuth.signOut

@@ -17,7 +17,7 @@ import {
   Clock
 } from 'lucide-react'
 
-export const runtime = 'edge'
+// export const runtime = 'edge'
 
 interface SecurityMetrics {
   totalRequests: number

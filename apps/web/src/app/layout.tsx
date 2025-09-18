@@ -25,7 +25,7 @@ const ContinuousLearningProvider = dynamic(() => import('@/components/continuous
 const inter = Inter({ subsets: ['latin'] })
 
 // Removed edge runtime to fix webpack compatibility issues
-// export const runtime = 'edge'
+// // export const runtime = 'edge'
 export const revalidate = 0
 
 export const metadata: Metadata = {
@@ -65,7 +65,7 @@ export default function RootLayout({
   
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={inter.className} suppressHydrationWarning>
         <ErrorBoundary>
           <SessionProvider>
             <ContinuousLearningProvider>

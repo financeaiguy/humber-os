@@ -1,6 +1,6 @@
 import { CardSkeleton } from '@/components/loading-skeleton'
 
-export const runtime = 'edge'
+// export const runtime = 'edge'
 
 export default function Loading() {
   return (
