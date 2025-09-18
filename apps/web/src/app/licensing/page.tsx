@@ -1,5 +1,4 @@
 'use client'
-// // export const runtime = 'edge' // Disabled for static export
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'

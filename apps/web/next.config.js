@@ -11,21 +11,11 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Disable static export - deploy real React app
-  // output: 'export',
-  // trailingSlash: true,
-  // distDir: 'out',
-  // generateBuildId: () => 'build',
   
   // Performance optimizations
   experimental: {
     optimizePackageImports: ['recharts', 'lucide-react'],
     // Removed serverComponentsExternalPackages to avoid conflict with transpilePackages
-    // turbo: {
-    //   rules: {
-    //     '*.svg': ['@svgr/webpack'],
-    //   },
-    // },
   },
   
   // Webpack optimizations with clientReferenceManifest fix

@@ -228,7 +228,7 @@ importers:
         specifier: ^5.10.0
         version: 5.10.0
       zod:
-        specifier: ^3.25.76
+        specifier: ^3.24.1
         version: 3.25.76
     devDependencies:
       '@cloudflare/workers-types':
