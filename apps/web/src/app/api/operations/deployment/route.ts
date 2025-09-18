@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { withKnowledgeSystem, KnowledgeEnhancedResponse } from '@/lib/knowledge-middleware'
 
 export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
+
+const knowledgeMiddleware = withKnowledgeSystem({
+  enableLearning: true,
+  trackUserActions: true,
+  enableAIInsights: true,
+  logLevel: 'detailed'
+})
 
 export async function POST(request: NextRequest) {
   try {

@@ -255,9 +255,13 @@ export class RecruitingDatabase {
         bindings.push(startDate, endDate)
       }
 
-      // Add sorting
-      const sortBy = params.sortBy || 'created_at'
-      const sortOrder = params.sortOrder || 'desc'
+      // Add sorting - SECURE: Whitelist allowed columns and orders
+      const allowedSortColumns = ['created_at', 'updated_at', 'first_name', 'last_name', 'status', 'years_experience']
+      const allowedSortOrders = ['asc', 'desc']
+      
+      const sortBy = allowedSortColumns.includes(params.sortBy) ? params.sortBy : 'created_at'
+      const sortOrder = allowedSortOrders.includes(params.sortOrder) ? params.sortOrder : 'desc'
+      
       query += ` ORDER BY ${sortBy} ${sortOrder}`
 
       // Add pagination

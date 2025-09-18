@@ -39,50 +39,16 @@ export async function authMiddleware(c: Context<{ Bindings: AuthEnv; Variables: 
     const requestId = crypto.randomUUID();
     c.set('requestId', requestId);
     
-    // Skip auth for testing endpoints (in development)
+    // SECURITY: Only truly public endpoints - NO SENSITIVE DATA
     const publicEndpoints = [
       '/health',
-      '/docs', 
-      '/api-test',
-      '/',
-      '/metrics',
-      '/bull-pen/dashboard',
-      '/bull-pen/engineers/by-category',
-      '/bull-pen/engineers/available',
-      '/engineers',
-      '/time-tracking/active-sessions',
-      '/time-tracking/work-sites',
-      '/time-tracking/verify-location',
-      '/time-tracking/clock-action',
-      '/documents',
-      '/documents/search',
-      '/chat/sessions',
-      '/chat/message',
-      '/notifications/history',
-      '/notifications/analytics',
-      '/notifications/send',
-      '/notifications/timesheet-submitted',
-      '/notifications/discrepancy-detected',
-      '/notifications/compliance-violation',
-      '/reports/history',
-      '/reports/scheduled',
-      '/reports/generate',
-      '/reports/timesheet-summary',
-      '/reports/financial-summary',
-      '/timesheets/reconcile',
-      '/timesheets/batch-reconcile',
-      '/timesheets/period',
-      '/reconciliation/submit',
-      '/reconciliation/customer-hours',
-      '/reconciliation/upload-spreadsheet',
-      '/reconciliation/human-review',
-      '/reconciliation/needs-review',
-      '/reconciliation/stats',
-      '/operations/recruiting-step-1',
-      '/operations/hiring-vetting-step-2',
-      '/operations/background-checks',
-      '/operations/offer-letter-visa',
-      '/operations/deployment'
+      '/docs'
+      // REMOVED: All sensitive endpoints now require authentication
+      // /api-test - SECURITY RISK: Exposes internal architecture
+      // /bull-pen/* - SECURITY RISK: Contains sensitive engineer data
+      // /documents/* - SECURITY RISK: Contains confidential documents
+      // /time-tracking/* - SECURITY RISK: Contains biometric/location data
+      // /financial/* - SECURITY RISK: Contains financial information
     ];
     
     // Also allow document operations and candidate timesheets for testing
