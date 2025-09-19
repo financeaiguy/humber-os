@@ -1,14 +1,56 @@
 'use client'
 
-import { UserRole, WorkflowType, Walkthrough, WalkthroughStep, UserProgress } from '@humber/types'
+import { Walkthrough, WalkthroughStep, UserProgress } from '@humber/types'
 import { WORKFLOW_WALKTHROUGHS, ROLE_BASED_TOOLTIPS, CONTEXTUAL_HELP, SIMPLE_PAGE_GUIDES } from './tooltip-system'
 
+// Local type definitions for walkthrough system
+export type UserRole = 
+  | 'NEW_USER'
+  | 'ENGINEER'
+  | 'MANAGER'
+  | 'RECRUITER'
+  | 'ACCOUNTANT'
+  | 'ADMIN'
+  | 'PARTNER_ADMIN'
+  | 'PARTNER_OPERATOR'
+  | 'ENGINEER_EMPLOYEE'
+
+export type WorkflowType = 
+  | 'ONBOARDING'
+  | 'TIMESHEET'
+  | 'RECRUITING'
+  | 'DEPLOYMENT'
+  | 'REPORTING'
+  | 'COMPLIANCE'
+  | 'BILLING'
+  | 'DOCUMENT_UPLOAD'
+  | 'CHAT_ASSISTANCE'
+  | 'DASHBOARD_TOUR'
+
+// Local interfaces for walkthrough system
+export interface LocalWalkthroughStep {
+  id: string
+  title: string
+  content: string
+  targetElement?: string
+  autoAdvance?: boolean
+  autoAdvanceDelay?: number
+}
+
+export interface LocalWalkthrough {
+  id: string
+  title: string
+  description: string
+  targetRoles: UserRole[]
+  steps: LocalWalkthroughStep[]
+}
+
 export class WalkthroughManager {
-  private currentWalkthrough: Walkthrough | null = null
+  private currentWalkthrough: LocalWalkthrough | null = null
   private currentStepIndex: number = 0
   private userRole: UserRole = 'NEW_USER'
   private userId: string = 'demo-user'
-  private onStepChange?: (step: WalkthroughStep, index: number) => void
+  private onStepChange?: (step: LocalWalkthroughStep, index: number) => void
   private onComplete?: (walkthroughId: string) => void
 
   constructor(userId: string = 'demo-user', userRole: UserRole = 'NEW_USER') {
@@ -18,10 +60,10 @@ export class WalkthroughManager {
 
   // Start a specific walkthrough
   startWalkthrough(workflowType: WorkflowType, callbacks?: {
-    onStepChange?: (step: WalkthroughStep, index: number) => void
+    onStepChange?: (step: LocalWalkthroughStep, index: number) => void
     onComplete?: (walkthroughId: string) => void
   }) {
-    const walkthrough = WORKFLOW_WALKTHROUGHS[workflowType]
+    const walkthrough = (WORKFLOW_WALKTHROUGHS as any)[workflowType] as LocalWalkthrough | undefined
     if (!walkthrough) {
       // SECURITY: console statement removed: console.error(`Walkthrough not found for workflow: ${workflowType}`)
       return false
@@ -53,7 +95,9 @@ export class WalkthroughManager {
     const step = this.getCurrentStep()!
     
     // Highlight target element
-    this.highlightElement(step.targetElement)
+    if (step.targetElement) {
+      this.highlightElement(step.targetElement)
+    }
     
     // Trigger step change callback
     this.onStepChange?.(step, this.currentStepIndex)
@@ -129,7 +173,7 @@ export class WalkthroughManager {
   }
 
   // Utility methods
-  getCurrentStep(): WalkthroughStep | null {
+  getCurrentStep(): LocalWalkthroughStep | null {
     if (!this.currentWalkthrough) return null
     return this.currentWalkthrough.steps[this.currentStepIndex] || null
   }
@@ -225,9 +269,9 @@ export class WalkthroughManager {
 
   // Get contextual help for current page
   getContextualHelp(pathname: string): string {
-    const pageHelp = CONTEXTUAL_HELP[pathname as keyof typeof CONTEXTUAL_HELP]
-    if (pageHelp && pageHelp[this.userRole]) {
-      return pageHelp[this.userRole]
+    const pageHelp = (CONTEXTUAL_HELP as any)[pathname]
+    if (pageHelp && (pageHelp as any)[this.userRole]) {
+      return (pageHelp as any)[this.userRole] as string
     }
 
     // Default help
@@ -241,7 +285,7 @@ export class WalkthroughManager {
 
   // Get tooltips for current user role
   getRoleTooltips(): any[] {
-    return ROLE_BASED_TOOLTIPS[this.userRole] || []
+    return (ROLE_BASED_TOOLTIPS as any)[this.userRole] || []
   }
 
   // Check if user is first-time visitor to a page
@@ -307,9 +351,21 @@ class GlobalWalkthroughState {
   isReady(): boolean {
     return this.isInitialized && this.manager !== null
   }
+
+  // Expose commonly used methods directly on global state
+  isFirstTimeVisit(pageName: string): boolean {
+    return this.manager?.isFirstTimeVisit(pageName) || false
+  }
+
+  markPageAsVisited(pageName: string) {
+    this.manager?.markPageAsVisited(pageName)
+  }
 }
 
 export const globalWalkthrough = GlobalWalkthroughState.getInstance()
+
+// Export singleton instance for backwards compatibility
+export const walkthroughManager = globalWalkthrough
 
 // Hook for using walkthrough in components
 export function useWalkthrough() {

@@ -7,6 +7,8 @@ import { motion } from 'framer-motion'
 import { UserSearch, Target, Briefcase, Globe, DollarSign, FileText, Shield, Award, Clock, Users, UserPlus, ArrowRight, CheckCircle } from 'lucide-react'
 import NewRecruitModal from '@/components/recruiting/NewRecruitModal'
 import { recruitsApi, type Recruit } from '@/lib/api/recruits'
+import { SimpleTooltip } from '@/components/walkthrough/SimpleTooltip'
+import { walkthroughManager } from '@/lib/walkthrough-manager'
 
 const recruitmentAgencies = [
   {
@@ -136,10 +138,17 @@ export default function RecruitsPage() {
   const [recruits, setRecruits] = useState<Recruit[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [movingToOnboarding, setMovingToOnboarding] = useState<string | null>(null)
+  const [showTooltips, setShowTooltips] = useState(false)
 
   // Fetch recruits on component mount
   useEffect(() => {
     fetchRecruits()
+
+    // Check if first-time visit
+    if (walkthroughManager.isFirstTimeVisit('recruits')) {
+      setShowTooltips(true)
+      walkthroughManager.markPageAsVisited('recruits')
+    }
   }, [])
 
   const fetchRecruits = async () => {
@@ -202,15 +211,23 @@ export default function RecruitsPage() {
             Manage headhunter partnerships, recruitment protocols, and candidate pipeline.
           </p>
         </div>
-        <div className="flex items-center space-x-3">
-          <button
-            onClick={() => setShowNewRecruitModal(true)}
-            className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg font-medium hover:from-green-600 hover:to-emerald-600 transition-all duration-300 flex items-center space-x-2"
-          >
-            <UserPlus className="h-5 w-5" />
-            <span>Add New Recruit</span>
-          </button>
-        </div>
+        <SimpleTooltip
+          title="Add New Recruit"
+          description="Click this green button to add a new person to your hiring list. Like adding a contact to your phone!"
+          isVisible={showTooltips}
+          onClose={() => setShowTooltips(false)}
+          position="left"
+        >
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={() => setShowNewRecruitModal(true)}
+              className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg font-medium hover:from-green-600 hover:to-emerald-600 transition-all duration-300 flex items-center space-x-2"
+            >
+              <UserPlus className="h-5 w-5" />
+              <span>Add New Recruit</span>
+            </button>
+          </div>
+        </SimpleTooltip>
       </div>
 
       {/* Recruitment Stats */}

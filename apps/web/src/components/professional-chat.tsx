@@ -40,6 +40,8 @@ import {
   MessageCircle
 } from 'lucide-react'
 
+import { ComprehensiveChatHistory } from './comprehensive-chat-history'
+
 interface ChatMessage {
   id: string
   role: 'user' | 'assistant'
@@ -268,7 +270,15 @@ export function ProfessionalChat({ isOpen, onToggle }: ProfessionalChatProps) {
       })
 
       if (response.ok) {
-        const data = await response.json()
+        const data = await response.json() as {
+          messageId: string;
+          content: string;
+          sourceDocuments?: Array<{
+            metadata?: { documentTitle?: string; category?: string };
+            documentTitle?: string;
+            score: number;
+          }>;
+        }
         
         // Simulate streaming effect
         const assistantMessage: ChatMessage = {
@@ -398,61 +408,17 @@ export function ProfessionalChat({ isOpen, onToggle }: ProfessionalChatProps) {
         </div>
       )}
 
-      {/* Chat History Sidebar */}
-      {showHistory && !isMinimized && (
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          className="w-80 border-r border-white/10 bg-slate-900/30 flex flex-col"
-        >
-          <div className="p-4 border-b border-white/10">
-            <h3 className="text-lg font-semibold text-white mb-2">Chat History</h3>
-            <button
-              onClick={() => {
-                setMessages([])
-                setSelectedEngineer(null)
-              }}
-              className="w-full p-3 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-xl text-white hover:from-purple-500/30 hover:to-pink-500/30 transition-all flex items-center space-x-2"
-            >
-              <Plus className="h-4 w-4" />
-              <span>New Conversation</span>
-            </button>
-          </div>
-          
-          <div className="flex-1 overflow-y-auto p-4 space-y-2">
-            {chatSessions.length === 0 ? (
-              <div className="text-center py-8">
-                <History className="h-8 w-8 text-slate-400 mx-auto mb-2" />
-                <p className="text-sm text-slate-400">No chat history yet</p>
-              </div>
-            ) : (
-              chatSessions.map((session, index) => (
-                <motion.button
-                  key={session.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="w-full text-left p-3 hover:bg-white/5 rounded-xl transition-colors border border-white/5 hover:border-white/20"
-                >
-                  <p className="text-sm font-medium text-white truncate">{session.title}</p>
-                  <p className="text-xs text-slate-400 truncate mt-1">{session.lastMessage}</p>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-xs text-slate-500">
-                      {new Date(session.timestamp).toLocaleDateString()}
-                    </span>
-                    {session.engineerId && (
-                      <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded">
-                        Engineer
-                      </span>
-                    )}
-                  </div>
-                </motion.button>
-              ))
-            )}
-          </div>
-        </motion.div>
-      )}
+      {/* Comprehensive Chat History Modal */}
+      <ComprehensiveChatHistory
+        isOpen={showHistory}
+        onClose={() => setShowHistory(false)}
+        onSelectConversation={(sessionId) => {
+          // Load the selected conversation
+          // In production, this would fetch the conversation from the API
+          console.log('Loading conversation:', sessionId)
+          setMessages([]) // Clear current messages and load selected conversation
+        }}
+      />
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col min-h-0">
@@ -533,44 +499,44 @@ export function ProfessionalChat({ isOpen, onToggle }: ProfessionalChatProps) {
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
                 chatMode === 'documents'
                   ? 'bg-blue-500/20 text-blue-300 shadow-lg border border-blue-500/30'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  : 'text-slate-300 hover:text-white hover:bg-white/5'
               }`}
             >
-              <FileText className="h-4 w-4" />
-              <span>Knowledge Base</span>
+              <FileText className="h-4 w-4 text-current" />
+              <span className="text-current">Knowledge Base</span>
             </button>
             <button
               onClick={() => setChatMode('engineer')}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
                 chatMode === 'engineer'
                   ? 'bg-green-500/20 text-green-300 shadow-lg border border-green-500/30'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  : 'text-slate-300 hover:text-white hover:bg-white/5'
               }`}
             >
-              <Users className="h-4 w-4" />
-              <span>Bull Pen</span>
+              <Users className="h-4 w-4 text-current" />
+              <span className="text-current">Bull Pen</span>
             </button>
             <button
               onClick={() => setChatMode('general')}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
                 chatMode === 'general'
                   ? 'bg-purple-500/20 text-purple-300 shadow-lg border border-purple-500/30'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  : 'text-slate-300 hover:text-white hover:bg-white/5'
               }`}
             >
-              <Brain className="h-4 w-4" />
-              <span>Operations</span>
+              <Brain className="h-4 w-4 text-current" />
+              <span className="text-current">Operations</span>
             </button>
             <button
               onClick={() => setChatMode('help')}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
                 chatMode === 'help'
                   ? 'bg-orange-500/20 text-orange-300 shadow-lg border border-orange-500/30'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  : 'text-slate-300 hover:text-white hover:bg-white/5'
               }`}
             >
-              <HelpCircle className="h-4 w-4" />
-              <span>Help Center</span>
+              <HelpCircle className="h-4 w-4 text-current" />
+              <span className="text-current">Help Center</span>
             </button>
           </div>
           
