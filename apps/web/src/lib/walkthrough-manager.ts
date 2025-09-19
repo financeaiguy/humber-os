@@ -1,7 +1,7 @@
 'use client'
 
 import { UserRole, WorkflowType, Walkthrough, WalkthroughStep, UserProgress } from '@humber/types'
-import { WORKFLOW_WALKTHROUGHS, ROLE_BASED_TOOLTIPS, CONTEXTUAL_HELP } from './tooltip-system'
+import { WORKFLOW_WALKTHROUGHS, ROLE_BASED_TOOLTIPS, CONTEXTUAL_HELP, SIMPLE_PAGE_GUIDES } from './tooltip-system'
 
 export class WalkthroughManager {
   private currentWalkthrough: Walkthrough | null = null
@@ -229,14 +229,40 @@ export class WalkthroughManager {
     if (pageHelp && pageHelp[this.userRole]) {
       return pageHelp[this.userRole]
     }
-    
+
     // Default help
     return 'This page contains tools and information relevant to your role. Explore the different sections and use the help buttons for guidance.'
+  }
+
+  // Get simple page guide for first-time users
+  getSimplePageGuide(pathname: string): any {
+    return SIMPLE_PAGE_GUIDES[pathname as keyof typeof SIMPLE_PAGE_GUIDES] || null
   }
 
   // Get tooltips for current user role
   getRoleTooltips(): any[] {
     return ROLE_BASED_TOOLTIPS[this.userRole] || []
+  }
+
+  // Check if user is first-time visitor to a page
+  isFirstTimeVisit(pageName: string): boolean {
+    const visitedPages = JSON.parse(localStorage.getItem('visitedPages') || '[]')
+    return !visitedPages.includes(pageName)
+  }
+
+  // Mark page as visited
+  markPageAsVisited(pageName: string) {
+    const visitedPages = JSON.parse(localStorage.getItem('visitedPages') || '[]')
+    if (!visitedPages.includes(pageName)) {
+      visitedPages.push(pageName)
+      localStorage.setItem('visitedPages', JSON.stringify(visitedPages))
+    }
+  }
+
+  // Reset all page visits (for testing)
+  resetPageVisits() {
+    localStorage.removeItem('visitedPages')
+    localStorage.removeItem('completedWalkthroughs')
   }
 }
 
@@ -288,12 +314,16 @@ export const globalWalkthrough = GlobalWalkthroughState.getInstance()
 // Hook for using walkthrough in components
 export function useWalkthrough() {
   const manager = globalWalkthrough.getManager()
-  
+
   return {
     startWalkthrough: (workflowType: WorkflowType) => manager?.startWalkthrough(workflowType),
     getRecommendations: () => manager?.getRecommendedWalkthroughs() || [],
     getContextualHelp: (pathname: string) => manager?.getContextualHelp(pathname) || '',
+    getSimplePageGuide: (pathname: string) => manager?.getSimplePageGuide(pathname),
     getRoleTooltips: () => manager?.getRoleTooltips() || [],
+    isFirstTimeVisit: (pageName: string) => manager?.isFirstTimeVisit(pageName) || false,
+    markPageAsVisited: (pageName: string) => manager?.markPageAsVisited(pageName),
+    resetPageVisits: () => manager?.resetPageVisits(),
     isReady: () => globalWalkthrough.isReady()
   }
 }

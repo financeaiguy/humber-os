@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Direct Camera Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Permissions-Policy" content="camera=*, geolocation=*, microphone=*">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1e293b; color: white; }
+        button { padding: 10px 20px; margin: 10px; background: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #2563eb; }
+        #status { margin: 20px 0; padding: 10px; background: #374151; border-radius: 5px; }
+        video { width: 100%; max-width: 500px; margin: 20px 0; border-radius: 5px; }
+        .error { color: #ef4444; }
+        .success { color: #10b981; }
+    </style>
+</head>
+<body>
+    <h1>Direct Camera Test (No Framework)</h1>
+    <p>URL: <span id="url"></span></p>
+    <p>Protocol: <span id="protocol"></span></p>
+
+    <button onclick="testCamera()">Test Camera Access</button>
+    <button onclick="testGeolocation()">Test Geolocation</button>
+    <button onclick="clearTest()">Clear</button>
+
+    <div id="status">Ready to test...</div>
+    <video id="video" autoplay playsinline style="display: none;"></video>
+
+    <script>
+        document.getElementById('url').textContent = window.location.href;
+        document.getElementById('protocol').textContent = window.location.protocol;
+
+        let currentStream = null;
+
+        function updateStatus(message, isError = false) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = isError ? 'error' : 'success';
+            console.log(message);
+        }
+
+        async function testCamera() {
+            updateStatus('Testing camera access...');
+
+            try {
+                // Check API availability
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    throw new Error('getUserMedia not supported in this browser');
+                }
+
+                // Try the simplest possible request
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: false
+                });
+
+                updateStatus('✅ Camera access granted! Stream active.');
+
+                // Show video
+                const video = document.getElementById('video');
+                video.srcObject = stream;
+                video.style.display = 'block';
+                currentStream = stream;
+
+            } catch (error) {
+                updateStatus(`❌ Camera failed: ${error.name} - ${error.message}`, true);
+            }
+        }
+
+        async function testGeolocation() {
+            updateStatus('Testing geolocation access...');
+
+            if (!navigator.geolocation) {
+                updateStatus('❌ Geolocation not supported', true);
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    updateStatus(`✅ Geolocation success: ${position.coords.latitude}, ${position.coords.longitude}`);
+                },
+                (error) => {
+                    updateStatus(`❌ Geolocation failed: ${error.code} - ${error.message}`, true);
+                },
+                { timeout: 10000 }
+            );
+        }
+
+        function clearTest() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+                currentStream = null;
+            }
+            document.getElementById('video').style.display = 'none';
+            updateStatus('Cleared. Ready to test...');
+        }
+
+        // Auto-test on load
+        window.onload = () => {
+            updateStatus('Page loaded. Click buttons to test permissions.');
+        };
+    </script>
+</body>
+</html>

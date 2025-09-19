@@ -45,6 +45,7 @@ export function Sidebar() {
   const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [notificationOpen, setNotificationOpen] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const { data: session } = useSession()
   
   // Mock unread notification count - in production this would come from an API
@@ -52,6 +53,36 @@ export function Sidebar() {
   
   const handleSignOut = async () => {
     await signOut({ callbackUrl: '/auth/signin' })
+  }
+
+  const confirmLogout = async () => {
+    setShowLogoutConfirm(false)
+    setMobileMenuOpen(false)
+
+    // Auto clock-out user before signing out to maintain location tracking
+    try {
+      const response = await fetch('/api/time-tracking/clock-out', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          reason: 'auto_logout',
+          timestamp: new Date().toISOString(),
+          location: 'system_logout'
+        })
+      })
+
+      if (!response.ok) {
+        // If clock-out fails, still proceed with logout but log the issue
+        console.warn('Failed to clock out user during logout')
+      }
+    } catch (error) {
+      // Don't block logout if clock-out API fails
+      console.warn('Error during auto clock-out:', error)
+    }
+
+    handleSignOut()
   }
 
   // For employee users, show limited navigation
@@ -165,8 +196,8 @@ export function Sidebar() {
                     )}
                   </button>
                 </div>
-                <div className="space-y-1">
-                  <Link 
+                <div className="space-y-2">
+                  <Link
                     href="/settings"
                     onClick={() => setMobileMenuOpen(false)}
                     className="flex w-full items-center px-4 py-3 lg:px-3 lg:py-2 text-sm text-slate-200 hover:text-white hover:bg-white/5 active:bg-white/10 rounded-lg transition-colors touch-manipulation"
@@ -174,12 +205,9 @@ export function Sidebar() {
                     <Settings className="mr-3 h-4 w-4" />
                     Settings
                   </Link>
-                  <button 
-                    onClick={() => {
-                      setMobileMenuOpen(false)
-                      handleSignOut()
-                    }}
-                    className="flex w-full items-center px-4 py-3 lg:px-3 lg:py-2 text-sm text-slate-200 hover:text-white hover:bg-white/5 active:bg-white/10 rounded-lg transition-colors touch-manipulation"
+                  <button
+                    onClick={() => setShowLogoutConfirm(true)}
+                    className="flex w-full items-center px-4 py-3 lg:px-3 lg:py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 active:bg-red-500/20 rounded-lg transition-colors touch-manipulation border border-red-500/20 hover:border-red-500/30"
                   >
                     <LogOut className="mr-3 h-4 w-4" />
                     Sign out
@@ -199,6 +227,35 @@ export function Sidebar() {
         />
       )}
       
+      {/* Logout Confirmation Dialog */}
+      {showLogoutConfirm && (
+        <>
+          <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="bg-slate-800 border border-slate-700 rounded-lg shadow-2xl p-6 max-w-md w-full mx-4">
+              <h3 className="text-lg font-semibold text-white mb-2">Sign Out Confirmation</h3>
+              <p className="text-slate-300 text-sm mb-4">
+                Are you sure you want to sign out? This will automatically clock you out and end your current work session.
+              </p>
+              <div className="flex space-x-3 justify-end">
+                <button
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="px-4 py-2 text-sm text-slate-300 hover:text-white border border-slate-600 hover:border-slate-500 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmLogout}
+                  className="px-4 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                >
+                  Sign Out & Clock Out
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
       {/* Notification Manager */}
       <NotificationManager
         isOpen={notificationOpen}

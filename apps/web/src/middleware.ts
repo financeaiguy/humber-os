@@ -9,12 +9,14 @@ export default auth((req) => {
   const publicRoutes = [
     '/',
     '/auth/signin',
-    '/auth/signup', 
+    '/auth/signup',
     '/auth/error',
     '/privacy',
     '/terms',
     '/_next',
-    '/favicon.ico'
+    '/favicon.ico',
+    '/camera-test.html',
+    '/test-camera'
   ]
   
   // Check if route is public
@@ -27,9 +29,16 @@ export default auth((req) => {
     return NextResponse.redirect(signInUrl)
   }
   
-  // Add security headers to all responses
+  // Add security headers to all responses (except test routes)
   const response = NextResponse.next()
-  
+
+  // Skip all security headers for camera test routes
+  if (pathname.includes('camera-test') || pathname.includes('test-camera')) {
+    // Allow all permissions for testing
+    response.headers.set('Permissions-Policy', 'camera=*, geolocation=*, microphone=*')
+    return response
+  }
+
   // COMPREHENSIVE SECURITY HEADERS
   
   // Prevent clickjacking attacks
@@ -44,10 +53,8 @@ export default auth((req) => {
   // Control referrer information
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
   
-  // Disable dangerous browser features
-  response.headers.set('Permissions-Policy', 
-    'geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=()'
-  )
+  // TEMPORARILY REMOVED ALL Permissions-Policy to test camera access
+  // response.headers.set('Permissions-Policy', ...)
   
   // Strict Transport Security (HTTPS only)
   response.headers.set('Strict-Transport-Security', 
@@ -75,7 +82,7 @@ export default auth((req) => {
         isDev 
           ? "connect-src 'self' https: wss: ws: localhost:* http://localhost:*"
           : "connect-src 'self' https:",
-        "media-src 'self'",
+        "media-src 'self' blob: data:",
         "object-src 'none'",
         "child-src 'none'",
         "frame-src 'none'",

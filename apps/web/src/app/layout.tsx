@@ -26,6 +26,9 @@ export const metadata: Metadata = {
     index: false, // Internal tool
     follow: false,
   },
+  other: {
+    'Permissions-Policy': 'camera=*, geolocation=*, microphone=*'
+  }
 }
 
 export const viewport: Viewport = {

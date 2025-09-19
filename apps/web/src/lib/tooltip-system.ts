@@ -909,16 +909,166 @@ export const FEATURE_COMPLEXITY = {
     description: 'Essential features everyone needs to know',
     timeToLearn: '30 minutes'
   },
-  
+
   INTERMEDIATE: {
     features: ['bull-pen', 'recruiting', 'document-upload', 'advanced-reports'],
     description: 'Management and administrative features',
     timeToLearn: '2 hours'
   },
-  
+
   ADVANCED: {
     features: ['system-admin', 'compliance', 'integrations', 'custom-workflows'],
     description: 'Administrative and technical features',
     timeToLearn: '1 day'
+  }
+};
+
+// Simple page guides for first-time visitors (9th grade level)
+export const SIMPLE_PAGE_GUIDES = {
+  '/': {
+    title: 'Welcome to Your Dashboard! 🏠',
+    steps: [
+      {
+        selector: '[data-tour="metrics"]',
+        title: 'Your Business Numbers',
+        description: 'These big numbers show how your business is doing. Think of them like the score in a game - higher is usually better!'
+      },
+      {
+        selector: '[data-tour="charts"]',
+        title: 'Visual Stories',
+        description: 'These colorful charts show trends over time. Hover over any part to see exact numbers. Lines going up = good news!'
+      },
+      {
+        selector: '[data-tour="quick-actions"]',
+        title: 'Quick Actions',
+        description: 'These buttons are like shortcuts on your phone. Click them to do common tasks quickly without searching around.'
+      }
+    ]
+  },
+
+  '/analytics': {
+    title: 'Analytics - Your Business Intelligence 📊',
+    steps: [
+      {
+        selector: '[data-tour="nervous-system"]',
+        title: 'AI Brain Status',
+        description: 'This shows if your AI assistant is working properly. Green dots = everything is good to go!'
+      },
+      {
+        selector: '[data-tour="ai-models"]',
+        title: 'AI Models',
+        description: 'These are different AI helpers, like having multiple smart assistants. Each one is good at different things.'
+      },
+      {
+        selector: '[data-tour="performance-metrics"]',
+        title: 'Performance Numbers',
+        description: 'These numbers show how well your AI and business are performing. Like a report card for your company!'
+      }
+    ]
+  },
+
+  '/bull-pen': {
+    title: 'Bull Pen - Your Team Roster 👥',
+    steps: [
+      {
+        selector: '[data-tour="engineer-list"]',
+        title: 'Your Engineers',
+        description: 'This shows all your engineers like a sports team roster. You can see who\'s available and who\'s working on projects.'
+      },
+      {
+        selector: '[data-tour="availability"]',
+        title: 'Availability Status',
+        description: 'Green = ready to work, Yellow = busy but available, Red = unavailable. Like traffic lights for your team!'
+      },
+      {
+        selector: '[data-tour="deploy-button"]',
+        title: 'Deploy Engineers',
+        description: 'Click this to assign engineers to new projects. It\'s like putting players in the game!'
+      }
+    ]
+  },
+
+  '/recruits': {
+    title: 'Recruiting - Finding New Team Members 🔍',
+    steps: [
+      {
+        selector: '[data-tour="recruit-list"]',
+        title: 'Potential Recruits',
+        description: 'These are people who might join your team. Think of it like looking at job applications.'
+      },
+      {
+        selector: '[data-tour="filters"]',
+        title: 'Search Filters',
+        description: 'Use these to find specific types of engineers. Like using filters when shopping online!'
+      },
+      {
+        selector: '[data-tour="add-recruit"]',
+        title: 'Add New Recruit',
+        description: 'Click here to add someone new who wants to join your team. Start their journey here!'
+      }
+    ]
+  },
+
+  '/time': {
+    title: 'Time Tracking - Clock In & Out ⏰',
+    steps: [
+      {
+        selector: '[data-tour="clock-in"]',
+        title: 'Clock In/Out',
+        description: 'Just like punching a time clock! Click here when you start and stop work. The system keeps track automatically.'
+      },
+      {
+        selector: '[data-tour="biometric"]',
+        title: 'Fingerprint/Face Scan',
+        description: 'This makes sure it\'s really you clocking in. Same technology as unlocking your phone - super secure!'
+      },
+      {
+        selector: '[data-tour="timesheet"]',
+        title: 'Your Timesheet',
+        description: 'See all your work hours here. Like a diary of when you worked and for how long.'
+      }
+    ]
+  },
+
+  '/projects': {
+    title: 'Projects - Your Work Assignments 📋',
+    steps: [
+      {
+        selector: '[data-tour="project-list"]',
+        title: 'Current Projects',
+        description: 'These are all your work assignments. Each box is like a different job you need to complete.'
+      },
+      {
+        selector: '[data-tour="project-status"]',
+        title: 'Project Status',
+        description: 'Colors show how projects are doing: Green = on track, Yellow = needs attention, Red = behind schedule.'
+      },
+      {
+        selector: '[data-tour="new-project"]',
+        title: 'Create New Project',
+        description: 'Click here to start a new work assignment. Like creating a new to-do list for your team.'
+      }
+    ]
+  },
+
+  '/knowledge': {
+    title: 'Knowledge Base - Your Digital Library 📚',
+    steps: [
+      {
+        selector: '[data-tour="upload-docs"]',
+        title: 'Upload Documents',
+        description: 'Drag and drop files here. The AI will read them and remember everything so you can ask questions later!'
+      },
+      {
+        selector: '[data-tour="document-list"]',
+        title: 'Your Documents',
+        description: 'All your uploaded files are here. Click on any document to read it or ask the AI questions about it.'
+      },
+      {
+        selector: '[data-tour="ai-chat"]',
+        title: 'AI Assistant',
+        description: 'Ask questions about your documents here. The AI has read everything and can help you find answers quickly!'
+      }
+    ]
   }
 };

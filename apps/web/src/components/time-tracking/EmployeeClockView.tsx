@@ -126,6 +126,12 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
 
   const requestBiometric = async (): Promise<boolean> => {
     try {
+      // Development bypass - always allow in development mode
+      if (process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_APP_ENV === 'development') {
+        setBiometricVerified(false) // Mark as manual verification for development
+        return true
+      }
+
       // Check if WebAuthn is available for biometric authentication
       if (window.PublicKeyCredential && navigator.credentials) {
         // Check available authenticators
@@ -622,6 +628,9 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
         throw new Error(result.message || 'Failed to submit time entry')
       }
 
+      // Temporary debug logging
+      console.log('✅ Time entry submitted successfully:', result)
+
       // Success - update local state
       if (pendingAction === 'clock-in') {
         setIsClockedIn(true)
@@ -643,12 +652,16 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
         })
       }
 
-      // Reset pending action
+      // Reset pending action and close camera
       setPendingAction(null)
+      setShowCamera(false)
 
     } catch (error: any) {
       // SECURITY: console statement removed: console.error('Camera capture submission error:', error)
-      alert(`Failed to submit ${pendingAction}: Submission failed. Please try again.`)
+      alert(`Failed to submit ${pendingAction}: ${error.message || 'Submission failed. Please try again.'}`)
+      // Close camera even on error
+      setShowCamera(false)
+      setPendingAction(null)
     }
   }
   

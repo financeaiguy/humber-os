@@ -72,7 +72,23 @@ const nextConfig = {
   
   // Compress responses
   compress: true,
-  
+
+  // Add headers to allow camera and geolocation with ALL origins
+  async headers() {
+    return [
+      {
+        // Apply to all routes
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=*, geolocation=*, microphone=*'
+          }
+        ],
+      },
+    ]
+  },
+
 }
 
 module.exports = nextConfig

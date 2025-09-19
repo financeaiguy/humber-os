@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced API Test Interface - Humber OS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            text-align: center;
+            color: #60a5fa;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+        .api-section {
+            margin-bottom: 40px;
+            padding: 25px;
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 8px;
+            border: 1px solid #475569;
+        }
+        .api-title {
+            color: #34d399;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .method-badge {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .get { background: #10b981; }
+        .post { background: #3b82f6; }
+        .put { background: #f59e0b; }
+        .delete { background: #ef4444; }
+
+        .test-form {
+            display: grid;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        label {
+            color: #cbd5e1;
+            font-weight: 500;
+        }
+        input, textarea, select {
+            padding: 12px;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            background: #1e293b;
+            color: #e2e8f0;
+            font-size: 14px;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+        .response-container {
+            margin-top: 20px;
+            padding: 20px;
+            background: #0f172a;
+            border-radius: 6px;
+            border: 1px solid #374151;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .response-header {
+            color: #60a5fa;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        .status-success { background: #10b981; }
+        .status-error { background: #ef4444; }
+        .status-warning { background: #f59e0b; }
+
+        .response-body {
+            white-space: pre-wrap;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #374151;
+            border-radius: 50%;
+            border-top-color: #60a5fa;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .diagnostics {
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid #a855f7;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .diagnostics h3 {
+            color: #a855f7;
+            margin-bottom: 10px;
+        }
+        .diagnostic-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            font-size: 0.9rem;
+        }
+        .endpoint-url {
+            font-family: monospace;
+            background: rgba(59, 130, 246, 0.1);
+            padding: 8px;
+            border-radius: 4px;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Enhanced API Test Interface</h1>
+
+        <!-- Recruits API Section -->
+        <div class="api-section">
+            <div class="api-title">
+                <span class="method-badge get">GET</span>
+                Recruits API - List & Search
+            </div>
+            <div class="endpoint-url">/api/recruits</div>
+
+            <div class="test-form">
+                <div class="form-group">
+                    <label>Server:</label>
+                    <select id="recruits-server">
+                        <option value="http://localhost:3000">Next.js (Port 3000)</option>
+                        <option value="http://localhost:8787">Worker (Port 8787)</option>
+                    </select>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Limit:</label>
+                        <input type="number" id="recruits-limit" value="10" min="1" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Status Filter:</label>
+                        <select id="recruits-status">
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="interviewed">Interviewed</option>
+                            <option value="offered">Offered</option>
+                            <option value="onboarding">Onboarding</option>
+                            <option value="onboarded">Onboarded</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Search:</label>
+                        <input type="text" id="recruits-search" placeholder="Name, email, position...">
+                    </div>
+                </div>
+                <button class="btn" onclick="testRecruitsGet()">🔍 Test GET Recruits</button>
+            </div>
+
+            <div id="recruits-get-response" class="response-container" style="display: none;">
+                <div class="response-header">
+                    <span>Response:</span>
+                    <span id="recruits-get-status"></span>
+                </div>
+                <div id="recruits-get-body" class="response-body"></div>
+            </div>
+        </div>
+
+        <!-- Create Recruit Section -->
+        <div class="api-section">
+            <div class="api-title">
+                <span class="method-badge post">POST</span>
+                Recruits API - Create New
+            </div>
+            <div class="endpoint-url">/api/recruits</div>
+
+            <div class="test-form">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>First Name:</label>
+                        <input type="text" id="create-firstName" value="Test" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name:</label>
+                        <input type="text" id="create-lastName" value="User" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="create-email" value="test@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone:</label>
+                        <input type="text" id="create-phone" value="(555) 123-4567">
+                    </div>
+                    <div class="form-group">
+                        <label>Position:</label>
+                        <input type="text" id="create-position" value="Software Engineer" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Department:</label>
+                        <input type="text" id="create-department" value="Engineering" required>
+                    </div>
+                </div>
+                <button class="btn" onclick="testRecruitsPost()">➕ Create New Recruit</button>
+            </div>
+
+            <div id="recruits-post-response" class="response-container" style="display: none;">
+                <div class="response-header">
+                    <span>Response:</span>
+                    <span id="recruits-post-status"></span>
+                </div>
+                <div id="recruits-post-body" class="response-body"></div>
+            </div>
+        </div>
+
+        <!-- Diagnostics Section -->
+        <div class="diagnostics">
+            <h3>🔧 API Diagnostics</h3>
+            <div id="diagnostics-content">
+                <div class="diagnostic-item">
+                    <span>Server Status:</span>
+                    <span id="server-status">Checking...</span>
+                </div>
+                <div class="diagnostic-item">
+                    <span>CORS Headers:</span>
+                    <span id="cors-status">Testing...</span>
+                </div>
+                <div class="diagnostic-item">
+                    <span>Response Time:</span>
+                    <span id="response-time">-</span>
+                </div>
+                <div class="diagnostic-item">
+                    <span>Last Test:</span>
+                    <span id="last-test">Never</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced API testing with comprehensive error handling and diagnostics
+
+        async function makeRequest(method, url, data = null, headers = {}) {
+            const startTime = performance.now();
+
+            try {
+                const options = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...headers
+                    }
+                };
+
+                if (data && method !== 'GET') {
+                    options.body = JSON.stringify(data);
+                }
+
+                console.log('🚀 Making request:', { method, url, data, headers });
+
+                const response = await fetch(url, options);
+                const endTime = performance.now();
+                const responseTime = Math.round(endTime - startTime);
+
+                // Update diagnostics
+                document.getElementById('response-time').textContent = `${responseTime}ms`;
+                document.getElementById('last-test').textContent = new Date().toLocaleTimeString();
+
+                let responseData;
+                const contentType = response.headers.get('content-type');
+
+                if (contentType && contentType.includes('application/json')) {
+                    responseData = await response.json();
+                } else {
+                    responseData = await response.text();
+                }
+
+                console.log('📡 Response received:', {
+                    status: response.status,
+                    headers: Object.fromEntries(response.headers.entries()),
+                    data: responseData
+                });
+
+                return {
+                    ok: response.ok,
+                    status: response.status,
+                    statusText: response.statusText,
+                    headers: Object.fromEntries(response.headers.entries()),
+                    data: responseData,
+                    responseTime
+                };
+            } catch (error) {
+                const endTime = performance.now();
+                const responseTime = Math.round(endTime - startTime);
+
+                console.error('❌ Request failed:', error);
+
+                // Update diagnostics
+                document.getElementById('response-time').textContent = `${responseTime}ms (failed)`;
+                document.getElementById('last-test').textContent = new Date().toLocaleTimeString();
+
+                return {
+                    ok: false,
+                    status: 0,
+                    statusText: 'Network Error',
+                    headers: {},
+                    data: { error: error.message, type: error.name },
+                    responseTime
+                };
+            }
+        }
+
+        function displayResponse(containerId, statusId, bodyId, response) {
+            const container = document.getElementById(containerId);
+            const statusEl = document.getElementById(statusId);
+            const bodyEl = document.getElementById(bodyId);
+
+            container.style.display = 'block';
+
+            // Status badge
+            let statusClass = 'status-error';
+            if (response.status >= 200 && response.status < 300) {
+                statusClass = 'status-success';
+            } else if (response.status >= 300 && response.status < 400) {
+                statusClass = 'status-warning';
+            }
+
+            statusEl.className = `status-badge ${statusClass}`;
+            statusEl.textContent = `${response.status} ${response.statusText}`;
+
+            // Response body
+            let displayData = response.data;
+            if (typeof displayData === 'object') {
+                displayData = JSON.stringify(displayData, null, 2);
+            }
+
+            bodyEl.textContent = displayData;
+
+            // Update server status
+            document.getElementById('server-status').textContent =
+                response.ok ? '✅ Online' : '❌ Error';
+
+            // Update CORS status
+            const corsHeaders = ['access-control-allow-origin', 'access-control-allow-methods'];
+            const hasCors = corsHeaders.some(header => response.headers[header]);
+            document.getElementById('cors-status').textContent =
+                hasCors ? '✅ Enabled' : '⚠️ Missing';
+        }
+
+        async function testRecruitsGet() {
+            const server = document.getElementById('recruits-server').value;
+            const limit = document.getElementById('recruits-limit').value;
+            const status = document.getElementById('recruits-status').value;
+            const search = document.getElementById('recruits-search').value;
+
+            const params = new URLSearchParams();
+            if (limit) params.append('limit', limit);
+            if (status) params.append('status', status);
+            if (search) params.append('search', search);
+
+            const url = `${server}/api/recruits?${params.toString()}`;
+
+            // Show loading
+            document.getElementById('recruits-get-body').innerHTML = '<div class="loading"></div> Loading...';
+            document.getElementById('recruits-get-response').style.display = 'block';
+
+            const response = await makeRequest('GET', url);
+            displayResponse('recruits-get-response', 'recruits-get-status', 'recruits-get-body', response);
+        }
+
+        async function testRecruitsPost() {
+            const server = document.getElementById('recruits-server').value;
+
+            const data = {
+                firstName: document.getElementById('create-firstName').value,
+                lastName: document.getElementById('create-lastName').value,
+                email: document.getElementById('create-email').value,
+                phone: document.getElementById('create-phone').value,
+                position: document.getElementById('create-position').value,
+                department: document.getElementById('create-department').value,
+                status: 'pending'
+            };
+
+            const url = `${server}/api/recruits`;
+
+            // Show loading
+            document.getElementById('recruits-post-body').innerHTML = '<div class="loading"></div> Creating...';
+            document.getElementById('recruits-post-response').style.display = 'block';
+
+            const response = await makeRequest('POST', url, data);
+            displayResponse('recruits-post-response', 'recruits-post-status', 'recruits-post-body', response);
+        }
+
+        // Initialize diagnostics on page load
+        window.addEventListener('load', async () => {
+            console.log('🔧 Initializing API Test Interface...');
+
+            // Test server connectivity
+            try {
+                const response = await fetch('http://localhost:3000/api/recruits?limit=1');
+                if (response.ok) {
+                    document.getElementById('server-status').textContent = '✅ Online';
+                } else {
+                    document.getElementById('server-status').textContent = '⚠️ Issues';
+                }
+            } catch (error) {
+                document.getElementById('server-status').textContent = '❌ Offline';
+                console.warn('Server connectivity check failed:', error);
+            }
+        });
+    </script>
+</body>
+</html>

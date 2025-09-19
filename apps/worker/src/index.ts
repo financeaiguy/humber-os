@@ -2821,7 +2821,7 @@ app.route('/notifications', notificationsRouter);
 app.route('/reports', reportsRouter);
 app.route('/knowledge-base', knowledgeBaseRouter);
 app.route('/mock-timesheets', mockTimesheetsRouter);
-app.route('/api/recruits', recruitsRouter);
+// app.route('/api/recruits', recruitsRouter); // Using Next.js API routes instead
 app.route('/api/expenses', expensesRouter);
 app.route('/api/gdpr', gdprRouter);
 app.route('/api/customer-portal', customerPortalRouter);

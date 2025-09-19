@@ -60,6 +60,9 @@ export default function CameraVerification({
   const [cameraPermission, setCameraPermission] = useState<'prompt' | 'granted' | 'denied'>('prompt')
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user')
   const [flashEnabled, setFlashEnabled] = useState(false)
+  const [analysisResult, setAnalysisResult] = useState<any>(null)
+  const [showApprovalUI, setShowApprovalUI] = useState(false)
+  const [showManualSubmit, setShowManualSubmit] = useState(false)
 
   // Request camera permission and start stream
   const startCamera = useCallback(async () => {
@@ -368,13 +371,119 @@ export default function CameraVerification({
     }
   }, [isCameraReady, capturePhoto, flashEnabled])
 
-  // Confirm and submit captured photo
+  // Confirm and submit captured photo with AI analysis
   const handleConfirmCapture = async () => {
     if (!capturedImage) return
 
     setIsProcessing(true)
     try {
-      // Get metadata again for final submission
+      // Get metadata for AI analysis
+      const location = await getCurrentLocation()
+      const metadata: CaptureMetadata = {
+        timestamp: new Date().toISOString(),
+        purpose,
+        employeeId,
+        location,
+        deviceInfo: {
+          userAgent: navigator.userAgent,
+          screenResolution: `${window.screen.width}x${window.screen.height}`,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          language: navigator.language
+        },
+        cameraInfo: canvasRef.current ? {
+          width: canvasRef.current.width,
+          height: canvasRef.current.height,
+          facingMode
+        } : undefined
+      }
+
+      // Analyze photo with Workers AI (Llama 4 Scout)
+      setError('Analyzing photo with AI...')
+
+      // Dynamic import to avoid SSR issues
+      const { workersAIPhotoOCR } = await import('@/lib/workers-ai-photo-ocr')
+
+      const analysisResult = await workersAIPhotoOCR.analyzeTimeTrackingPhoto(
+        capturedImage,
+        {
+          timestamp: metadata.timestamp,
+          employeeId: metadata.employeeId,
+          purpose: metadata.purpose,
+          location: metadata.location,
+          deviceInfo: {
+            userAgent: metadata.deviceInfo.userAgent,
+            screenResolution: metadata.deviceInfo.screenResolution,
+            timezone: metadata.deviceInfo.timezone
+          }
+        }
+      )
+
+      // Show analysis results to user
+      setError(null)
+      setAnalysisResult(analysisResult)
+
+      // Auto-approve if high confidence, otherwise show for review
+      if (analysisResult.recommendation === 'approve' && analysisResult.confidence > 0.85) {
+        await onCapture(capturedImage, metadata)
+        onClose()
+      } else {
+        // Show approval interface
+        setShowApprovalUI(true)
+      }
+
+    } catch (err: any) {
+      setError(`Analysis failed: ${err.message}. You can still submit manually.`)
+      setShowManualSubmit(true)
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  // Handle manual approval after AI analysis
+  const handleManualApproval = async (approved: boolean) => {
+    if (!capturedImage) return
+
+    setIsProcessing(true)
+    try {
+      if (approved) {
+        const location = await getCurrentLocation()
+        const metadata: CaptureMetadata = {
+          timestamp: new Date().toISOString(),
+          purpose,
+          employeeId,
+          location,
+          deviceInfo: {
+            userAgent: navigator.userAgent,
+            screenResolution: `${window.screen.width}x${window.screen.height}`,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            language: navigator.language
+          },
+          cameraInfo: canvasRef.current ? {
+            width: canvasRef.current.width,
+            height: canvasRef.current.height,
+            facingMode
+          } : undefined
+        }
+
+        await onCapture(capturedImage, metadata)
+        onClose()
+      } else {
+        // User rejected, go back to retake
+        handleRetake()
+      }
+    } catch (err: any) {
+      setError('Failed to submit photo. Please try again.')
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  // Handle manual submit when AI analysis fails
+  const handleManualSubmit = async () => {
+    if (!capturedImage) return
+
+    setIsProcessing(true)
+    try {
       const location = await getCurrentLocation()
       const metadata: CaptureMetadata = {
         timestamp: new Date().toISOString(),
@@ -397,7 +506,6 @@ export default function CameraVerification({
       await onCapture(capturedImage, metadata)
       onClose()
     } catch (err: any) {
-      // SECURITY: console statement removed: console.error('Failed to submit photo:', err)
       setError('Failed to submit photo. Please try again.')
     } finally {
       setIsProcessing(false)
@@ -408,6 +516,9 @@ export default function CameraVerification({
   const handleRetake = () => {
     setCapturedImage(null)
     setError(null)
+    setAnalysisResult(null)
+    setShowApprovalUI(false)
+    setShowManualSubmit(false)
   }
 
   // Switch camera (front/back)
@@ -630,6 +741,134 @@ export default function CameraVerification({
                   )}
                 </div>
               </div>
+            ) : showApprovalUI && analysisResult ? (
+              <div className="space-y-4">
+                {/* AI Analysis Results */}
+                <div className="bg-slate-800 rounded-lg p-4">
+                  <h4 className="font-medium text-white mb-2">AI Analysis Results</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Confidence:</span>
+                      <span className={`font-medium ${
+                        analysisResult.confidence > 0.7 ? 'text-green-400' :
+                        analysisResult.confidence > 0.4 ? 'text-yellow-400' : 'text-red-400'
+                      }`}>
+                        {Math.round(analysisResult.confidence * 100)}%
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Recommendation:</span>
+                      <span className={`font-medium capitalize ${
+                        analysisResult.recommendation === 'approve' ? 'text-green-400' :
+                        analysisResult.recommendation === 'review' ? 'text-yellow-400' : 'text-red-400'
+                      }`}>
+                        {analysisResult.recommendation}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Face Detected:</span>
+                      <span className={analysisResult.analysis.faceDetected ? 'text-green-400' : 'text-red-400'}>
+                        {analysisResult.analysis.faceDetected ? 'Yes' : 'No'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Workplace:</span>
+                      <span className={analysisResult.analysis.workplaceEnvironment ? 'text-green-400' : 'text-yellow-400'}>
+                        {analysisResult.analysis.workplaceEnvironment ? 'Detected' : 'Uncertain'}
+                      </span>
+                    </div>
+                    {analysisResult.flags.length > 0 && (
+                      <div className="mt-3">
+                        <span className="text-slate-400 text-xs">Flags:</span>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {analysisResult.flags.map((flag: string, index: number) => (
+                            <span key={index} className="px-2 py-1 bg-red-900/50 text-red-300 text-xs rounded">
+                              {flag.replace(/_/g, ' ')}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Approval Actions */}
+                <div className="flex items-center justify-between">
+                  <button
+                    onClick={handleRetake}
+                    disabled={isProcessing}
+                    className="px-6 py-3 bg-slate-700 text-white rounded-xl hover:bg-slate-600 transition-colors disabled:opacity-50 flex items-center space-x-2"
+                  >
+                    <RotateCcw size={20} />
+                    <span>Retake</span>
+                  </button>
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => handleManualApproval(false)}
+                      disabled={isProcessing}
+                      className="px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center space-x-2"
+                    >
+                      <X size={20} />
+                      <span>Reject</span>
+                    </button>
+                    <button
+                      onClick={() => handleManualApproval(true)}
+                      disabled={isProcessing}
+                      className="px-8 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center space-x-2"
+                    >
+                      {isProcessing ? (
+                        <>
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                          <span>Submitting...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Check size={20} />
+                          <span>Approve & Submit</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+                <p className="text-center text-sm text-slate-400">
+                  AI has analyzed your photo. Please review and decide.
+                </p>
+              </div>
+            ) : showManualSubmit ? (
+              <div className="space-y-3">
+                <div className="bg-yellow-900/50 rounded-lg p-3">
+                  <p className="text-yellow-300 text-sm">
+                    AI analysis is unavailable. You can still submit manually for review.
+                  </p>
+                </div>
+                <div className="flex items-center justify-between">
+                  <button
+                    onClick={handleRetake}
+                    disabled={isProcessing}
+                    className="px-6 py-3 bg-slate-700 text-white rounded-xl hover:bg-slate-600 transition-colors disabled:opacity-50 flex items-center space-x-2"
+                  >
+                    <RotateCcw size={20} />
+                    <span>Retake</span>
+                  </button>
+                  <button
+                    onClick={handleManualSubmit}
+                    disabled={isProcessing}
+                    className="px-8 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center space-x-2"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        <span>Submitting...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Check size={20} />
+                        <span>Submit for Review</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
             ) : (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -649,18 +888,18 @@ export default function CameraVerification({
                     {isProcessing ? (
                       <>
                         <Loader2 className="h-5 w-5 animate-spin" />
-                        <span>Processing...</span>
+                        <span>Analyzing...</span>
                       </>
                     ) : (
                       <>
                         <Check size={20} />
-                        <span>Confirm & Submit</span>
+                        <span>Analyze & Submit</span>
                       </>
                     )}
                   </button>
                 </div>
                 <p className="text-center text-sm text-slate-400">
-                  Review your photo and confirm to proceed
+                  Photo will be analyzed by AI before submission
                 </p>
               </div>
             )}
