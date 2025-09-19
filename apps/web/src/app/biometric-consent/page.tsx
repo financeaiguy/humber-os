@@ -424,7 +424,7 @@ export default function BiometricConsentPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-purple-300 font-semibold mb-2">Biometric Privacy Officer</p>
-                  <p className="text-purple-200">Email: biometric@humberops.com</p>
+                  <p className="text-purple-200">Email: biometric@example.com</p>
                   <p className="text-purple-200">Phone: 1-800-HUMBER-1 ext. 101</p>
                   <p className="text-purple-200">Response time: 24 hours</p>
                 </div>
@@ -432,7 +432,7 @@ export default function BiometricConsentPage() {
                 <div>
                   <p className="text-purple-300 font-semibold mb-2">Emergency Contact</p>
                   <p className="text-purple-200">For data breaches or security concerns</p>
-                  <p className="text-purple-200">Email: security@humberops.com</p>
+                  <p className="text-purple-200">Email: security@example.com</p>
                   <p className="text-purple-200">Phone: 1-800-HUMBER-1 (24/7)</p>
                 </div>
               </div>

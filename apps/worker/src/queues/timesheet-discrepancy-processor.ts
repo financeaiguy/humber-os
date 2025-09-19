@@ -190,7 +190,7 @@ export class TimesheetDiscrepancyProcessor {
 
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: 'Processing failed',
       };
     }
   }

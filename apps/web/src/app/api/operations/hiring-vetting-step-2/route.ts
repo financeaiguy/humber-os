@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       message: 'Vetting step 2 completed successfully'
     })
   } catch (error) {
-    // SECURITY: Removed console.error('Error processing vetting step 2:', error)
+    // SECURITY: console statement removed: console.error('Error processing vetting step 2:', error)
     return NextResponse.json(
       {
         success: false,

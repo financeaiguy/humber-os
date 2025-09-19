@@ -98,7 +98,7 @@ export class JWTManager {
       // Validate payload structure
       const validated = JWTPayloadSchema.safeParse(payload);
       if (!validated.success) {
-        // SECURITY: Removed console.error('Invalid JWT payload structure:', validated.error);
+        // SECURITY: console statement removederror('Invalid JWT payload structure:', validated.error);
         return null;
       }
 
@@ -106,7 +106,7 @@ export class JWTManager {
 
       // Check token type if specified
       if (options?.expectedTokenType && tokenData.tokenType !== options.expectedTokenType) {
-        // SECURITY: Removed console.error(`Expected ${options.expectedTokenType} token, got ${tokenData.tokenType}`);
+        // SECURITY: console statement removederror(`Expected ${options.expectedTokenType} token, got ${tokenData.tokenType}`);
         return null;
       }
 
@@ -114,25 +114,25 @@ export class JWTManager {
       if (options?.checkBlacklist && options?.kvStore && tokenData.jti) {
         const blacklisted = await options.kvStore.get(`blacklist:${tokenData.jti}`);
         if (blacklisted) {
-          // SECURITY: Removed console.error('Token is blacklisted:', tokenData.jti);
+          // SECURITY: console statement removederror('Token is blacklisted:', tokenData.jti);
           return null;
         }
       }
 
       // Additional security checks
       if (tokenData.exp && tokenData.exp < Date.now() / 1000) {
-        // SECURITY: Removed console.error('Token has expired');
+        // SECURITY: console statement removederror('Token has expired');
         return null;
       }
 
       if (tokenData.nbf && tokenData.nbf > Date.now() / 1000) {
-        // SECURITY: Removed console.error('Token not yet valid');
+        // SECURITY: console statement removederror('Token not yet valid');
         return null;
       }
 
       return tokenData;
     } catch (error) {
-      // SECURITY: Removed console.error('JWT verification failed:', error);
+      // SECURITY: console statement removederror('JWT verification failed:', error);
       return null;
     }
   }
@@ -174,7 +174,7 @@ export class JWTManager {
         expirationTtl ? { expirationTtl } : undefined
       );
     } catch (error) {
-      // SECURITY: Removed console.error('Failed to blacklist token:', error);
+      // SECURITY: console statement removederror('Failed to blacklist token:', error);
       throw error;
     }
   }
@@ -187,7 +187,7 @@ export class JWTManager {
       const blacklisted = await kvStore.get(`blacklist:${jti}`);
       return !!blacklisted;
     } catch (error) {
-      // SECURITY: Removed console.error('Failed to check token blacklist:', error);
+      // SECURITY: console statement removederror('Failed to check token blacklist:', error);
       return false;
     }
   }

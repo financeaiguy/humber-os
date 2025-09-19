@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
     
     // Get specific offboarding request implementation
     return NextResponse.json({
@@ -19,7 +19,7 @@ export async function GET(
       message: 'Offboarding request retrieved successfully'
     })
   } catch (error) {
-    // SECURITY: Removed console.error('Get offboarding error:', error)
+    // SECURITY: console statement removed: console.error('Get offboarding error:', error)
     return NextResponse.json(
       { error: 'Failed to retrieve offboarding request' },
       { status: 500 }
@@ -46,7 +46,7 @@ export async function PUT(
       message: 'Offboarding request updated successfully'
     })
   } catch (error) {
-    // SECURITY: Removed console.error('Update offboarding error:', error)
+    // SECURITY: console statement removed: console.error('Update offboarding error:', error)
     return NextResponse.json(
       { error: 'Failed to update offboarding request' },
       { status: 500 }

@@ -181,7 +181,7 @@ export class GeolocationService {
       (error) => {
         callback({
           success: false,
-          error: error.message
+          error: 'Location verification failed'
         });
       },
       {

@@ -79,7 +79,7 @@ export function NervousSystemDashboard() {
         automationLevel: 73.8
       })
     } catch (error) {
-      // SECURITY: Removed console.error('Failed to load system data:', error)
+      // SECURITY: console statement removed: console.error('Failed to load system data:', error)
     }
   }
 
@@ -88,7 +88,7 @@ export function NervousSystemDashboard() {
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
           <Brain className="w-16 h-16 text-blue-500 animate-pulse mx-auto mb-4" />
-          <p className="text-gray-600">Connecting to Nervous System...</p>
+          <p className="text-slate-400">Connecting to Nervous System...</p>
         </div>
       </div>
     )
@@ -97,18 +97,18 @@ export function NervousSystemDashboard() {
   return (
     <div className="space-y-6">
       {/* System Health Overview */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-slate-800 rounded-lg shadow-sm border border-slate-700 p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-3">
             <Brain className="w-8 h-8 text-blue-600" />
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">Humber Nervous System</h2>
-              <p className="text-sm text-gray-600">Central AI Intelligence & Learning Platform</p>
+              <h2 className="text-xl font-semibold text-slate-100">Humber Nervous System</h2>
+              <p className="text-sm text-slate-400">Central AI Intelligence & Learning Platform</p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
             <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm font-medium text-slate-300">
               {isConnected ? 'Connected' : 'Disconnected'}
             </span>
           </div>
@@ -161,55 +161,55 @@ export function NervousSystemDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* AI Models Status */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-slate-800 rounded-lg shadow-sm border border-slate-700 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">AI Models</h3>
-            <Layers className="w-5 h-5 text-gray-500" />
+            <h3 className="text-lg font-semibold text-slate-100">AI Models</h3>
+            <Layers className="w-5 h-5 text-slate-400" />
           </div>
           
           {systemHealth?.components && (
             <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-slate-900 rounded-lg">
                 <div className="flex items-center space-x-3">
                   <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span className="font-medium text-gray-900">GPT-4 Turbo</span>
+                  <span className="font-medium text-slate-100">Llama 4 Scout</span>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900">94% Accuracy</p>
-                  <p className="text-xs text-gray-500">1.2s avg latency</p>
+                  <p className="text-sm font-medium text-slate-100">98% Accuracy</p>
+                  <p className="text-xs text-slate-400">0.8s avg latency</p>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-slate-900 rounded-lg">
                 <div className="flex items-center space-x-3">
                   <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span className="font-medium text-gray-900">Claude 3.5 Sonnet</span>
+                  <span className="font-medium text-slate-100">GPT OSS 120B</span>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900">96% Accuracy</p>
-                  <p className="text-xs text-gray-500">1.0s avg latency</p>
+                  <p className="text-sm font-medium text-slate-100">96% Accuracy</p>
+                  <p className="text-xs text-slate-400">1.0s avg latency</p>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-slate-900 rounded-lg">
                 <div className="flex items-center space-x-3">
                   <Clock className="w-5 h-5 text-yellow-500" />
-                  <span className="font-medium text-gray-900">Humber Domain Expert</span>
+                  <span className="font-medium text-slate-100">Humber Domain Expert</span>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900">Training</p>
-                  <p className="text-xs text-gray-500">73% complete</p>
+                  <p className="text-sm font-medium text-slate-100">Training</p>
+                  <p className="text-xs text-slate-400">73% complete</p>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-slate-900 rounded-lg">
                 <div className="flex items-center space-x-3">
                   <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span className="font-medium text-gray-900">GPT-4 Vision</span>
+                  <span className="font-medium text-slate-100">Multi-Model Ensemble</span>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900">91% Accuracy</p>
-                  <p className="text-xs text-gray-500">2.0s avg latency</p>
+                  <p className="text-sm font-medium text-slate-100">99% Accuracy</p>
+                  <p className="text-xs text-slate-400">Combined Response</p>
                 </div>
               </div>
             </div>
@@ -217,10 +217,10 @@ export function NervousSystemDashboard() {
         </div>
 
         {/* Learning Insights */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-slate-800 rounded-lg shadow-sm border border-slate-700 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Learning Insights</h3>
-            <Lightbulb className="w-5 h-5 text-gray-500" />
+            <h3 className="text-lg font-semibold text-slate-100">Learning Insights</h3>
+            <Lightbulb className="w-5 h-5 text-slate-400" />
           </div>
           
           <div className="space-y-4">
@@ -242,7 +242,7 @@ export function NervousSystemDashboard() {
                 </motion.div>
               ))
             ) : (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-slate-400">
                 <Eye className="w-8 h-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">Learning from interactions...</p>
               </div>
@@ -252,37 +252,37 @@ export function NervousSystemDashboard() {
       </div>
 
       {/* Performance Metrics */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-slate-800 rounded-lg shadow-sm border border-slate-700 p-6">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">Performance Metrics</h3>
-          <BarChart3 className="w-5 h-5 text-gray-500" />
+          <h3 className="text-lg font-semibold text-slate-100">Performance Metrics</h3>
+          <BarChart3 className="w-5 h-5 text-slate-400" />
         </div>
 
         {realTimeMetrics && (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900">{realTimeMetrics.documentsProcessed}</p>
-              <p className="text-sm text-gray-600">Documents Processed</p>
+              <p className="text-2xl font-bold text-slate-100">{realTimeMetrics.documentsProcessed}</p>
+              <p className="text-sm text-slate-400">Documents Processed</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900">{realTimeMetrics.insightsGenerated}</p>
-              <p className="text-sm text-gray-600">Insights Generated</p>
+              <p className="text-2xl font-bold text-slate-100">{realTimeMetrics.insightsGenerated}</p>
+              <p className="text-sm text-slate-400">Insights Generated</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900">{realTimeMetrics.relationships}</p>
-              <p className="text-sm text-gray-600">Knowledge Links</p>
+              <p className="text-2xl font-bold text-slate-100">{realTimeMetrics.relationships}</p>
+              <p className="text-sm text-slate-400">Knowledge Links</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900">{realTimeMetrics.predictionsAccuracy}%</p>
-              <p className="text-sm text-gray-600">Prediction Accuracy</p>
+              <p className="text-2xl font-bold text-slate-100">{realTimeMetrics.predictionsAccuracy}%</p>
+              <p className="text-sm text-slate-400">Prediction Accuracy</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900">{realTimeMetrics.automationLevel}%</p>
-              <p className="text-sm text-gray-600">Automation Level</p>
+              <p className="text-2xl font-bold text-slate-100">{realTimeMetrics.automationLevel}%</p>
+              <p className="text-sm text-slate-400">Automation Level</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900">${modelStats?.averageCost || 0}</p>
-              <p className="text-sm text-gray-600">Avg Cost/Request</p>
+              <p className="text-2xl font-bold text-slate-100">${modelStats?.averageCost || 0}</p>
+              <p className="text-sm text-slate-400">Avg Cost/Request</p>
             </div>
           </div>
         )}
@@ -290,10 +290,10 @@ export function NervousSystemDashboard() {
 
       {/* Smart Recommendations */}
       {recommendations.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-slate-800 rounded-lg shadow-sm border border-slate-700 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Smart Recommendations</h3>
-            <Zap className="w-5 h-5 text-gray-500" />
+            <h3 className="text-lg font-semibold text-slate-100">Smart Recommendations</h3>
+            <Zap className="w-5 h-5 text-slate-400" />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

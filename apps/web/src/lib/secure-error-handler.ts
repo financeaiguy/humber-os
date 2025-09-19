@@ -34,19 +34,19 @@ export class SecureErrorHandler {
     
     if (error) {
       // Categorize error types without exposing details
-      if (error.name === 'ValidationError' || error.message?.includes('validation')) {
+      if (error.name === 'ValidationError') {
         sanitizedMessage = genericMessages.validation
         errorCode = 'VALIDATION_ERROR'
-      } else if (error.name === 'AuthenticationError' || error.message?.includes('auth')) {
+      } else if (error.name === 'AuthenticationError') {
         sanitizedMessage = genericMessages.authentication
         errorCode = 'AUTH_ERROR'
-      } else if (error.name === 'AuthorizationError' || error.message?.includes('permission')) {
+      } else if (error.name === 'AuthorizationError') {
         sanitizedMessage = genericMessages.authorization
         errorCode = 'AUTHZ_ERROR'
-      } else if (error.message?.includes('database') || error.message?.includes('sql')) {
+      } else if (error.name === 'DatabaseError') {
         sanitizedMessage = genericMessages.database
         errorCode = 'DATABASE_ERROR'
-      } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
+      } else if (error.name === 'NetworkError') {
         sanitizedMessage = genericMessages.network
         errorCode = 'NETWORK_ERROR'
       } else {
@@ -81,16 +81,12 @@ export class SecureErrorHandler {
     
     // In production, this should go to secure logging service
     if (process.env.NODE_ENV === 'development') {
-      // SECURITY: Removed console.error('SECURE_ERROR_LOG:', JSON.stringify(logEntry, null, 2))
+      // SECURITY: console statement removed: console.error('SECURE_ERROR_LOG:', JSON.stringify(logEntry, null, 2))
     } else {
       // Send to secure logging service (e.g., Datadog, CloudWatch, etc.)
       // For now, log without sensitive details
-      // SECURITY: Removed console.error(JSON.stringify({
-        timestamp: logEntry.timestamp,
-        level: 'error',
-        message: 'Application error occurred',
-        requestId: context?.requestId
-      }))
+      // SECURITY: console statement removed
+      // Error log: timestamp, level, message, requestId
     }
   }
   

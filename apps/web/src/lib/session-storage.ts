@@ -75,9 +75,9 @@ class SessionStorage {
         localStorage.setItem(userSessionsKey, JSON.stringify(existingSessions))
       }
       
-      // SECURITY: Removed // SECURITY: Removed console.log('✅ Session stored in localStorage:', sessionToken.substring(0, 8) + '...')
+      // SECURITY: console statement removed: console.log('✅ Session stored in localStorage:', sessionToken.substring(0, 8) + '...')
     } catch (error) {
-      // SECURITY: Removed console.error('❌ Failed to store session in localStorage:', error)
+      // SECURITY: console statement removed: console.error('❌ Failed to store session in localStorage:', error)
     }
   }
 
@@ -98,10 +98,10 @@ class SessionStorage {
         return null
       }
       
-      // SECURITY: Removed // SECURITY: Removed console.log('✅ Session retrieved from localStorage:', sessionToken.substring(0, 8) + '...')
+      // SECURITY: console statement removed: console.log('✅ Session retrieved from localStorage:', sessionToken.substring(0, 8) + '...')
       return sessionData
     } catch (error) {
-      // SECURITY: Removed console.error('❌ Failed to retrieve session from localStorage:', error)
+      // SECURITY: console statement removed: console.error('❌ Failed to retrieve session from localStorage:', error)
       return null
     }
   }
@@ -112,9 +112,9 @@ class SessionStorage {
     try {
       const key = `humber-session-${sessionToken}`
       localStorage.removeItem(key)
-      // SECURITY: Removed // SECURITY: Removed console.log('🗑️ Session deleted from localStorage:', sessionToken.substring(0, 8) + '...')
+      // SECURITY: console statement removed: console.log('🗑️ Session deleted from localStorage:', sessionToken.substring(0, 8) + '...')
     } catch (error) {
-      // SECURITY: Removed console.error('❌ Failed to delete session from localStorage:', error)
+      // SECURITY: console statement removed: console.error('❌ Failed to delete session from localStorage:', error)
     }
   }
 
@@ -132,9 +132,9 @@ class SessionStorage {
       
       // Delete the user sessions list
       localStorage.removeItem(userSessionsKey)
-      // SECURITY: Removed // SECURITY: Removed console.log('🗑️ All sessions deleted for user:', userId)
+      // SECURITY: console statement removed: console.log('🗑️ All sessions deleted for user:', userId)
     } catch (error) {
-      // SECURITY: Removed console.error('❌ Failed to delete user sessions from localStorage:', error)
+      // SECURITY: console statement removed: console.error('❌ Failed to delete user sessions from localStorage:', error)
     }
   }
 
@@ -157,9 +157,9 @@ class SessionStorage {
         throw new Error(`KV storage failed: ${response.statusText}`)
       }
       
-      // SECURITY: Removed // SECURITY: Removed console.log('✅ Session stored in KV store:', sessionToken.substring(0, 8) + '...')
+      // SECURITY: console statement removed: console.log('✅ Session stored in KV store:', sessionToken.substring(0, 8) + '...')
     } catch (error) {
-      // SECURITY: Removed console.error('❌ Failed to store session in KV store:', error)
+      // SECURITY: console statement removed: console.error('❌ Failed to store session in KV store:', error)
       // Fallback to localStorage
       this.setLocalSession(sessionToken, sessionData)
     }
@@ -182,10 +182,10 @@ class SessionStorage {
       }
       
       const sessionData = await response.json()
-      // SECURITY: Removed // SECURITY: Removed console.log('✅ Session retrieved from KV store:', sessionToken.substring(0, 8) + '...')
+      // SECURITY: console statement removed: console.log('✅ Session retrieved from KV store:', sessionToken.substring(0, 8) + '...')
       return sessionData
     } catch (error) {
-      // SECURITY: Removed console.error('❌ Failed to retrieve session from KV store:', error)
+      // SECURITY: console statement removed: console.error('❌ Failed to retrieve session from KV store:', error)
       // Fallback to localStorage
       return this.getLocalSession(sessionToken)
     }
@@ -206,9 +206,9 @@ class SessionStorage {
         throw new Error(`KV deletion failed: ${response.statusText}`)
       }
       
-      // SECURITY: Removed // SECURITY: Removed console.log('🗑️ Session deleted from KV store:', sessionToken.substring(0, 8) + '...')
+      // SECURITY: console statement removed: console.log('🗑️ Session deleted from KV store:', sessionToken.substring(0, 8) + '...')
     } catch (error) {
-      // SECURITY: Removed console.error('❌ Failed to delete session from KV store:', error)
+      // SECURITY: console statement removed: console.error('❌ Failed to delete session from KV store:', error)
       // Fallback to localStorage
       this.deleteLocalSession(sessionToken)
     }
@@ -229,9 +229,9 @@ class SessionStorage {
         throw new Error(`KV user session deletion failed: ${response.statusText}`)
       }
       
-      // SECURITY: Removed // SECURITY: Removed console.log('🗑️ All sessions deleted for user from KV store:', userId)
+      // SECURITY: console statement removed: console.log('🗑️ All sessions deleted for user from KV store:', userId)
     } catch (error) {
-      // SECURITY: Removed console.error('❌ Failed to delete user sessions from KV store:', error)
+      // SECURITY: console statement removed: console.error('❌ Failed to delete user sessions from KV store:', error)
       // Fallback to localStorage
       this.deleteLocalUserSessions(userId)
     }
@@ -252,7 +252,7 @@ class SessionStorage {
               const sessionData = JSON.parse(data)
               if (new Date(sessionData.expires) < new Date()) {
                 localStorage.removeItem(key)
-                // SECURITY: Removed // SECURITY: Removed console.log('🧹 Cleaned expired session:', key)
+                // SECURITY: console statement removed: console.log('🧹 Cleaned expired session:', key)
               }
             }
           } catch (error) {
@@ -261,7 +261,7 @@ class SessionStorage {
           }
         })
       } catch (error) {
-        // SECURITY: Removed console.error('❌ Failed to cleanup expired sessions:', error)
+        // SECURITY: console statement removed: console.error('❌ Failed to cleanup expired sessions:', error)
       }
     }
   }

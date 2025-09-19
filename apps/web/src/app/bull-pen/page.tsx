@@ -363,46 +363,46 @@ const mockExpenses = [
 const mockTimeEntries: EngineerTimeEntry[] = [
   // GM Project Time Entries
   ...Array.from({ length: 50 }, (_, i) => {
-    const engineer = availableEngineers[i % availableEngineers.length]
+    const engineer = availableEngineers[i % availableEngineers.length] || availableEngineers[0]
     return {
       id: `time-gm-${i}`,
-      engineerId: engineer.id,
-      engineerName: engineer.name,
+      engineerId: engineer?.id || 'unknown',
+      engineerName: engineer?.name || 'Unknown Engineer',
       poId: 'po-001',
       projectId: 'proj-001',
       hours: 8 + Math.random() * 4,
       date: new Date(2024, 0, 1 + i * 2).toISOString(),
-      rate: engineer.hourlyRate,
+      rate: engineer?.hourlyRate || 100,
       approved: true
     }
   }),
   // Ford Project Time Entries
   ...Array.from({ length: 80 }, (_, i) => {
-    const engineer = availableEngineers[i % availableEngineers.length]
+    const engineer = availableEngineers[i % availableEngineers.length] || availableEngineers[0]
     return {
       id: `time-ford-${i}`,
-      engineerId: engineer.id,
-      engineerName: engineer.name,
+      engineerId: engineer?.id || 'unknown',
+      engineerName: engineer?.name || 'Unknown Engineer',
       poId: 'po-002',
       projectId: 'proj-002',
       hours: 7 + Math.random() * 5,
       date: new Date(2024, 0, 15 + i).toISOString(),
-      rate: engineer.hourlyRate,
+      rate: engineer?.hourlyRate || 100,
       approved: true
     }
   }),
   // Tesla Project Time Entries (high burn rate)
   ...Array.from({ length: 60 }, (_, i) => {
-    const engineer = availableEngineers[i % availableEngineers.length]
+    const engineer = availableEngineers[i % availableEngineers.length] || availableEngineers[0]
     return {
       id: `time-tesla-${i}`,
-      engineerId: engineer.id,
-      engineerName: engineer.name,
+      engineerId: engineer?.id || 'unknown',
+      engineerName: engineer?.name || 'Unknown Engineer',
       poId: 'po-003',
       projectId: 'proj-003',
       hours: 10 + Math.random() * 4,
       date: new Date(2024, 1, 1 + i).toISOString(),
-      rate: engineer.hourlyRate,
+      rate: engineer?.hourlyRate || 100,
       approved: true
     }
   })
@@ -1338,7 +1338,7 @@ export default function BullPenDashboard() {
                       compact={true}
                       showDetails={false}
                       onAlertClick={(alert) => {
-                        // SECURITY: Removed // SECURITY: Removed console.log('Alert clicked:', alert)
+                        // SECURITY: console statement removed: console.log('Alert clicked:', alert)
                         // Handle alert click - could open modal or navigate to details
                       }}
                     />
@@ -1480,11 +1480,11 @@ export default function BullPenDashboard() {
         }}
         onMessage={(engineer) => {
           // Handle message functionality
-          // SECURITY: Removed // SECURITY: Removed console.log('Message engineer:', engineer.name)
+          // SECURITY: console statement removed: console.log('Message engineer:', engineer.name)
         }}
         onVideoCall={(engineer) => {
           // Handle video call functionality
-          // SECURITY: Removed // SECURITY: Removed console.log('Video call engineer:', engineer.name)
+          // SECURITY: console statement removed: console.log('Video call engineer:', engineer.name)
         }}
         currentProjectPO={selectedEngineer && selectedEngineer.availability === 'On Project' ? 
           mockPurchaseOrders.find(po => 

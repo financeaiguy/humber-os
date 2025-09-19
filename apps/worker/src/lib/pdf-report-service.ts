@@ -489,7 +489,7 @@ class ReportDataService {
       engineer: {
         id: engineerId,
         name: 'John Smith',
-        email: 'john.smith@humber.com',
+        email: 'employee@example.com',
         category: 'Controls',
         hireDate: new Date('2023-01-15'),
         status: 'Active'
@@ -644,7 +644,7 @@ export class PDFReportService {
       };
       
     } catch (error) {
-      // SECURITY: Removed console.error('Report generation failed:', error);
+      // SECURITY: console statement removederror('Report generation failed:', error);
       throw error;
     }
   }

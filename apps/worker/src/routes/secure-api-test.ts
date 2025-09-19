@@ -143,7 +143,7 @@ app.get('/secure-api-test', (c) => {
                 document.getElementById('healthResponse').textContent = data;
             } catch (error) {
                 document.getElementById('healthResponse').style.display = 'block';
-                document.getElementById('healthResponse').textContent = 'Error: ' + error.message;
+                document.getElementById('healthResponse').textContent = 'Error: Request failed';
             }
         }
 
@@ -159,14 +159,14 @@ app.get('/secure-api-test', (c) => {
                 document.getElementById('profileResponse').textContent = data;
             } catch (error) {
                 document.getElementById('profileResponse').style.display = 'block';
-                document.getElementById('profileResponse').textContent = 'Error: ' + error.message;
+                document.getElementById('profileResponse').textContent = 'Error: Request failed';
             }
         }
 
         // Security warning on load
         window.onload = () => {
-            // SECURITY: Removed console.warn('🔒 SECURE API TESTING INTERFACE');
-            // SECURITY: Removed console.warn('All API calls are authenticated and logged for security auditing');
+            // SECURITY: console statement removedwarn('🔒 SECURE API TESTING INTERFACE');
+            // SECURITY: console statement removedwarn('All API calls are authenticated and logged for security auditing');
             
             if (!localStorage.getItem('authToken')) {
                 alert('⚠️ No authentication token found. Please log in first.');

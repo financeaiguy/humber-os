@@ -1,5 +1,4 @@
 {
-  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "ES2017",
     "lib": [
@@ -29,7 +28,13 @@
     "paths": {
       "@/*": [
         "./src/*"
-      ]
+      ],
+      "@humber/database": ["../../packages/database/src"],
+      "@humber/database/*": ["../../packages/database/src/*"],
+      "@humber/types": ["../../packages/types/src"],
+      "@humber/types/*": ["../../packages/types/src/*"],
+      "@humber/utils": ["../../packages/utils/src"],
+      "@humber/utils/*": ["../../packages/utils/src/*"]
     }
   },
   "include": [

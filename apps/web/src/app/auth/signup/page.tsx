@@ -37,12 +37,12 @@ const roles: { value: UserRole; label: string; description: string }[] = [
 
 // Demo accounts for quick testing
 const demoAccounts = [
-  { email: 'admin@humber.com', password: 'admin123', role: 'System Admin', access: 'Full system access' },
-  { email: 'engineer@humber.com', password: 'engineer123', role: 'Engineer', access: 'Team management, approvals' },
-  { email: 'operator@humber.com', password: 'operator123', role: 'Operator', access: 'Operations control' },
-  { email: 'customer@gm.com', password: 'customer123', role: 'Customer (GM)', access: 'Client portal access' },
-  { email: 'partner@ford.com', password: 'partner123', role: 'Partner (Ford)', access: 'Strategic management' },
-  { email: 'employee@humber.com', password: 'employee123', role: 'Employee', access: 'Self-service portal' },
+  { email: 'demo.admin@example.com', password: 'demo123', role: 'System Admin', access: 'Full system access' },
+  { email: 'demo.engineer@example.com', password: 'demo123', role: 'Engineer', access: 'Team management, approvals' },
+  { email: 'demo.operator@example.com', password: 'demo123', role: 'Operator', access: 'Operations control' },
+  { email: 'demo.customer@example.com', password: 'demo123', role: 'Customer (Demo)', access: 'Client portal access' },
+  { email: 'demo.partner@example.com', password: 'demo123', role: 'Partner (Demo)', access: 'Strategic management' },
+  { email: 'demo.employee@example.com', password: 'demo123', role: 'Employee', access: 'Self-service portal' },
 ]
 
 export default function SignUpPage() {
@@ -73,7 +73,7 @@ export default function SignUpPage() {
 
     try {
       // TODO: Implement actual signup API call
-      // // SECURITY: Removed console.log('Sign up data:', formData)
+      // // SECURITY: console statement removed: console.log('Sign up data:', formData)
       
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000))
@@ -90,8 +90,8 @@ export default function SignUpPage() {
       router.push('/auth/signin')
       
     } catch (error) {
-      // SECURITY: Removed // SECURITY: Removed console.error('Signup error:', error)
-      setError(error instanceof Error ? error.message : 'Something went wrong')
+      // SECURITY: console statement removed: console.error('Signup error:', error)
+      setError('Registration failed. Please try again.')
     } finally {
       setLoading(false)
     }

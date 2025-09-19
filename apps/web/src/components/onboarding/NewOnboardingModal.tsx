@@ -129,7 +129,7 @@ export default function NewOnboardingModal({
       
       setRetryCount(0)
     } catch (error) {
-      // SECURITY: Removed console.error('Error fetching recruitment data:', error)
+      // SECURITY: console statement removed: console.error('Error fetching recruitment data:', error)
       
       if (error instanceof ApiNetworkError) {
         setNetworkError(true)
@@ -248,7 +248,7 @@ export default function NewOnboardingModal({
         setOfferDetails({...offerDetails, contractAddress})
       }
     } catch (error) {
-      // SECURITY: Removed console.error('Error generating offer letter:', error)
+      // SECURITY: console statement removed: console.error('Error generating offer letter:', error)
       setApiError('Failed to generate offer letter. Please try again.')
     } finally {
       setIsGenerating(false)
@@ -288,7 +288,7 @@ export default function NewOnboardingModal({
         phase: currentPhase
       })
       
-      // SECURITY: Removed // SECURITY: Removed console.log('Onboarding submission successful:', response)
+      // SECURITY: console statement removed: console.log('Onboarding submission successful:', response)
       setSubmitSuccess(true)
       
       // Close modal after success delay
@@ -298,7 +298,7 @@ export default function NewOnboardingModal({
       }, 2000)
       
     } catch (error) {
-      // SECURITY: Removed console.error('Error submitting onboarding:', error)
+      // SECURITY: console statement removed: console.error('Error submitting onboarding:', error)
       
       if (error instanceof ApiValidationError) {
         // Set field-specific errors
@@ -473,7 +473,7 @@ export default function NewOnboardingModal({
                           value={onboardingData.email}
                           onChange={(e) => handleInputChange('email', e.target.value)}
                           className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:border-blue-500 focus:outline-none"
-                          placeholder="john.smith@email.com"
+                          placeholder="employee@example.com"
                         />
                       </div>
                       <div>

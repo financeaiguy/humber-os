@@ -98,7 +98,7 @@ export default function ProjectActionPanel({
         onUpdateStatus(project.id, 'on_hold')
         break
       default:
-        // SECURITY: Removed // SECURITY: Removed console.log('Action clicked:', actionId)
+        // SECURITY: console statement removed: console.log('Action clicked:', actionId)
     }
   }
 

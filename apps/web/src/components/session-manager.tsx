@@ -18,9 +18,9 @@ export function SessionManager() {
           // Update session to extend it (every 6 hours)
           await update()
           
-          // SECURITY: Removed // SECURITY: Removed console.log('🔄 Session refreshed for:', session.user.email)
+          // SECURITY: console statement removed: console.log('🔄 Session refreshed for:', session.user.email)
         } catch (error) {
-          // SECURITY: Removed console.error('❌ Session refresh failed:', error)
+          // SECURITY: console statement removed: console.error('❌ Session refresh failed:', error)
         }
       }
     }, 6 * 60 * 60 * 1000) // Every 6 hours
@@ -59,10 +59,10 @@ export function useSessionPersistence() {
           sessionToken
         }
         await sessionStorage.setSession(sessionToken, sessionData)
-        // SECURITY: Removed // SECURITY: Removed console.log('✅ Session manually extended')
+        // SECURITY: console statement removed: console.log('✅ Session manually extended')
         return true
       } catch (error) {
-        // SECURITY: Removed console.error('❌ Manual session extension failed:', error)
+        // SECURITY: console statement removed: console.error('❌ Manual session extension failed:', error)
         return false
       }
     }
@@ -74,10 +74,10 @@ export function useSessionPersistence() {
       try {
         await sessionStorage.deleteUserSessions(session.user.id)
         await signOut({ callbackUrl: '/auth/signin' })
-        // SECURITY: Removed // SECURITY: Removed console.log('✅ All sessions cleared')
+        // SECURITY: console statement removed: console.log('✅ All sessions cleared')
         return true
       } catch (error) {
-        // SECURITY: Removed console.error('❌ Session cleanup failed:', error)
+        // SECURITY: console statement removed: console.error('❌ Session cleanup failed:', error)
         return false
       }
     }

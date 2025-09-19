@@ -172,7 +172,7 @@ export function NewCustomerModal({ isOpen, onClose, onSubmit }: NewCustomerModal
         }
       })
     } catch (error) {
-      // SECURITY: Removed console.error('Error creating customer:', error)
+      // SECURITY: console statement removed: console.error('Error creating customer:', error)
       alert('Failed to create customer. Please try again.')
     } finally {
       setIsSubmitting(false)
@@ -300,7 +300,7 @@ export function NewCustomerModal({ isOpen, onClose, onSubmit }: NewCustomerModal
                         value={formData.contact.email}
                         onChange={(e) => handleInputChange('email', e.target.value, 'contact')}
                         className="w-full pl-10 pr-4 py-3 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="email@company.com"
+                        placeholder="email@example.com"
                       />
                     </div>
                   </div>

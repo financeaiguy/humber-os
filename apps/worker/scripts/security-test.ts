@@ -6,7 +6,7 @@ import { promisify } from 'util';
 const execAsync = promisify(exec);
 
 async function testSecurity() {
-  // SECURITY: Removed // SECURITY: Removed console.log('🛡️  HUMBER OS SECURITY TESTING SUITE\n');
+  // SECURITY: console statement removedlog('🛡️  HUMBER OS SECURITY TESTING SUITE\n');
   
   const baseUrl = 'https://humber-operations-worker-dev.evafiai.workers.dev';
   let testsPassed = 0;
@@ -14,17 +14,17 @@ async function testSecurity() {
   
   async function test(name: string, testFn: () => Promise<boolean>) {
     try {
-      // SECURITY: Removed // SECURITY: Removed console.log(`🧪 Testing: ${name}`);
+      // SECURITY: console statement removedlog(`🧪 Testing: ${name}`);
       const result = await testFn();
       if (result) {
-        // SECURITY: Removed // SECURITY: Removed console.log(`   ✅ PASSED\n`);
+        // SECURITY: console statement removedlog(`   ✅ PASSED\n`);
         testsPassed++;
       } else {
-        // SECURITY: Removed // SECURITY: Removed console.log(`   ❌ FAILED\n`);
+        // SECURITY: console statement removedlog(`   ❌ FAILED\n`);
         testsFailed++;
       }
     } catch (error) {
-      // SECURITY: Removed // SECURITY: Removed console.log(`   💥 ERROR: ${error}\n`);
+      // SECURITY: console statement removedlog(`   💥 ERROR: ${error}\n`);
       testsFailed++;
     }
   }
@@ -97,55 +97,55 @@ async function testSecurity() {
     return response.error && response.requestId; // Should fail validation but return proper error
   });
   
-  // SECURITY: Removed // SECURITY: Removed console.log('\n' + '='.repeat(60));
-  // SECURITY: Removed // SECURITY: Removed console.log('🎯 SECURITY TEST RESULTS');
-  // SECURITY: Removed // SECURITY: Removed console.log('='.repeat(60));
-  // SECURITY: Removed // SECURITY: Removed console.log(`✅ Tests Passed: ${testsPassed}`);
-  // SECURITY: Removed // SECURITY: Removed console.log(`❌ Tests Failed: ${testsFailed}`);
-  // SECURITY: Removed // SECURITY: Removed console.log(`📊 Success Rate: ${((testsPassed / (testsPassed + testsFailed)) * 100).toFixed(1)}%`);
+  // SECURITY: console statement removedlog('\n' + '='.repeat(60));
+  // SECURITY: console statement removedlog('🎯 SECURITY TEST RESULTS');
+  // SECURITY: console statement removedlog('='.repeat(60));
+  // SECURITY: console statement removedlog(`✅ Tests Passed: ${testsPassed}`);
+  // SECURITY: console statement removedlog(`❌ Tests Failed: ${testsFailed}`);
+  // SECURITY: console statement removedlog(`📊 Success Rate: ${((testsPassed / (testsPassed + testsFailed)) * 100).toFixed(1)}%`);
   
   if (testsFailed === 0) {
-    // SECURITY: Removed // SECURITY: Removed console.log('\n🎉 ALL SECURITY TESTS PASSED!');
-    // SECURITY: Removed // SECURITY: Removed console.log('🛡️  Your Humber OS API has robust security controls!');
+    // SECURITY: console statement removedlog('\n🎉 ALL SECURITY TESTS PASSED!');
+    // SECURITY: console statement removedlog('🛡️  Your Humber OS API has robust security controls!');
   } else {
-    // SECURITY: Removed // SECURITY: Removed console.log('\n⚠️  Some security tests failed. Please review and fix.');
+    // SECURITY: console statement removedlog('\n⚠️  Some security tests failed. Please review and fix.');
   }
   
-  // SECURITY: Removed // SECURITY: Removed console.log('\n🔐 SECURITY FEATURES VERIFIED:');
-  // SECURITY: Removed // SECURITY: Removed console.log('• ✅ Authentication enforcement on protected routes');
-  // SECURITY: Removed // SECURITY: Removed console.log('• ✅ Health endpoint publicly accessible');
-  // SECURITY: Removed // SECURITY: Removed console.log('• ✅ Security headers implementation');
-  // SECURITY: Removed // SECURITY: Removed console.log('• ✅ CORS configuration');
-  // SECURITY: Removed // SECURITY: Removed console.log('• ✅ Request tracking with unique IDs');
-  // SECURITY: Removed // SECURITY: Removed console.log('• ✅ Rate limiting protection');
-  // SECURITY: Removed // SECURITY: Removed console.log('• ✅ Error response sanitization');
-  // SECURITY: Removed // SECURITY: Removed console.log('• ✅ Authentication endpoint availability');
+  // SECURITY: console statement removedlog('\n🔐 SECURITY FEATURES VERIFIED:');
+  // SECURITY: console statement removedlog('• ✅ Authentication enforcement on protected routes');
+  // SECURITY: console statement removedlog('• ✅ Health endpoint publicly accessible');
+  // SECURITY: console statement removedlog('• ✅ Security headers implementation');
+  // SECURITY: console statement removedlog('• ✅ CORS configuration');
+  // SECURITY: console statement removedlog('• ✅ Request tracking with unique IDs');
+  // SECURITY: console statement removedlog('• ✅ Rate limiting protection');
+  // SECURITY: console statement removedlog('• ✅ Error response sanitization');
+  // SECURITY: console statement removedlog('• ✅ Authentication endpoint availability');
   
-  // SECURITY: Removed // SECURITY: Removed console.log('\n🛡️  SECURITY ARCHITECTURE SUMMARY:');
-  // SECURITY: Removed // SECURITY: Removed console.log('🔹 JWT-based authentication with token blacklisting');
-  // SECURITY: Removed // SECURITY: Removed console.log('🔹 Role-based access control (RBAC)');
-  // SECURITY: Removed // SECURITY: Removed console.log('🔹 Multi-tenant database isolation');
-  // SECURITY: Removed // SECURITY: Removed console.log('🔹 Rate limiting with IP tracking');
-  // SECURITY: Removed // SECURITY: Removed console.log('🔹 Comprehensive audit logging');
-  // SECURITY: Removed // SECURITY: Removed console.log('🔹 API key authentication for service accounts');
-  // SECURITY: Removed // SECURITY: Removed console.log('🔹 Session management with secure storage');
-  // SECURITY: Removed // SECURITY: Removed console.log('🔹 Input validation and sanitization');
-  // SECURITY: Removed // SECURITY: Removed console.log('🔹 Security headers protection');
-  // SECURITY: Removed // SECURITY: Removed console.log('🔹 CORS policy enforcement');
+  // SECURITY: console statement removedlog('\n🛡️  SECURITY ARCHITECTURE SUMMARY:');
+  // SECURITY: console statement removedlog('🔹 JWT-based authentication with token blacklisting');
+  // SECURITY: console statement removedlog('🔹 Role-based access control (RBAC)');
+  // SECURITY: console statement removedlog('🔹 Multi-tenant database isolation');
+  // SECURITY: console statement removedlog('🔹 Rate limiting with IP tracking');
+  // SECURITY: console statement removedlog('🔹 Comprehensive audit logging');
+  // SECURITY: console statement removedlog('🔹 API key authentication for service accounts');
+  // SECURITY: console statement removedlog('🔹 Session management with secure storage');
+  // SECURITY: console statement removedlog('🔹 Input validation and sanitization');
+  // SECURITY: console statement removedlog('🔹 Security headers protection');
+  // SECURITY: console statement removedlog('🔹 CORS policy enforcement');
   
-  // SECURITY: Removed // SECURITY: Removed console.log('\n📋 PRODUCTION SECURITY CHECKLIST:');
-  // SECURITY: Removed // SECURITY: Removed console.log('🔸 ✅ Change default JWT secrets');
-  // SECURITY: Removed // SECURITY: Removed console.log('🔸 ✅ Enable proper password hashing (bcrypt)');
-  // SECURITY: Removed // SECURITY: Removed console.log('🔸 ✅ Configure MFA for admin accounts');
-  // SECURITY: Removed // SECURITY: Removed console.log('🔸 ✅ Set up security monitoring alerts');
-  // SECURITY: Removed // SECURITY: Removed console.log('🔸 ✅ Implement key rotation policies');
-  // SECURITY: Removed // SECURITY: Removed console.log('🔸 ✅ Configure backup and disaster recovery');
-  // SECURITY: Removed // SECURITY: Removed console.log('🔸 ✅ Set up automated security scanning');
-  // SECURITY: Removed // SECURITY: Removed console.log('🔸 ✅ Monitor rate limiting and audit logs');
+  // SECURITY: console statement removedlog('\n📋 PRODUCTION SECURITY CHECKLIST:');
+  // SECURITY: console statement removedlog('🔸 ✅ Change default JWT secrets');
+  // SECURITY: console statement removedlog('🔸 ✅ Enable proper password hashing (bcrypt)');
+  // SECURITY: console statement removedlog('🔸 ✅ Configure MFA for admin accounts');
+  // SECURITY: console statement removedlog('🔸 ✅ Set up security monitoring alerts');
+  // SECURITY: console statement removedlog('🔸 ✅ Implement key rotation policies');
+  // SECURITY: console statement removedlog('🔸 ✅ Configure backup and disaster recovery');
+  // SECURITY: console statement removedlog('🔸 ✅ Set up automated security scanning');
+  // SECURITY: console statement removedlog('🔸 ✅ Monitor rate limiting and audit logs');
 }
 
 // Run the security tests
-main().catch(// SECURITY: Removed console.error);
+main().catch(// SECURITY: console statement removederror);
 
 async function main() {
   await testSecurity();

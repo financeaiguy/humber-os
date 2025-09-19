@@ -4,6 +4,14 @@
  * across all platform features and integrations.
  */
 
+import { logger } from './logger'
+import { knowledgeCache, modelCache, memoryMonitor } from './memory-manager'
+import { d1Client } from './db/d1-client'
+import { r2Client } from './storage/r2-client'
+import { kvCache, sessionCache, modelCache as kvModelCache } from './cache/kv-client'
+import type { TenantContext } from './db/d1-client'
+import * as crypto from 'crypto'
+
 interface KnowledgeNode {
   id: string
   type: 'document' | 'interaction' | 'process' | 'insight' | 'pattern' | 'prediction'
@@ -75,6 +83,7 @@ class KnowledgeNervousSystem {
   private learningQueue: Array<{ data: any; context: LearningContext; priority: number }> = []
   private contextCache: Map<string, any> = new Map()
   private subscribers: Map<string, Array<(data: any) => void>> = new Map()
+  private tenantContext: TenantContext | null = null
   private modelUsageStats: Map<string, {
     totalRequests: number
     successRate: number
@@ -100,6 +109,20 @@ class KnowledgeNervousSystem {
     this.startLearningProcessor()
     this.initializeKnowledgeGraph()
     this.startModelMonitoring()
+  }
+
+  // Set tenant context for multi-tenant isolation
+  setTenantContext(context: TenantContext) {
+    this.tenantContext = context
+    d1Client.setTenantContext(context)
+    r2Client.setTenant(context.tenantId)
+    kvCache.setTenant(context.tenantId)
+    sessionCache.setTenant(context.tenantId)
+    kvModelCache.setTenant(context.tenantId)
+    logger.info('Tenant context set for knowledge nervous system', {
+      tenantId: context.tenantId,
+      component: 'knowledge-nervous-system'
+    })
   }
 
   private initializeDefaultModels() {
@@ -201,8 +224,58 @@ class KnowledgeNervousSystem {
     })
   }
 
-  private initializeKnowledgeGraph() {
-    // Seed with initial knowledge nodes from platform data
+  private async initializeKnowledgeGraph() {
+    if (!this.tenantContext) {
+      logger.warn('No tenant context set during knowledge graph initialization', {
+        component: 'knowledge-nervous-system'
+      })
+      return
+    }
+
+    try {
+      // Load existing knowledge nodes from D1
+      const existingNodes = await d1Client.getKnowledgeGraph(100)
+      
+      for (const dbNode of existingNodes) {
+        const node: KnowledgeNode = {
+          id: dbNode.id,
+          type: dbNode.type as KnowledgeNode['type'],
+          content: dbNode.content,
+          relationships: dbNode.relationships || [],
+          metadata: {
+            source: dbNode.source,
+            timestamp: dbNode.created_at,
+            confidence: dbNode.confidence || 0.8,
+            relevanceScore: dbNode.relevance_score || 0.7,
+            accessCount: dbNode.access_count || 0,
+            lastAccessed: dbNode.last_accessed || dbNode.created_at,
+            tags: dbNode.tags || [],
+            importance: (dbNode.importance as KnowledgeNode['metadata']['importance']) || 'medium'
+          },
+          aiAnalysis: dbNode.ai_analysis
+        }
+        this.knowledgeGraph.set(node.id, node)
+      }
+
+      logger.info('Knowledge graph loaded from D1', {
+        nodeCount: existingNodes.length,
+        component: 'knowledge-nervous-system'
+      })
+
+      // If no existing nodes, seed with defaults
+      if (existingNodes.length === 0) {
+        await this.seedDefaultNodes()
+      }
+    } catch (error) {
+      logger.error('Failed to initialize knowledge graph from D1', error as Error, {
+        component: 'knowledge-nervous-system'
+      })
+      // Fall back to in-memory defaults
+      await this.seedDefaultNodes()
+    }
+  }
+
+  private async seedDefaultNodes() {
     const seedNodes: KnowledgeNode[] = [
       {
         id: 'safety-protocols-core',
@@ -253,9 +326,11 @@ class KnowledgeNervousSystem {
       }
     ]
 
-    seedNodes.forEach(node => {
+    for (const node of seedNodes) {
       this.knowledgeGraph.set(node.id, node)
-    })
+      // Persist to D1
+      await this.persistNodeToD1(node)
+    }
   }
 
   // Core Learning Functions
@@ -276,8 +351,44 @@ class KnowledgeNervousSystem {
   }
 
   async learnFromDocument(document: any, context: LearningContext) {
+    const nodeId = `doc-${document.id || Date.now()}`
+    
+    // Check if document has file content to upload to R2
+    if (document.fileContent) {
+      try {
+        const uploadResult = await r2Client.uploadDocument({
+          id: nodeId,
+          filename: document.filename || 'document.pdf',
+          content: document.fileContent,
+          contentType: document.contentType || 'application/pdf',
+          metadata: {
+            uploadedBy: context.userId || 'system',
+            feature: context.currentFeature,
+            tags: document.tags?.join(',') || ''
+          },
+          extractedText: document.extractedText,
+          aiAnalysis: await this.analyzeContent(document)
+        })
+
+        logger.info('Document uploaded to R2', {
+          documentId: nodeId,
+          r2Key: uploadResult.r2Key,
+          component: 'knowledge-nervous-system'
+        })
+
+        // Update document with R2 reference
+        document.r2Key = uploadResult.r2Key
+        document.r2Url = uploadResult.url
+      } catch (error) {
+        logger.error('Failed to upload document to R2', error as Error, {
+          documentId: nodeId,
+          component: 'knowledge-nervous-system'
+        })
+      }
+    }
+
     const node: KnowledgeNode = {
-      id: `doc-${document.id || Date.now()}`,
+      id: nodeId,
       type: 'document',
       content: document,
       relationships: [],
@@ -299,7 +410,15 @@ class KnowledgeNervousSystem {
     // Find relationships with existing nodes
     node.relationships = await this.findRelationships(node)
 
+    // Persist to D1
+    await this.persistNodeToD1(node)
+
+    // Add to in-memory graph
     this.knowledgeGraph.set(node.id, node)
+    
+    // Cache in KV for quick access
+    await kvCache.set(`knowledge:node:${node.id}`, node, { ttl: 3600 })
+
     this.notifySubscribers('knowledge-updated', { nodeId: node.id, type: 'document-added' })
   }
 
@@ -331,9 +450,37 @@ class KnowledgeNervousSystem {
 
   // AI Model Management
   async queryAI(prompt: string, context: LearningContext, modelPreference?: string): Promise<any> {
+    // Check KV cache first (distributed)
+    const kvCached = await kvModelCache.getCachedResponse(modelPreference || 'auto', prompt)
+    
+    if (kvCached) {
+      logger.debug('KV cache hit for AI query', {
+        component: 'knowledge-nervous-system'
+      })
+      return kvCached
+    }
+
+    // Check local memory cache
+    const cacheKey = modelCache.generateKey(modelPreference || 'auto', prompt, context)
+    const cachedResponse = modelCache.get(cacheKey)
+    
+    if (cachedResponse) {
+      logger.debug('Memory cache hit for AI query', { 
+        cacheKey,
+        component: 'knowledge-nervous-system'
+      })
+      // Also store in KV cache for other instances
+      await kvModelCache.cacheModelResponse(modelPreference || 'auto', prompt, cachedResponse)
+      return cachedResponse
+    }
+    
     const bestModel = await this.selectOptimalModel(prompt, context, modelPreference)
     
     if (!bestModel) {
+      logger.error('No suitable AI model available', undefined, {
+        component: 'knowledge-nervous-system',
+        prompt: prompt.substring(0, 100)
+      })
       throw new Error('No suitable AI model available')
     }
 
@@ -341,6 +488,10 @@ class KnowledgeNervousSystem {
     
     try {
       const response = await this.callModel(bestModel, enrichedPrompt, context)
+      
+      // Cache the response in both memory and KV
+      modelCache.set(cacheKey, response, 300000) // 5 minute TTL
+      await kvModelCache.cacheModelResponse(bestModel.id, enrichedPrompt, response, 300)
       
       // Learn from the interaction
       await this.learnFromInteraction({
@@ -352,10 +503,15 @@ class KnowledgeNervousSystem {
 
       return response
     } catch (error) {
+      logger.error('AI query failed', error as Error, {
+        component: 'knowledge-nervous-system',
+        model: bestModel.id
+      })
+      
       // Learn from failures too
       await this.learnFromInteraction({
         prompt: enrichedPrompt,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: 'An error occurred',
         modelUsed: bestModel.id,
         success: false
       }, context, 8)
@@ -456,6 +612,64 @@ User query: ${prompt}`
 
   // Knowledge Graph Operations
   private async findRelevantNodes(query: string, context: LearningContext, limit: number = 10): Promise<KnowledgeNode[]> {
+    // First try to search in D1 using full-text search
+    if (query && query.length > 2) {
+      try {
+        const searchResults = await d1Client.searchKnowledgeNodes(query, limit * 2)
+        
+        if (searchResults.length > 0) {
+          const nodes: KnowledgeNode[] = []
+          for (const result of searchResults) {
+            // Check if node is in memory cache
+            let node = this.knowledgeGraph.get(result.id)
+            
+            if (!node) {
+              // Try to get from KV cache
+              node = await kvCache.get<KnowledgeNode>(`knowledge:node:${result.id}`)
+              
+              if (!node) {
+                // Reconstruct from D1 result
+                node = {
+                  id: result.id,
+                  type: result.type as KnowledgeNode['type'],
+                  content: result.content,
+                  relationships: result.relationships || [],
+                  metadata: {
+                    source: result.source,
+                    timestamp: result.created_at,
+                    confidence: result.confidence || 0.8,
+                    relevanceScore: result.relevance_score || 0.7,
+                    accessCount: result.access_count || 0,
+                    lastAccessed: result.last_accessed || result.created_at,
+                    tags: result.tags || [],
+                    importance: (result.importance as KnowledgeNode['metadata']['importance']) || 'medium'
+                  },
+                  aiAnalysis: result.ai_analysis
+                }
+                // Cache for next time
+                this.knowledgeGraph.set(node.id, node)
+                await kvCache.set(`knowledge:node:${node.id}`, node, { ttl: 3600 })
+              }
+            }
+            nodes.push(node)
+          }
+          
+          logger.debug('Found relevant nodes from D1 search', {
+            query,
+            resultCount: nodes.length,
+            component: 'knowledge-nervous-system'
+          })
+          
+          return nodes.slice(0, limit)
+        }
+      } catch (error) {
+        logger.error('D1 search failed, falling back to in-memory search', error as Error, {
+          component: 'knowledge-nervous-system'
+        })
+      }
+    }
+
+    // Fallback to in-memory search
     const nodes = Array.from(this.knowledgeGraph.values())
     
     // Simple relevance scoring (would use vector embeddings in production)
@@ -599,7 +813,9 @@ User query: ${prompt}`
       try {
         await this.processLearningItem(item)
       } catch (error) {
-        // SECURITY: Removed console.error('Learning processing error:', error)
+        logger.error('Learning processing error', error as Error, {
+          component: 'knowledge-nervous-system'
+        })
       }
     }
   }
@@ -644,6 +860,18 @@ User query: ${prompt}`
       }
     }
 
+    // Persist to D1
+    await this.persistNodeToD1(insight)
+    
+    // Add to learning queue in D1
+    await d1Client.addToLearningQueue({
+      type: 'interaction',
+      data,
+      context,
+      priority: 5,
+      status: 'processed'
+    })
+
     this.knowledgeGraph.set(insight.id, insight)
   }
 
@@ -653,6 +881,38 @@ User query: ${prompt}`
 
   private async processProcessLearning(data: any, context: LearningContext) {
     // Already handled in learnFromProcess
+  }
+
+  // Helper method to persist node to D1
+  private async persistNodeToD1(node: KnowledgeNode) {
+    try {
+      await d1Client.addKnowledgeNode({
+        id: node.id,
+        type: node.type,
+        content: node.content,
+        relationships: node.relationships,
+        source: node.metadata.source,
+        confidence: node.metadata.confidence,
+        relevance_score: node.metadata.relevanceScore,
+        access_count: node.metadata.accessCount,
+        last_accessed: node.metadata.lastAccessed,
+        tags: node.metadata.tags,
+        importance: node.metadata.importance,
+        ai_analysis: node.aiAnalysis,
+        embeddings: null // Would be generated by AI model
+      })
+      
+      logger.debug('Knowledge node persisted to D1', {
+        nodeId: node.id,
+        type: node.type,
+        component: 'knowledge-nervous-system'
+      })
+    } catch (error) {
+      logger.error('Failed to persist knowledge node to D1', error as Error, {
+        nodeId: node.id,
+        component: 'knowledge-nervous-system'
+      })
+    }
   }
 
   // Content Analysis
@@ -773,7 +1033,10 @@ User query: ${prompt}`
       try {
         callback(data)
       } catch (error) {
-        // SECURITY: Removed console.error('Subscriber callback error:', error)
+        logger.error('Subscriber callback error', error as Error, {
+          event,
+          component: 'knowledge-nervous-system'
+        })
       }
     })
   }
@@ -915,7 +1178,10 @@ User query: ${prompt}`
 
       this.modelUsageStats.set(modelId, stats)
     } catch (error) {
-      // SECURITY: Removed console.error(`Failed to update metrics for model ${modelId}:`, error)
+      logger.error('Failed to update model metrics', error as Error, {
+        modelId,
+        component: 'knowledge-nervous-system'
+      })
     }
   }
 

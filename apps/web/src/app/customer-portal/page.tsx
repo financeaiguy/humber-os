@@ -52,7 +52,7 @@ export default function CustomerPortalPage() {
         setError(data.error || 'Session validation failed')
       }
     } catch (error) {
-      // SECURITY: Removed console.error('Session validation error:', error)
+      // SECURITY: console statement removed: console.error('Session validation error:', error)
       setError('Failed to validate session')
     } finally {
       setLoading(false)
@@ -71,7 +71,7 @@ export default function CustomerPortalPage() {
           projectName: 'GM Assembly Line Automation',
           clientId: 'client-gm',
           clientName: 'General Motors',
-          clientEmail: 'customer@gm.com',
+          clientEmail: 'customer@example.com',
           status: 'sent',
           type: 'project_milestone',
           description: 'First milestone - Electrical system design and implementation',
@@ -125,7 +125,7 @@ export default function CustomerPortalPage() {
           projectName: 'GM Assembly Line Automation',
           clientId: 'client-gm',
           clientName: 'General Motors',
-          clientEmail: 'customer@gm.com',
+          clientEmail: 'customer@example.com',
           status: 'paid',
           type: 'hourly_billing',
           description: 'Monthly billing - October 2024',
@@ -169,7 +169,7 @@ export default function CustomerPortalPage() {
       
       setInvoices(mockInvoices)
     } catch (error) {
-      // SECURITY: Removed console.error('Error fetching invoices:', error)
+      // SECURITY: console statement removed: console.error('Error fetching invoices:', error)
     }
   }
 
@@ -202,7 +202,7 @@ export default function CustomerPortalPage() {
         alert('Failed to create payment: ' + data.error)
       }
     } catch (error) {
-      // SECURITY: Removed console.error('Payment initiation error:', error)
+      // SECURITY: console statement removed: console.error('Payment initiation error:', error)
       alert('Failed to initiate payment')
     }
   }

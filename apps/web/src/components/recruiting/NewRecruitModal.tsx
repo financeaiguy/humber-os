@@ -169,7 +169,7 @@ export default function NewRecruitModal({ isOpen, onClose, onRecruitAdded }: New
     try {
       const response = await recruitsApi.submitRecruit(recruitData)
       
-      // SECURITY: Removed // SECURITY: Removed console.log('Recruit submission successful:', response)
+      // SECURITY: console statement removed: console.log('Recruit submission successful:', response)
       setSubmitSuccess(true)
       
       // Close modal after success
@@ -184,7 +184,7 @@ export default function NewRecruitModal({ isOpen, onClose, onRecruitAdded }: New
       }, 2000)
       
     } catch (error) {
-      // SECURITY: Removed console.error('Error submitting recruit:', error)
+      // SECURITY: console statement removed: console.error('Error submitting recruit:', error)
       
       if (error instanceof ApiValidationError) {
         // Set field-specific errors

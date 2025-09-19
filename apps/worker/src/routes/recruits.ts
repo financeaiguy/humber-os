@@ -721,7 +721,7 @@ async function createAuditTrail(db: D1Database, data: {
     ).run();
   } catch (error) {
     // If table doesn't exist, just log it
-    // SECURITY: Removed console.log('Audit trail table not yet created, skipping audit log');
+    // SECURITY: console statement removedlog('Audit trail table not yet created, skipping audit log');
   }
 }
 
@@ -856,11 +856,11 @@ recruitsRouter.post('/:id/anonymize', async (c) => {
     });
     
   } catch (error) {
-    logger.error('Failed to anonymize recruit data', { error: error.message, recruitId });
+    logger.error('Failed to anonymize recruit data', { error: 'Anonymization failed', recruitId });
     return c.json({
       success: false,
       error: 'Failed to anonymize data',
-      message: error.message || 'Unknown error',
+      message: 'Anonymization failed',
       gdprCompliance: {
         compliant: false,
         requiresManualIntervention: true,

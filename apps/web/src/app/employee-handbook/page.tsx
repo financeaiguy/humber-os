@@ -195,9 +195,9 @@ export default function EmployeeHandbookPage() {
                     <h4 className="font-semibold text-white mb-2">Immediate Dangers</h4>
                     <ul className="text-red-200 text-sm space-y-1">
                       <li>• <strong>Safety Emergencies:</strong> Call 911 first, then notify supervisor</li>
-                      <li>• <strong>Security Breaches:</strong> security@humberops.com (24/7)</li>
+                      <li>• <strong>Security Breaches:</strong> security@example.com (24/7)</li>
                       <li>• <strong>Violence/Threats:</strong> Call 911 and HR immediately</li>
-                      <li>• <strong>Data Breaches:</strong> privacy@humberops.com within 1 hour</li>
+                      <li>• <strong>Data Breaches:</strong> privacy@example.com within 1 hour</li>
                     </ul>
                   </div>
                   
@@ -206,8 +206,8 @@ export default function EmployeeHandbookPage() {
                     <ul className="text-red-200 text-sm space-y-1">
                       <li>• <strong>Emergency Line:</strong> 1-800-HUMBER-1</li>
                       <li>• <strong>Anonymous Tip Line:</strong> 1-800-ETHICS-1</li>
-                      <li>• <strong>HR After Hours:</strong> hr-emergency@humberops.com</li>
-                      <li>• <strong>Legal Emergencies:</strong> legal-emergency@humberops.com</li>
+                      <li>• <strong>HR After Hours:</strong> hr-emergency@example.com</li>
+                      <li>• <strong>Legal Emergencies:</strong> legal-emergency@example.com</li>
                     </ul>
                   </div>
                 </div>
@@ -219,9 +219,9 @@ export default function EmployeeHandbookPage() {
                   <div>
                     <h4 className="font-semibold text-white mb-2">HR Issues</h4>
                     <ul className="text-yellow-200 text-sm space-y-1">
-                      <li>• <strong>Workplace Conflicts:</strong> hr@humberops.com</li>
-                      <li>• <strong>Benefits Questions:</strong> benefits@humberops.com</li>
-                      <li>• <strong>Payroll Issues:</strong> payroll@humberops.com</li>
+                      <li>• <strong>Workplace Conflicts:</strong> hr@example.com</li>
+                      <li>• <strong>Benefits Questions:</strong> benefits@example.com</li>
+                      <li>• <strong>Payroll Issues:</strong> payroll@example.com</li>
                       <li>• <strong>Performance Concerns:</strong> Direct supervisor first</li>
                     </ul>
                   </div>
@@ -229,10 +229,10 @@ export default function EmployeeHandbookPage() {
                   <div>
                     <h4 className="font-semibold text-white mb-2">Technical Support</h4>
                     <ul className="text-yellow-200 text-sm space-y-1">
-                      <li>• <strong>App Issues:</strong> support@humberops.com</li>
-                      <li>• <strong>Biometric Problems:</strong> biometric@humberops.com</li>
-                      <li>• <strong>System Access:</strong> it-support@humberops.com</li>
-                      <li>• <strong>Training Requests:</strong> training@humberops.com</li>
+                      <li>• <strong>App Issues:</strong> support@example.com</li>
+                      <li>• <strong>Biometric Problems:</strong> biometric@example.com</li>
+                      <li>• <strong>System Access:</strong> it-support@example.com</li>
+                      <li>• <strong>Training Requests:</strong> training@example.com</li>
                     </ul>
                   </div>
                 </div>

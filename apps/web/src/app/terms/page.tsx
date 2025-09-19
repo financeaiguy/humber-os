@@ -374,7 +374,7 @@ export default function TermsOfServicePage() {
                   <h3 className="font-semibold text-white mb-2">🤝 Dispute Resolution</h3>
                   <p className="text-slate-300 text-sm">
                     We prefer to resolve disputes through direct communication. For formal disputes:
-                    1) Contact legal@humberops.com, 2) 30-day good faith negotiation period, 
+                    1) Contact legal@example.com, 2) 30-day good faith negotiation period, 
                     3) Binding arbitration if needed, 4) Court proceedings as last resort.
                   </p>
                 </div>
@@ -390,7 +390,7 @@ export default function TermsOfServicePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-blue-300 font-semibold mb-2">Legal Department</p>
-                  <p className="text-blue-200">Email: legal@humberops.com</p>
+                  <p className="text-blue-200">Email: legal@example.com</p>
                   <p className="text-blue-200">Phone: 1-800-HUMBER-1</p>
                   <p className="text-blue-200">Response time: 24 hours</p>
                 </div>

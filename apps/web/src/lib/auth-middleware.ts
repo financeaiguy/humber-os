@@ -47,7 +47,7 @@ export async function withAuth<T>(
 
       return handler(authenticatedRequest, context)
     } catch (error) {
-      // SECURITY: Removed console.error('Authentication middleware error:', error)
+      // SECURITY: console statement removed: console.error('Authentication middleware error:', error)
       return NextResponse.json(
         { error: 'Authentication failed', code: 'AUTH_ERROR' },
         { status: 500 }
@@ -193,36 +193,14 @@ export function withAuditLog(action: string) {
         const response = await handler(request, context)
         
         // Log successful operation
-        // SECURITY: Removed // SECURITY: Removed console.log(JSON.stringify({
-          type: 'AUDIT_LOG',
-          timestamp: new Date().toISOString(),
-          action,
-          userId: request.user?.id,
-          userEmail: request.user?.email,
-          userRole: request.user?.role,
-          method: request.method,
-          url: request.url,
-          statusCode: response.status,
-          duration: Date.now() - startTime,
-          ipAddress: request.ip || request.headers.get('x-forwarded-for') || 'unknown'
-        }))
+        // SECURITY: console statement removed
+        // Audit log: type, timestamp, action, userId, userEmail, userRole, method, url, statusCode, duration, ipAddress
         
         return response
       } catch (error) {
         // Log failed operation
-        // SECURITY: Removed console.error(JSON.stringify({
-          type: 'AUDIT_LOG_ERROR',
-          timestamp: new Date().toISOString(),
-          action,
-          userId: request.user?.id,
-          userEmail: request.user?.email,
-          userRole: request.user?.role,
-          method: request.method,
-          url: request.url,
-          error: error instanceof Error ? error.message : 'Unknown error',
-          duration: Date.now() - startTime,
-          ipAddress: request.ip || request.headers.get('x-forwarded-for') || 'unknown'
-        }))
+        // SECURITY: console statement removed
+        // Audit log error: type, timestamp, action, userId, userEmail, userRole, method, url, error, duration, ipAddress
         
         throw error
       }

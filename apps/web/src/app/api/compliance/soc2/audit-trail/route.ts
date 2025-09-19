@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
       message: 'SOC2 audit trail retrieved successfully'
     })
   } catch (error) {
-    // SECURITY: Removed console.error('SOC2 audit trail error:', error)
+    // SECURITY: console statement removed: console.error('SOC2 audit trail error:', error)
     return NextResponse.json(
       { error: 'Failed to retrieve SOC2 audit trail' },
       { status: 500 }

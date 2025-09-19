@@ -123,7 +123,7 @@ export class AIChatService {
         usage: response.usage
       }
     } catch (error) {
-      // SECURITY: Removed console.error('AI Chat Service error:', error)
+      // SECURITY: console statement removederror('AI Chat Service error:', error)
       
       // Fallback response
       return {
@@ -215,7 +215,7 @@ export class AIChatService {
         usage: response.usage
       }
     } catch (error) {
-      // SECURITY: Removed console.error('Model generation error:', error)
+      // SECURITY: console statement removederror('Model generation error:', error)
       throw error
     }
   }
@@ -244,7 +244,7 @@ export class AIChatService {
       
       return []
     } catch (error) {
-      // SECURITY: Removed console.error('Document retrieval error:', error)
+      // SECURITY: console statement removederror('Document retrieval error:', error)
       return []
     }
   }
@@ -257,7 +257,7 @@ export class AIChatService {
       
       return response.data[0]
     } catch (error) {
-      // SECURITY: Removed console.error('Embedding generation error:', error)
+      // SECURITY: console statement removederror('Embedding generation error:', error)
       // Return zero vector as fallback
       return new Array(this.MODELS.embeddings.dimensions).fill(0)
     }

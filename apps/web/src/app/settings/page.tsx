@@ -108,7 +108,7 @@ export default function SettingsPage() {
                       type="button"
                       onClick={(e) => {
                         e.preventDefault()
-                        // // SECURITY: Removed console.log('Change avatar')
+                        // // SECURITY: console statement removed: console.log('Change avatar')
                       }}
                       className="absolute bottom-0 right-0 h-8 w-8 bg-slate-700 rounded-full flex items-center justify-center hover:bg-slate-600 transition-colors">
                       <Camera className="h-4 w-4 text-white" />
@@ -197,7 +197,7 @@ export default function SettingsPage() {
                     onClick={(e) => {
                       e.preventDefault()
                       // TODO: Implement save functionality
-                      // // SECURITY: Removed console.log('Saving changes...')
+                      // // SECURITY: console statement removed: console.log('Saving changes...')
                     }}
                     type="button"
                     className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg font-medium hover:from-blue-600 hover:to-purple-600 transition-all duration-300 flex items-center space-x-2">
@@ -290,7 +290,7 @@ export default function SettingsPage() {
                         type="button"
                         onClick={(e) => {
                           e.preventDefault()
-                          // // SECURITY: Removed console.log('Update password')
+                          // // SECURITY: console statement removed: console.log('Update password')
                         }}
                         className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
                         Update Password
@@ -308,7 +308,7 @@ export default function SettingsPage() {
                       type="button"
                       onClick={(e) => {
                         e.preventDefault()
-                        // // SECURITY: Removed console.log('Enable 2FA')
+                        // // SECURITY: console statement removed: console.log('Enable 2FA')
                       }}
                       className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
                       Enable 2FA

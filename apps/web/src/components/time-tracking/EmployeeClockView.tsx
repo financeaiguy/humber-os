@@ -75,22 +75,14 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
     }
   }, [isClockedIn, clockInTime])
 
-  // Get user location
+  // Don't automatically request location on mount - wait for user action
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-            accuracy: position.coords.accuracy
-          })
-        },
-        (error) => {
-          setLocationError(error.message)
-        },
-        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-      )
+    // Check if geolocation is available but don't request it yet
+    if (!navigator.geolocation) {
+      setLocationError('Geolocation not supported')
+    } else {
+      // Just mark that location is available but not yet requested
+      console.log('Geolocation available, will request when needed')
     }
   }, [])
 
@@ -158,11 +150,11 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
             
             if (assertion) {
               setBiometricVerified(true)
-              // SECURITY: Removed // SECURITY: Removed console.log('Biometric authentication successful')
+              // SECURITY: console statement removed: console.log('Biometric authentication successful')
               return true
             }
           } catch (getError) {
-            // SECURITY: Removed // SECURITY: Removed console.log('No existing credentials, attempting registration')
+            // SECURITY: console statement removed: console.log('No existing credentials, attempting registration')
             
             // If no existing credentials, try to create new ones (registration)
             const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions = {
@@ -196,11 +188,11 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
               
               if (credential) {
                 setBiometricVerified(true)
-                // SECURITY: Removed // SECURITY: Removed console.log('Biometric registration and authentication successful')
+                // SECURITY: console statement removed: console.log('Biometric registration and authentication successful')
                 return true
               }
             } catch (createError) {
-              // SECURITY: Removed console.error('Biometric registration failed:', createError)
+              // SECURITY: console statement removed: console.error('Biometric registration failed:', createError)
             }
           }
         }
@@ -244,7 +236,7 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
       
       return false
     } catch (error) {
-      // SECURITY: Removed console.error('Biometric authentication error:', error)
+      // SECURITY: console statement removed: console.error('Biometric authentication error:', error)
       
       // Even errors should require fallback verification
       const proceed = window.confirm(
@@ -265,12 +257,19 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
 
   const handleClockIn = async () => {
     // Step 1: Pre-flight checks
+    console.log('Clock in button clicked')
     setIsClockingIn(true)
-    
+
     try {
-      // Check location first
+      // Check location first (but don't block if it fails)
       if (!location) {
-        await getCurrentLocation()
+        console.log('No location yet, attempting to get current location...')
+        try {
+          await getCurrentLocation()
+        } catch (locationError) {
+          console.log('Location access failed, continuing without location:', locationError)
+          // Continue without location - will be flagged for review
+        }
       }
       
       // Check device approval
@@ -287,17 +286,29 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
         return
       }
       
-      // Verify location geofence
-      if (location && !await verifyGeofence(location)) {
-        if (!isDemoMode()) {
+      // Verify location geofence (skip if no location available)
+      if (location) {
+        const isWithinGeofence = await verifyGeofence(location)
+        if (!isWithinGeofence && !isDemoMode()) {
           alert(
             'You are not within the authorized work location.\n\n' +
             'Please ensure you are at the work site and try again.\n' +
             `Current accuracy: ±${Math.round(location.accuracy)}m`
           )
+          setIsClockingIn(false)
+          return
         }
-        setIsClockingIn(false)
-        return
+      } else if (!isDemoMode()) {
+        // No location available - warn but allow to continue
+        const proceed = confirm(
+          'Location services are unavailable.\n\n' +
+          'Your clock-in will be flagged for manual review.\n' +
+          'Do you want to continue?'
+        )
+        if (!proceed) {
+          setIsClockingIn(false)
+          return
+        }
       }
       
       // All checks passed - show camera for photo verification
@@ -305,9 +316,13 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
       setShowCamera(true)
       setIsClockingIn(false)
       
-    } catch (error) {
-      // SECURITY: Removed console.error('Clock in preparation error:', error)
-      alert('An error occurred preparing clock in. Please try again.')
+    } catch (error: any) {
+      // SECURITY: console statement removed: console.error('Clock in preparation error:', error)
+      console.error('Clock in preparation error:', error)
+      // Only show error alert for actual errors, not cancellations
+      if (error?.message && error.message !== 'User cancelled' && error.message !== 'Location access failed') {
+        alert(`Clock in error: ${error.message}`)
+      }
       setIsClockingIn(false)
     }
   }
@@ -330,7 +345,7 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
           resolve()
         },
         (error) => {
-          setLocationError(error.message)
+          setLocationError('Location access failed')
           reject(error)
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
@@ -389,7 +404,7 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
       setIsClockingOut(false)
       
     } catch (error) {
-      // SECURITY: Removed console.error('Clock out preparation error:', error)
+      // SECURITY: console statement removed: console.error('Clock out preparation error:', error)
       alert('An error occurred preparing clock out. Please try again.')
       setIsClockingOut(false)
     }
@@ -470,12 +485,12 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
       
       // Check if within radius (accounting for GPS accuracy)
       if (distance <= (workSite.radius + location.accuracy)) {
-        // SECURITY: Removed // SECURITY: Removed console.log(`Location verified at ${workSite.name}: ${distance.toFixed(0)}m away`)
+        // SECURITY: console statement removed: console.log(`Location verified at ${workSite.name}: ${distance.toFixed(0)}m away`)
         return true
       }
     }
     
-    // SECURITY: Removed console.warn('Location verification failed: Not at any authorized work site')
+    // SECURITY: console statement removed: console.warn('Location verification failed: Not at any authorized work site')
     return false
   }
 
@@ -486,7 +501,7 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
     // Scenario 1: First attempt (clock in) - SUCCESS
     if (currentAttempts === 0) {
       localStorage.setItem('demoLocationAttempts', '1')
-      // SECURITY: Removed // SECURITY: Removed console.log('🎭 DEMO: Clock in successful - authorized location')
+      // SECURITY: console statement removed: console.log('🎭 DEMO: Clock in successful - authorized location')
       showDemoNotification('✅ Location Verified', 'You are at an authorized work site', 'success')
       return true
     }
@@ -494,7 +509,7 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
     // Scenario 2: Second attempt (clock out) - FAIL
     if (currentAttempts === 1) {
       localStorage.setItem('demoLocationAttempts', '2')
-      // SECURITY: Removed // SECURITY: Removed console.log('🎭 DEMO: Clock out failed - location verification failed')
+      // SECURITY: console statement removed: console.log('🎭 DEMO: Clock out failed - location verification failed')
       showDemoNotification('❌ Location Verification Failed', 'You are not within the authorized work location.\n\nPlease ensure you are at the work site and try again.', 'error')
       return false
     }
@@ -502,7 +517,7 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
     // Scenario 3: Third attempt - SUCCESS (after moving back to work site)
     if (currentAttempts === 2) {
       localStorage.setItem('demoLocationAttempts', '3')
-      // SECURITY: Removed // SECURITY: Removed console.log('🎭 DEMO: Clock out successful - back at authorized location')
+      // SECURITY: console statement removed: console.log('🎭 DEMO: Clock out successful - back at authorized location')
       showDemoNotification('✅ Location Verified', 'Successfully verified work site location', 'success')
       return true
     }
@@ -632,8 +647,8 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
       setPendingAction(null)
 
     } catch (error: any) {
-      // SECURITY: Removed console.error('Camera capture submission error:', error)
-      alert(`Failed to submit ${pendingAction}: ${error.message}`)
+      // SECURITY: console statement removed: console.error('Camera capture submission error:', error)
+      alert(`Failed to submit ${pendingAction}: Submission failed. Please try again.`)
     }
   }
   

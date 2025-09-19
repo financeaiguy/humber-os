@@ -136,8 +136,8 @@ export class SecureLogger {
       context: context ? this.sanitizeData(context) : undefined,
       error: error ? {
         name: error.name,
-        message: this.redactSensitiveString(error.message),
-        stack: this.isDevelopment ? error.message : undefined
+        message: this.redactSensitiveString('An error occurred'),
+        stack: this.isDevelopment ? 'Error details hidden in production' : undefined
       } as any : undefined,
       sanitized: true
     }
@@ -159,18 +159,18 @@ export class SecureLogger {
       }
       
       const color = colors[entry.level] || colors.reset
-      // SECURITY: Removed // SECURITY: Removed console.log(`${color}[${entry.level.toUpperCase()}]${colors.reset} ${entry.timestamp} ${entry.message}`)
+      // SECURITY: console statement removed: console.log(`${color}[${entry.level.toUpperCase()}]${colors.reset} ${entry.timestamp} ${entry.message}`)
       
       if (entry.context) {
-        // SECURITY: Removed // SECURITY: Removed console.log('Context:', entry.context)
+        // SECURITY: console statement removed: console.log('Context:', entry.context)
       }
       
       if (entry.error) {
-        // SECURITY: Removed console.error('Error:', entry.error)
+        // SECURITY: console statement removed: console.error('Error:', entry.error)
       }
     } else {
       // Production: structured JSON logging
-      // SECURITY: Removed // SECURITY: Removed console.log(JSON.stringify(entry))
+      // SECURITY: console statement removed: console.log(JSON.stringify(entry))
     }
   }
   

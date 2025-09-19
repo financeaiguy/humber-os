@@ -217,14 +217,14 @@ export default function NewOffboardingPage() {
           }))
       }
 
-      // SECURITY: Removed console.log('Submitting off-boarding request:', submissionData)
+      // SECURITY: console statement removed: console.log('Submitting off-boarding request:', submissionData)
 
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000))
 
       router.push('/offboarding')
     } catch (error) {
-      // SECURITY: Removed // SECURITY: Removed console.error('Error submitting off-boarding request:', error)
+      // SECURITY: console statement removed: console.error('Error submitting off-boarding request:', error)
     } finally {
       setIsSubmitting(false)
     }

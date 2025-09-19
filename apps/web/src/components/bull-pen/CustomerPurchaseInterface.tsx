@@ -193,7 +193,7 @@ export default function CustomerPurchaseInterface({ isOpen, onClose, customerDat
       setCart([])
       onClose()
     } catch (error) {
-      // SECURITY: Removed console.error('Purchase error:', error)
+      // SECURITY: console statement removed: console.error('Purchase error:', error)
       alert('Purchase failed. Please try again.')
     } finally {
       setIsSubmitting(false)

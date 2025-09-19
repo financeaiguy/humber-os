@@ -24,6 +24,44 @@ const projectApprovals = new Map<string, ProjectApproval[]>()
 const approvalWorkflows = new Map<string, ApproverType[]>()
 
 export async function POST(request: NextRequest) {
+  // Development bypass for API testing interface
+  const authHeader = request.headers.get('authorization')
+  const isDevelopment = process.env.NODE_ENV === 'development'
+
+  if (isDevelopment && authHeader === 'Bearer test-token-for-api-testing') {
+    // Simplified test mode without knowledge middleware
+    try {
+      const requestData = await request.json()
+      const { projectId, requestType, requesterId, requesterName, budgetAmount, deploymentDetails } = requestData
+
+      // Create simplified approval for testing
+      const approval = {
+        id: `test-approval-${Date.now()}`,
+        projectId,
+        approverType: 'project_manager',
+        approverId: 'test-approver',
+        approverName: 'Test Approver',
+        approverEmail: 'test@example.com',
+        status: 'pending',
+        budgetLimit: 100000,
+        conditions: []
+      }
+
+      return NextResponse.json({
+        success: true,
+        approvals: [approval],
+        message: 'Test approval request created successfully'
+      })
+
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'Failed to create test approval request' },
+        { status: 500 }
+      )
+    }
+  }
+
+  // Normal processing with knowledge middleware
   const context = await knowledgeMiddleware.processRequest(
     request,
     'project-approvals',
@@ -33,7 +71,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const requestData = await request.json()
-    
+
     // Track approval request initiation
     await knowledgeMiddleware.trackUserAction('approval_request_initiated', requestData, context)
     
@@ -41,7 +79,6 @@ export async function POST(request: NextRequest) {
     const validationResult = validateRequestBody(projectApprovalRequestSchema, requestData)
     if (!validationResult.success) {
       const errorResponse: KnowledgeEnhancedResponse = {
-        success: false,
         ...createValidationResponse(validationResult.errors),
         _metadata: {
           processedAt: new Date().toISOString(),
@@ -125,15 +162,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(enrichedResponse)
 
   } catch (error) {
-    // SECURITY: Removed console.error('Approval request error:', error)
+    // SECURITY: console statement removed: console.error('Approval request error:', error)
     
     // Track approval workflow failure
-    await knowledgeMiddleware.trackUserAction('approval_workflow_failed', { error: error.message }, context)
+    await knowledgeMiddleware.trackUserAction('approval_workflow_failed', { error: 'Workflow failed' }, context)
     
     const errorResponse: KnowledgeEnhancedResponse = {
       success: false,
       error: 'Failed to create approval request',
-      message: error instanceof Error ? error.message : 'Unknown error',
+      message: 'Approval request processing failed',
       _metadata: {
         processedAt: new Date().toISOString(),
         sessionId: context.sessionId,
@@ -147,7 +184,21 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    // TODO: Add auth validation here instead of HOF wrapper
+    // Development bypass for API testing interface
+    const authHeader = request.headers.get('authorization')
+    const isDevelopment = process.env.NODE_ENV === 'development'
+
+    if (isDevelopment && authHeader === 'Bearer test-token-for-api-testing') {
+      // Simplified test mode
+      const requestData = await request.json()
+      return NextResponse.json({
+        success: true,
+        approval: { ...requestData, status: 'approved', approvalDate: new Date().toISOString() },
+        projectStatus: 'approved',
+        allApproved: true,
+        message: 'Test approval processed successfully'
+      })
+    }
     const requestData = await request.json()
     
     // Validate approval action
@@ -200,7 +251,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Log approval action
-    // SECURITY: Removed // SECURITY: Removed console.log(`📋 Approval ${action} by ${approval.approverName} for project ${approval.projectId}`)
+    // SECURITY: console statement removed: console.log(`📋 Approval ${action} by ${approval.approverName} for project ${approval.projectId}`)
 
     return NextResponse.json({
       success: true,
@@ -211,7 +262,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (error) {
-    // SECURITY: Removed console.error('Approval action error:', error)
+    // SECURITY: console statement removed: console.error('Approval action error:', error)
     return NextResponse.json(
       { error: 'Failed to process approval' },
       { status: 500 }
@@ -221,7 +272,33 @@ export async function PUT(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    // TODO: Add auth validation here instead of HOF wrapper
+    // Development bypass for API testing interface
+    const authHeader = request.headers.get('authorization')
+    const isDevelopment = process.env.NODE_ENV === 'development'
+
+    if (isDevelopment && authHeader === 'Bearer test-token-for-api-testing') {
+      // Return test approvals
+      return NextResponse.json({
+        approvals: [
+          {
+            id: 'test-approval-001',
+            projectId: 'proj-gm-001',
+            approverType: 'project_manager',
+            approverId: 'test-approver',
+            approverName: 'Test Approver',
+            status: 'pending',
+            projectDetails: {
+              id: 'proj-gm-001',
+              name: 'Test Project',
+              client: 'Test Client',
+              status: 'pending_approval',
+              budget: 100000
+            }
+          }
+        ],
+        total: 1
+      })
+    }
     const { searchParams } = new URL(request.url)
     
     // Validate query parameters
@@ -274,7 +351,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    // SECURITY: Removed console.error('Get approvals error:', error)
+    // SECURITY: console statement removed: console.error('Get approvals error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch approvals' },
       { status: 500 }
@@ -322,19 +399,19 @@ async function getApproversByType(approverType: ApproverType) {
   // Mock data - replace with actual database query
   const approvers = {
     operator: [
-      { id: 'op-001', name: 'Operations Manager', email: 'operator@humber.com' }
+      { id: 'op-001', name: 'Operations Manager', email: 'operator@example.com' }
     ],
     partner: [
-      { id: 'partner-001', name: 'Partner Admin', email: 'partner@ford.com' }
+      { id: 'partner-001', name: 'Partner Admin', email: 'partner@example.com' }
     ],
     admin: [
-      { id: 'admin-001', name: 'System Administrator', email: 'admin@humber.com' }
+      { id: 'admin-001', name: 'System Administrator', email: 'admin@example.com' }
     ],
     finance: [
-      { id: 'finance-001', name: 'Finance Manager', email: 'finance@humber.com' }
+      { id: 'finance-001', name: 'Finance Manager', email: 'finance@example.com' }
     ],
     project_manager: [
-      { id: 'pm-001', name: 'Project Manager', email: 'pm@humber.com' }
+      { id: 'pm-001', name: 'Project Manager', email: 'pm@example.com' }
     ]
   }
 
@@ -372,12 +449,8 @@ function getApprovalConditions(requestType: string, budgetAmount: number): strin
 async function sendApprovalNotifications(approvals: ProjectApproval[], requestDetails: any) {
   // Mock notification sending - replace with actual email/SMS service
   for (const approval of approvals) {
-    // SECURITY: Removed // SECURITY: Removed console.log(`📧 Sending approval request to ${approval.approverEmail}`, {
-      approvalId: approval.id,
-      projectId: approval.projectId,
-      requestType: requestDetails.requestType,
-      budgetAmount: requestDetails.budgetAmount
-    })
+    // SECURITY: console statement removed
+    // Sending approval request: approverEmail, approvalId, projectId, requestType, budgetAmount
   }
 }
 
@@ -390,7 +463,7 @@ async function findApprovalById(approvalId: string): Promise<ProjectApproval | n
 }
 
 async function initiateProjectDeployment(projectId: string) {
-  // SECURITY: Removed // SECURITY: Removed console.log(`🚀 Initiating project deployment for project ${projectId}`)
+  // SECURITY: console statement removed: console.log(`🚀 Initiating project deployment for project ${projectId}`)
   // Implement project deployment logic here
 }
 

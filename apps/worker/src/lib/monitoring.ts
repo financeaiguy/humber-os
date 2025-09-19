@@ -108,10 +108,10 @@ export class MonitoringService {
       });
       
       // Log critical errors immediately
-      if (error.message.includes('database') || error.message.includes('timeout')) {
+      if (error.name === 'DatabaseError' || error.name === 'TimeoutError') {
         this.logger.error('Critical error detected', {
           errorId: error.id,
-          message: error.message,
+          message: 'Critical error occurred',
           endpoint: error.endpoint,
           tenantId: error.tenantId
         });
@@ -186,7 +186,7 @@ export class MonitoringService {
       this.logger.error('Failed to get system health', error);
       return {
         status: 'unhealthy',
-        metrics: { error: error instanceof Error ? error.message : 'Unknown error' },
+        metrics: { error: 'An error occurred' },
         timestamp: Date.now()
       };
     }
@@ -286,8 +286,8 @@ export function errorTrackingMiddleware() {
       const monitoring = new MonitoringService(c.env);
       await monitoring.trackError({
         id: crypto.randomUUID(),
-        message: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.message : undefined,
+        message: 'An error occurred',
+        stack: undefined,
         endpoint: c.req.path,
         method: c.req.method,
         tenantId: c.get('tenantId'),

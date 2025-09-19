@@ -243,7 +243,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    // SECURITY: Removed console.error('Access controls retrieval error:', error)
+    // SECURITY: console statement removed: console.error('Access controls retrieval error:', error)
     return NextResponse.json(
       { error: 'Failed to retrieve access controls' },
       { status: 500 }
@@ -306,14 +306,8 @@ export async function POST(request: NextRequest) {
     accessControls.set(accessId, accessControl)
 
     // Log access provisioning
-    // SECURITY: Removed // SECURITY: Removed console.log(`🔐 SOC 2 Access Provisioned:`, {
-      accessId,
-      userId,
-      userName,
-      role,
-      accessLevel,
-      grantedBy: 'system'
-    })
+    // SECURITY: console statement removed
+    // SOC 2 Access Provisioned: accessId, userId, userName, role, accessLevel
 
     return NextResponse.json({
       success: true,
@@ -327,7 +321,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    // SECURITY: Removed console.error('Access provisioning error:', error)
+    // SECURITY: console statement removed: console.error('Access provisioning error:', error)
     return NextResponse.json(
       { error: 'Failed to provision user access' },
       { status: 500 }
@@ -376,13 +370,8 @@ export async function PUT(request: NextRequest) {
     accessControls.set(accessId, accessControl)
 
     // Log modification
-    // SECURITY: Removed // SECURITY: Removed console.log(`🔧 SOC 2 Access Modified:`, {
-      accessId,
-      userId: accessControl.userId,
-      modifications,
-      modificationReason,
-      approvedBy
-    })
+    // SECURITY: console statement removed
+    // SOC 2 Access Modified: accessId, userId, modifications, modificationReason, approvedBy
 
     return NextResponse.json({
       success: true,
@@ -400,7 +389,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (error) {
-    // SECURITY: Removed console.error('Access modification error:', error)
+    // SECURITY: console statement removed: console.error('Access modification error:', error)
     return NextResponse.json(
       { error: 'Failed to modify user access' },
       { status: 500 }
@@ -450,7 +439,7 @@ export async function DELETE(request: NextRequest) {
     accessControls.set(accessId, accessControl)
 
     // Log termination
-    // SECURITY: Removed // SECURITY: Removed console.log(`🚫 SOC 2 Access Terminated:`, terminationRecord)
+    // SECURITY: console statement removed: console.log(`🚫 SOC 2 Access Terminated:`, terminationRecord)
 
     return NextResponse.json({
       success: true,
@@ -466,7 +455,7 @@ export async function DELETE(request: NextRequest) {
     })
 
   } catch (error) {
-    // SECURITY: Removed console.error('Access termination error:', error)
+    // SECURITY: console statement removed: console.error('Access termination error:', error)
     return NextResponse.json(
       { error: 'Failed to terminate user access' },
       { status: 500 }

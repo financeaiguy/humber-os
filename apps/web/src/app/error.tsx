@@ -15,18 +15,15 @@ export default function Error({
     try {
       if (error && typeof error === 'object') {
         if (error instanceof Error) {
-          // SECURITY: Removed console.error('Application error:', error.message, error.message)
-        } else if ('message' in error && typeof error.message === 'string') {
-          // SECURITY: Removed console.error('Application error:', error.message)
+          // Application error occurred - Error instance
         } else {
-          // SECURITY: Removed console.error('Application error:', JSON.stringify(error))
+          // Application error occurred - generic object
         }
       } else {
-        // SECURITY: Removed console.error('Application error:', String(error || 'Unknown error'))
+        // Application error occurred - non-object type
       }
     } catch (e) {
-      // SECURITY: Removed console.error('Error in error handler:', e)
-      // SECURITY: Removed console.error('Original error:', error)
+      // Error in error handler
     }
   }, [error])
 

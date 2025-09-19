@@ -4,23 +4,7 @@ import './globals.css'
 import '../styles/jobs-design-system.css'
 import { LayoutClient } from '@/components/layout-client'
 import { SessionProvider } from '@/components/session-context'
-import { ErrorBoundary } from '@/components/error-boundary'
 import { Suspense } from 'react'
-import dynamic from 'next/dynamic'
-
-// Dynamically import heavy components to fix clientReferenceManifest issue
-const GlobalLoadingIndicator = dynamic(() => import('@/components/global-loading').then(mod => ({ default: mod.GlobalLoadingIndicator })), {
-  loading: () => null
-})
-
-
-const LoadingProvider = dynamic(() => import('@/components/route-loading').then(mod => ({ default: mod.LoadingProvider })), {
-  loading: () => null
-})
-
-const ContinuousLearningProvider = dynamic(() => import('@/components/continuous-learning-provider').then(mod => ({ default: mod.ContinuousLearningProvider })), {
-  loading: () => null
-})
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -66,20 +50,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className} suppressHydrationWarning>
-        <ErrorBoundary>
-          <SessionProvider>
-            <ContinuousLearningProvider>
-              <LoadingProvider>
-                <LayoutClient>
-                  <Suspense fallback={<div>Loading...</div>}>
-                    <GlobalLoadingIndicator />
-                    {children}
-                  </Suspense>
-                </LayoutClient>
-              </LoadingProvider>
-            </ContinuousLearningProvider>
-          </SessionProvider>
-        </ErrorBoundary>
+        <SessionProvider>
+          <LayoutClient>
+            <Suspense fallback={<div>Loading...</div>}>
+              {children}
+            </Suspense>
+          </LayoutClient>
+        </SessionProvider>
       </body>
     </html>
   )

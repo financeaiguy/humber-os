@@ -91,14 +91,14 @@ export function ProfessionalChat({ isOpen, onToggle }: ProfessionalChatProps) {
 
   // Mock Humber users for sharing
   const humberUsers = [
-    { id: 'user_001', name: 'John Smith', role: 'Project Manager', email: 'john.smith@humber.com', avatar: 'JS' },
-    { id: 'user_002', name: 'Mary Johnson', role: 'Engineering Lead', email: 'mary.johnson@humber.com', avatar: 'MJ' },
-    { id: 'user_003', name: 'Robert Chen', role: 'Operations Manager', email: 'robert.chen@humber.com', avatar: 'RC' },
-    { id: 'user_004', name: 'Jennifer Davis', role: 'Quality Manager', email: 'jennifer.davis@humber.com', avatar: 'JD' },
-    { id: 'user_005', name: 'Michael Wilson', role: 'Deployment Lead', email: 'michael.wilson@humber.com', avatar: 'MW' },
-    { id: 'user_006', name: 'Sarah Martinez', role: 'Client Success', email: 'sarah.martinez@humber.com', avatar: 'SM' },
-    { id: 'user_007', name: 'David Thompson', role: 'Technical Lead', email: 'david.thompson@humber.com', avatar: 'DT' },
-    { id: 'user_008', name: 'Lisa Anderson', role: 'HR Manager', email: 'lisa.anderson@humber.com', avatar: 'LA' }
+    { id: 'user_001', name: 'John Smith', role: 'Project Manager', email: 'john.smith@example.com', avatar: 'JS' },
+    { id: 'user_002', name: 'Mary Johnson', role: 'Engineering Lead', email: 'mary.johnson@example.com', avatar: 'MJ' },
+    { id: 'user_003', name: 'Robert Chen', role: 'Operations Manager', email: 'robert.chen@example.com', avatar: 'RC' },
+    { id: 'user_004', name: 'Jennifer Davis', role: 'Quality Manager', email: 'jennifer.davis@example.com', avatar: 'JD' },
+    { id: 'user_005', name: 'Michael Wilson', role: 'Deployment Lead', email: 'michael.wilson@example.com', avatar: 'MW' },
+    { id: 'user_006', name: 'Sarah Martinez', role: 'Client Success', email: 'sarah.martinez@example.com', avatar: 'SM' },
+    { id: 'user_007', name: 'David Thompson', role: 'Technical Lead', email: 'david.thompson@example.com', avatar: 'DT' },
+    { id: 'user_008', name: 'Lisa Anderson', role: 'HR Manager', email: 'lisa.anderson@example.com', avatar: 'LA' }
   ]
 
   // Mock engineers data
@@ -300,7 +300,7 @@ export function ProfessionalChat({ isOpen, onToggle }: ProfessionalChatProps) {
         throw new Error('Failed to get response')
       }
     } catch (error) {
-      // SECURITY: Removed console.error('Chat error:', error)
+      // SECURITY: console statement removed: console.error('Chat error:', error)
       
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
@@ -1249,7 +1249,7 @@ export function ProfessionalChat({ isOpen, onToggle }: ProfessionalChatProps) {
                   whileTap={{ scale: 0.98 }}
                   onClick={() => {
                     // Here you would normally send the share request to your backend
-                    // SECURITY: Removed // SECURITY: Removed console.log('Sharing with:', selectedShareUsers, 'Message:', shareMessage)
+                    // SECURITY: console statement removed: console.log('Sharing with:', selectedShareUsers, 'Message:', shareMessage)
                     alert(`Conversation shared with ${selectedShareUsers.length} team member${selectedShareUsers.length === 1 ? '' : 's'}!`)
                     setShowShareModal(false)
                     setSelectedShareUsers([])
@@ -1439,7 +1439,7 @@ export function ProfessionalChat({ isOpen, onToggle }: ProfessionalChatProps) {
                     // Save settings
                     setShowSettings(false)
                     // Show success message
-                    // SECURITY: Removed // SECURITY: Removed console.log('Settings saved')
+                    // SECURITY: console statement removed: console.log('Settings saved')
                   }}
                   className="w-full px-4 py-2.5 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all flex items-center justify-center space-x-2"
                 >

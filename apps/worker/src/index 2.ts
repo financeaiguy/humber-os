@@ -446,7 +446,7 @@ app.route('/chat', realChatRouter);
 
 app.onError((err, c) => {
   // Log full error internally
-  // SECURITY: Removed console.error(`Error in ${c.req.path}:`, err);
+  // SECURITY: console statement removederror(`Error in ${c.req.path}:`, err);
   
   // Return sanitized error to prevent information leakage
   const sanitized = {
@@ -467,10 +467,10 @@ export default {
   async queue(batch: MessageBatch<any>, env: Env): Promise<void> {
     for (const message of batch.messages) {
       try {
-        // SECURITY: Removed console.log('Processing queue message:', message.body);
+        // SECURITY: console statement removedlog('Processing queue message:', message.body);
         message.ack();
       } catch (error) {
-        // SECURITY: Removed console.error('Queue processing error:', error);
+        // SECURITY: console statement removederror('Queue processing error:', error);
         message.retry();
       }
     }

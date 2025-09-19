@@ -385,11 +385,8 @@ export default function RoleBasedOnboardingModal({
           {phaseIndex === config.phases.length - 1 ? (
             <button
               onClick={() => {
-                // SECURITY: Removed // SECURITY: Removed console.log('Onboarding completed with data:', {
-                  type: onboardingType,
-                  role: selectedRole,
-                  data: formData
-                })
+                // SECURITY: console statement removed
+                // Onboarding completed with data: type, role, formData
                 onClose()
               }}
               className="px-6 py-3 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 text-white font-medium hover:opacity-90 transition-opacity flex items-center space-x-2"

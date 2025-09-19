@@ -50,9 +50,9 @@ export class Logger {
     const fullContext = { ...requestContext, ...context };
     
     if (this.isDevelopment) {
-      // SECURITY: Removed // SECURITY: Removed console.log(message, fullContext);
+      // SECURITY: console statement removed: console.log(message, fullContext);
     } else {
-      // SECURITY: Removed // SECURITY: Removed console.log(this.formatMessage('INFO', message, fullContext));
+      // SECURITY: console statement removed: console.log(this.formatMessage('INFO', message, fullContext));
     }
   }
 
@@ -61,9 +61,9 @@ export class Logger {
     const fullContext = { ...requestContext, ...context };
     
     if (this.isDevelopment) {
-      // SECURITY: Removed console.warn(message, fullContext);
+      // SECURITY: console statement removed: console.warn(message, fullContext);
     } else {
-      // SECURITY: Removed console.warn(this.formatMessage('WARN', message, fullContext));
+      // SECURITY: console statement removed: console.warn(this.formatMessage('WARN', message, fullContext));
     }
   }
 
@@ -73,16 +73,16 @@ export class Logger {
       ...requestContext,
       ...context,
       error: error ? {
-        message: error.message,
-        stack: error.message,
+        message: 'An error occurred',
+        stack: '[REDACTED]',
         name: error.name,
       } : undefined,
     };
     
     if (this.isDevelopment) {
-      // SECURITY: Removed console.error(message, error, fullContext);
+      // SECURITY: console statement removed: console.error(message, error, fullContext);
     } else {
-      // SECURITY: Removed console.error(this.formatMessage('ERROR', message, fullContext));
+      // SECURITY: console statement removed: console.error(this.formatMessage('ERROR', message, fullContext));
     }
 
     // Send to error tracking in production
@@ -105,10 +105,10 @@ export class Logger {
     
     // In production, this would send to audit log storage
     if (this.isProduction) {
-      // SECURITY: Removed // SECURITY: Removed console.log(this.formatMessage('AUDIT', `Audit: ${action}`, auditContext));
+      // SECURITY: console statement removed: console.log(this.formatMessage('AUDIT', `Audit: ${action}`, auditContext));
       // Send to audit storage service
     } else {
-      // SECURITY: Removed // SECURITY: Removed console.log('AUDIT:', action, auditContext);
+      // SECURITY: console statement removed: console.log('AUDIT:', action, auditContext);
     }
   }
 }
@@ -126,7 +126,7 @@ export class PerformanceMonitor {
   static end(label: string, metadata?: Record<string, any>) {
     const startTime = this.timers.get(label);
     if (!startTime) {
-      // SECURITY: Removed console.warn(`Timer ${label} was not started`);
+      // SECURITY: console statement removed: console.warn(`Timer ${label} was not started`);
       return;
     }
 

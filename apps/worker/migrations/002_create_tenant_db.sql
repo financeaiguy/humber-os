@@ -272,3 +272,36 @@ CREATE TABLE IF NOT EXISTS time_entries (
 CREATE INDEX IF NOT EXISTS idx_time_engineer_date ON time_entries(engineer_id, date);
 CREATE INDEX IF NOT EXISTS idx_time_deployment ON time_entries(deployment_id);
 CREATE INDEX IF NOT EXISTS idx_time_status ON time_entries(status);
+
+-- Enhanced Timesheets for reconciliation problem
+CREATE TABLE IF NOT EXISTS timesheets_reconciliation (
+  id TEXT PRIMARY KEY,
+  tenant_id TEXT NOT NULL,
+  engineer_id TEXT NOT NULL,
+  week_start_date INTEGER NOT NULL,
+  week_end_date INTEGER NOT NULL,
+  engineer_hours REAL NOT NULL,
+  customer_hours REAL,
+  difference REAL,
+  reconciled_hours REAL,
+  human_in_loop INTEGER DEFAULT 0,
+  human_reviewed_by TEXT,
+  human_reviewed_at INTEGER,
+  human_review_notes TEXT,
+  customer_spreadsheet TEXT,
+  customer_spreadsheet_url TEXT,
+  customer_name TEXT,
+  project_code TEXT,
+  status TEXT CHECK(status IN ('pending', 'auto_reconciled', 'needs_review', 'human_approved', 'disputed', 'resolved')) DEFAULT 'pending',
+  hourly_rate REAL,
+  total_amount REAL,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL,
+  FOREIGN KEY (engineer_id) REFERENCES engineers(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_timesheets_recon_engineer ON timesheets_reconciliation(engineer_id);
+CREATE INDEX IF NOT EXISTS idx_timesheets_recon_tenant ON timesheets_reconciliation(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_timesheets_recon_dates ON timesheets_reconciliation(week_start_date, week_end_date);
+CREATE INDEX IF NOT EXISTS idx_timesheets_recon_status ON timesheets_reconciliation(status);
+CREATE INDEX IF NOT EXISTS idx_timesheets_recon_human ON timesheets_reconciliation(human_in_loop);

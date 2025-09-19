@@ -43,7 +43,7 @@ async function proxyToWorker(request: NextRequest, id: string) {
       },
     })
   } catch (error) {
-    // SECURITY: Removed console.error('Error proxying to worker:', error)
+    // SECURITY: console statement removed: console.error('Error proxying to worker:', error)
     return NextResponse.json(
       {
         success: false,
@@ -89,7 +89,8 @@ export async function DELETE(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  return proxyToWorker(request, params.id)
+  const { id } = await params
+  return proxyToWorker(request, id)
 }

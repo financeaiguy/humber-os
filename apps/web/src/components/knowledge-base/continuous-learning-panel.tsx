@@ -67,7 +67,7 @@ export function ContinuousLearningPanel() {
     continuousLearning.on('batch_processed', updateStats);
     continuousLearning.on('knowledge_updated', updateStats);
     continuousLearning.on('pattern_detected', (data: any) => {
-      // SECURITY: Removed // SECURITY: Removed console.log('Pattern detected:', data);
+      // SECURITY: console statement removed: console.log('Pattern detected:', data);
     });
 
     return () => {
@@ -112,7 +112,7 @@ export function ContinuousLearningPanel() {
           alert('Knowledge base imported successfully!');
         } catch (error) {
           alert('Error importing knowledge base');
-          // SECURITY: Removed console.error(error);
+          // SECURITY: console statement removed: console.error(error);
         }
       };
       reader.readAsText(file);

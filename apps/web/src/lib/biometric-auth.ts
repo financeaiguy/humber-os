@@ -66,7 +66,7 @@ export class BiometricAuthService {
         capabilities.camera = devices.some(device => device.kind === 'videoinput');
         capabilities.microphone = devices.some(device => device.kind === 'audioinput');
       } catch (error) {
-        // SECURITY: Removed console.warn('Could not enumerate media devices:', error);
+        // SECURITY: console statement removed: console.warn('Could not enumerate media devices:', error);
       }
     }
 
@@ -132,7 +132,7 @@ export class BiometricAuthService {
         success: false,
         type: 'WEBAUTHN',
         confidence: 0,
-        error: error instanceof Error ? error.message : 'Registration failed'
+        error: 'Registration failed'
       };
     }
   }
@@ -182,7 +182,7 @@ export class BiometricAuthService {
         success: false,
         type: 'WEBAUTHN',
         confidence: 0,
-        error: error instanceof Error ? error.message : 'Authentication failed'
+        error: 'Authentication failed'
       };
     }
   }
@@ -240,7 +240,7 @@ export class BiometricAuthService {
         success: false,
         type: 'FACE_ID',
         confidence: 0,
-        error: error instanceof Error ? error.message : 'Face recognition failed'
+        error: 'Face recognition failed'
       };
     }
   }
@@ -286,7 +286,7 @@ export class BiometricAuthService {
         success: false,
         type: 'VOICE',
         confidence: 0,
-        error: error instanceof Error ? error.message : 'Voice recognition failed'
+        error: 'Voice recognition failed'
       };
     }
   }
@@ -487,7 +487,7 @@ export class FaceRecognitionService {
   async loadModel(): Promise<void> {
     // In production, would load actual face recognition model
     // Example: @tensorflow-models/face-landmarks-detection
-    // SECURITY: Removed // SECURITY: Removed console.log('Loading face recognition model...');
+    // SECURITY: console statement removed: console.log('Loading face recognition model...');
     
     // Mock model loading
     await new Promise(resolve => setTimeout(resolve, 2000));
@@ -519,7 +519,7 @@ export class FaceRecognitionService {
         success: false,
         type: 'FACE_ID',
         confidence: 0,
-        error: error instanceof Error ? error.message : 'Face recognition failed'
+        error: 'Face recognition failed'
       };
     }
   }

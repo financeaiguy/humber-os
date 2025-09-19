@@ -130,7 +130,7 @@ export class WorkersAIClient {
       
       return response
     } catch (error) {
-      // SECURITY: Removed console.warn('Primary chat model failed, trying fallback:', error)
+      // SECURITY: console statement removed: console.warn('Primary chat model failed, trying fallback:', error)
       return this.runModel(WORKERS_AI_MODELS.chat.fallback, {
         messages,
         ...settings
@@ -164,7 +164,7 @@ export class WorkersAIClient {
       
       return response
     } catch (error) {
-      // SECURITY: Removed console.warn('Primary analysis model failed, trying fallback:', error)
+      // SECURITY: console statement removed: console.warn('Primary analysis model failed, trying fallback:', error)
       return this.runModel(WORKERS_AI_MODELS.analysis.fallback, {
         messages,
         ...settings
@@ -198,7 +198,7 @@ export class WorkersAIClient {
       
       return response
     } catch (error) {
-      // SECURITY: Removed console.warn('Primary code model failed, trying fallback:', error)
+      // SECURITY: console statement removed: console.warn('Primary code model failed, trying fallback:', error)
       return this.runModel(WORKERS_AI_MODELS.code.fallback, {
         messages,
         ...settings
@@ -226,7 +226,7 @@ export class WorkersAIClient {
       const data = await response.json()
       return data.result.data
     } catch (error) {
-      // SECURITY: Removed console.warn('Primary embeddings model failed, trying fallback:', error)
+      // SECURITY: console statement removed: console.warn('Primary embeddings model failed, trying fallback:', error)
       
       const response = await fetch(`${this.baseUrl}/${WORKERS_AI_MODELS.embeddings.fallback}`, {
         method: 'POST',

@@ -96,14 +96,8 @@ export const POST = withAuditLog('GDPR_CONSENT_RECORD')(
       consentRecords.set(consentId, consentRecord)
 
       // Log consent action
-      // SECURITY: Removed // SECURITY: Removed console.log(`📋 GDPR Consent ${consentGiven ? 'Given' : 'Denied'}:`, {
-        consentId,
-        userId,
-        email,
-        consentType,
-        purpose,
-        legalBasis: consentRecord.legalBasis
-      })
+      // SECURITY: console statement removed
+      // GDPR Consent action: consentId, userId, email, consentType, purpose, legalBasis
 
       return NextResponse.json({
         success: true,
@@ -117,7 +111,7 @@ export const POST = withAuditLog('GDPR_CONSENT_RECORD')(
       })
 
     } catch (error) {
-      // SECURITY: Removed console.error('Consent recording error:', error)
+      // SECURITY: console statement removed: console.error('Consent recording error:', error)
       return NextResponse.json(
         { error: 'Failed to record consent' },
         { status: 500 }
@@ -167,7 +161,7 @@ export const GET = withAuditLog('GDPR_CONSENT_VIEW')(
       })
 
     } catch (error) {
-      // SECURITY: Removed console.error('Consent retrieval error:', error)
+      // SECURITY: console statement removed: console.error('Consent retrieval error:', error)
       return NextResponse.json(
         { error: 'Failed to retrieve consent records' },
         { status: 500 }
@@ -224,13 +218,8 @@ export const PUT = withAuditLog('GDPR_CONSENT_WITHDRAWAL')(
       // Execute data processing changes based on withdrawal
       await processConsentWithdrawal(consentRecord, withdrawal)
 
-      // SECURITY: Removed // SECURITY: Removed console.log(`🚫 GDPR Consent Withdrawn:`, {
-        consentId,
-        userId: consentRecord.userId,
-        email: consentRecord.email,
-        consentType: consentRecord.consentType,
-        withdrawalMethod
-      })
+      // SECURITY: console statement removed
+      // GDPR Consent Withdrawn: consentId, userId, email, consentType, withdrawalMethod
 
       return NextResponse.json({
         success: true,
@@ -241,7 +230,7 @@ export const PUT = withAuditLog('GDPR_CONSENT_WITHDRAWAL')(
       })
 
     } catch (error) {
-      // SECURITY: Removed console.error('Consent withdrawal error:', error)
+      // SECURITY: console statement removed: console.error('Consent withdrawal error:', error)
       return NextResponse.json(
         { error: 'Failed to withdraw consent' },
         { status: 500 }
@@ -276,12 +265,8 @@ export const DELETE = withAuditLog('GDPR_CONSENT_DELETE')(
       consentRecords.delete(consentId)
       consentWithdrawals.delete(consentId)
 
-      // SECURITY: Removed // SECURITY: Removed console.log(`🗑️ GDPR Consent Record Deleted:`, {
-        consentId,
-        userId: consentRecord.userId,
-        email: consentRecord.email,
-        consentType: consentRecord.consentType
-      })
+      // SECURITY: console statement removed
+      // GDPR Consent Record Deleted: consentId, userId, email, consentType
 
       return NextResponse.json({
         success: true,
@@ -289,7 +274,7 @@ export const DELETE = withAuditLog('GDPR_CONSENT_DELETE')(
       })
 
     } catch (error) {
-      // SECURITY: Removed console.error('Consent deletion error:', error)
+      // SECURITY: console statement removed: console.error('Consent deletion error:', error)
       return NextResponse.json(
         { error: 'Failed to delete consent record' },
         { status: 500 }
@@ -368,17 +353,17 @@ function getDataProcessingChanges(consentType: string): string[] {
 }
 
 async function stopMarketingCommunications(email: string) {
-  // SECURITY: Removed // SECURITY: Removed console.log(`📧 Stopping marketing communications for ${email}`)
+  // SECURITY: console statement removed: console.log(`📧 Stopping marketing communications for ${email}`)
 }
 
 async function disableAnalyticsTracking(userId: string) {
-  // SECURITY: Removed // SECURITY: Removed console.log(`📊 Disabling analytics tracking for user ${userId}`)
+  // SECURITY: console statement removed: console.log(`📊 Disabling analytics tracking for user ${userId}`)
 }
 
 async function deleteUserProfile(userId: string) {
-  // SECURITY: Removed // SECURITY: Removed console.log(`👤 Deleting user profile data for ${userId}`)
+  // SECURITY: console statement removed: console.log(`👤 Deleting user profile data for ${userId}`)
 }
 
 async function deleteBiometricData(userId: string) {
-  // SECURITY: Removed // SECURITY: Removed console.log(`🔒 Deleting biometric data for user ${userId}`)
+  // SECURITY: console statement removed: console.log(`🔒 Deleting biometric data for user ${userId}`)
 }

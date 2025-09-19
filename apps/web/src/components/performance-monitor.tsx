@@ -169,7 +169,7 @@ export function ProductionPerformanceTracker() {
       
       // Send to analytics (implement your analytics service here)
       if (loadTime > 3000) {
-        // SECURITY: Removed console.warn(`Slow page load detected: ${route} (${loadTime.toFixed(0)}ms)`)
+        // SECURITY: console statement removed: console.warn(`Slow page load detected: ${route} (${loadTime.toFixed(0)}ms)`)
       }
     }
 

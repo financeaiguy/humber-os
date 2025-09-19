@@ -198,7 +198,7 @@ export default function CustomerOnboardingFlow({ isOpen, onClose, onComplete }: 
       onComplete(customerData)
       onClose()
     } catch (error) {
-      // SECURITY: Removed console.error('Error submitting customer onboarding:', error)
+      // SECURITY: console statement removed: console.error('Error submitting customer onboarding:', error)
       setErrors({ submit: 'Failed to create customer account. Please try again.' })
     } finally {
       setIsSubmitting(false)
@@ -383,7 +383,7 @@ export default function CustomerOnboardingFlow({ isOpen, onClose, onComplete }: 
                         className={`w-full px-3 py-2 bg-slate-700 border rounded-lg text-white ${
                           errors.contactEmail ? 'border-red-500' : 'border-slate-600'
                         }`}
-                        placeholder="contact@company.com"
+                        placeholder="contact@example.com"
                       />
                       {errors.contactEmail && <p className="text-red-400 text-sm mt-1">{errors.contactEmail}</p>}
                     </div>
@@ -460,7 +460,7 @@ export default function CustomerOnboardingFlow({ isOpen, onClose, onComplete }: 
                       className={`w-full px-3 py-2 bg-slate-700 border rounded-lg text-white ${
                         errors.billingEmail ? 'border-red-500' : 'border-slate-600'
                       }`}
-                      placeholder="billing@company.com"
+                      placeholder="billing@example.com"
                     />
                     {errors.billingEmail && <p className="text-red-400 text-sm mt-1">{errors.billingEmail}</p>}
                   </div>

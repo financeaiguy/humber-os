@@ -53,8 +53,8 @@ export default function LegalContactPage() {
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-slate-400" />
-                <a href="mailto:legal@humberops.com" className="text-blue-400 hover:text-blue-300 transition-colors">
-                  legal@humberops.com
+                <a href="mailto:legal@example.com" className="text-blue-400 hover:text-blue-300 transition-colors">
+                  legal@example.com
                 </a>
               </div>
               
@@ -89,8 +89,8 @@ export default function LegalContactPage() {
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-slate-400" />
-                <a href="mailto:privacy@humberops.com" className="text-green-400 hover:text-green-300 transition-colors">
-                  privacy@humberops.com
+                <a href="mailto:privacy@example.com" className="text-green-400 hover:text-green-300 transition-colors">
+                  privacy@example.com
                 </a>
               </div>
               
@@ -164,7 +164,7 @@ export default function LegalContactPage() {
               </h3>
               <div className="space-y-3 text-slate-300 text-sm">
                 <p><strong>Q: Can I see all data you have about me?</strong></p>
-                <p>A: Yes. Request a complete data export through your profile settings or email privacy@humberops.com. 
+                <p>A: Yes. Request a complete data export through your profile settings or email privacy@example.com. 
                    We'll provide it within 30 days in machine-readable format.</p>
                 
                 <p><strong>Q: Can I delete my account and data?</strong></p>
@@ -192,11 +192,11 @@ export default function LegalContactPage() {
                 Call: 1-800-HUMBER-1 (24/7)
               </a>
               <a 
-                href="mailto:emergency@humberops.com" 
+                href="mailto:emergency@example.com" 
                 className="flex items-center gap-2 px-4 py-2 bg-red-500/20 text-red-300 rounded-lg hover:bg-red-500/30 transition-colors"
               >
                 <Mail className="w-4 h-4" />
-                Email: emergency@humberops.com
+                Email: emergency@example.com
               </a>
             </div>
           </div>

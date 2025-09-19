@@ -36,7 +36,7 @@ export function useOffboardingIntegration() {
         bullPenStatus: bullPen
       })
     } catch (error) {
-      // SECURITY: Removed console.error('Error fetching integration data:', error)
+      // SECURITY: console statement removed: console.error('Error fetching integration data:', error)
     } finally {
       setIsLoading(false)
     }
@@ -254,7 +254,7 @@ export function useOffboardingIntegration() {
 
   const updateBullPenStatus = async (engineerId: string, newStatus: 'available' | 'transitioning' | 'offboarded') => {
     // In production, this would update the bull pen system
-    // SECURITY: Removed // SECURITY: Removed console.log(`Updating bull pen status for ${engineerId} to ${newStatus}`)
+    // SECURITY: console statement removed: console.log(`Updating bull pen status for ${engineerId} to ${newStatus}`)
     
     // Refresh integration data
     await fetchIntegrationData()
@@ -294,7 +294,7 @@ export function useOffboardingIntegration() {
       finalPayment: offboardingRequest.financialImpact.finalPayment
     })
 
-    // SECURITY: Removed // SECURITY: Removed console.log('Sending notifications:', notifications)
+    // SECURITY: console statement removed: console.log('Sending notifications:', notifications)
     return notifications
   }
 

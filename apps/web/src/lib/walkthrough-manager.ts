@@ -23,13 +23,13 @@ export class WalkthroughManager {
   }) {
     const walkthrough = WORKFLOW_WALKTHROUGHS[workflowType]
     if (!walkthrough) {
-      // SECURITY: Removed console.error(`Walkthrough not found for workflow: ${workflowType}`)
+      // SECURITY: console statement removed: console.error(`Walkthrough not found for workflow: ${workflowType}`)
       return false
     }
 
     // Check if user role is eligible
     if (!walkthrough.targetRoles.includes(this.userRole)) {
-      // SECURITY: Removed console.warn(`Walkthrough ${workflowType} not available for role: ${this.userRole}`)
+      // SECURITY: console statement removed: console.warn(`Walkthrough ${workflowType} not available for role: ${this.userRole}`)
       return false
     }
 

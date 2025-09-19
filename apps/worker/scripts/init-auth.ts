@@ -15,11 +15,11 @@ const execAsync = promisify(exec);
  * Initialize authentication tables and create default users
  */
 async function initializeAuth() {
-  // SECURITY: Removed // SECURITY: Removed console.log('🔐 Initializing Humber OS Authentication System...\n');
+  // SECURITY: console statement removedlog('🔐 Initializing Humber OS Authentication System...\n');
   
   try {
     // 1. Run auth migration on master database
-    // SECURITY: Removed // SECURITY: Removed console.log('📦 Creating authentication tables...');
+    // SECURITY: console statement removedlog('📦 Creating authentication tables...');
     
     const authMigration = readFileSync(
       join(__dirname, '..', 'migrations', '003_create_auth_tables.sql'), 
@@ -33,19 +33,19 @@ async function initializeAuth() {
     const { stdout, stderr } = await execAsync(command);
     
     if (stderr && !stderr.includes('warning')) {
-      // SECURITY: Removed console.error('❌ Error creating auth tables:', stderr);
+      // SECURITY: console statement removederror('❌ Error creating auth tables:', stderr);
       throw new Error(stderr);
     }
     
-    // SECURITY: Removed // SECURITY: Removed console.log('✅ Authentication tables created successfully\n');
+    // SECURITY: console statement removedlog('✅ Authentication tables created successfully\n');
     
     // 2. Create additional test users
-    // SECURITY: Removed // SECURITY: Removed console.log('👥 Creating test users...');
+    // SECURITY: console statement removedlog('👥 Creating test users...');
     
     const testUsers = [
       {
         id: 'user_manager_001',
-        email: 'manager@humber-operations.com',
+        email: 'manager@example.com',
         password: 'manager123',
         firstName: 'John',
         lastName: 'Manager',
@@ -53,7 +53,7 @@ async function initializeAuth() {
       },
       {
         id: 'user_engineer_001',
-        email: 'engineer@humber-operations.com',
+        email: 'engineer@example.com',
         password: 'engineer123',
         firstName: 'Jane',
         lastName: 'Engineer',
@@ -61,7 +61,7 @@ async function initializeAuth() {
       },
       {
         id: 'user_viewer_001',
-        email: 'viewer@humber-operations.com',
+        email: 'viewer@example.com',
         password: 'viewer123',
         firstName: 'Bob',
         lastName: 'Viewer',
@@ -102,59 +102,59 @@ async function initializeAuth() {
       const userCommand = `echo "${escapedUserSql}" | npx wrangler d1 execute humber_os_master --local`;
       
       await execAsync(userCommand);
-      // SECURITY: Removed // SECURITY: Removed console.log(`   ✅ Created ${user.role}: ${user.email}`);
+      // SECURITY: console statement removedlog(`   ✅ Created ${user.role}: ${user.email}`);
     }
     
-    // SECURITY: Removed // SECURITY: Removed console.log('\n🔑 Test Authentication Credentials:');
-    // SECURITY: Removed // SECURITY: Removed console.log('┌─────────────────────────────────────────────────────────┐');
-    // SECURITY: Removed // SECURITY: Removed console.log('│                    🧪 TEST USERS                       │');
-    // SECURITY: Removed // SECURITY: Removed console.log('├─────────────────────────────────────────────────────────┤');
-    // SECURITY: Removed // SECURITY: Removed console.log('│ ADMIN:    admin@humber-operations.com    / admin123     │');
-    // SECURITY: Removed // SECURITY: Removed console.log('│ MANAGER:  manager@humber-operations.com  / manager123   │');
-    // SECURITY: Removed // SECURITY: Removed console.log('│ ENGINEER: engineer@humber-operations.com / engineer123  │');
-    // SECURITY: Removed // SECURITY: Removed console.log('│ VIEWER:   viewer@humber-operations.com   / viewer123    │');
-    // SECURITY: Removed // SECURITY: Removed console.log('└─────────────────────────────────────────────────────────┘');
+    // SECURITY: console statement removedlog('\n🔑 Test Authentication Credentials:');
+    // SECURITY: console statement removedlog('┌─────────────────────────────────────────────────────────┐');
+    // SECURITY: console statement removedlog('│                    🧪 TEST USERS                       │');
+    // SECURITY: console statement removedlog('├─────────────────────────────────────────────────────────┤');
+    // SECURITY: console statement removedlog('│ ADMIN:    admin@example.com    / admin123     │');
+    // SECURITY: console statement removedlog('│ MANAGER:  manager@example.com  / manager123   │');
+    // SECURITY: console statement removedlog('│ ENGINEER: engineer@example.com / engineer123  │');
+    // SECURITY: console statement removedlog('│ VIEWER:   viewer@example.com   / viewer123    │');
+    // SECURITY: console statement removedlog('└─────────────────────────────────────────────────────────┘');
     
-    // SECURITY: Removed // SECURITY: Removed console.log('\n🛡️  Security Features Enabled:');
-    // SECURITY: Removed // SECURITY: Removed console.log('✅ JWT-based authentication');
-    // SECURITY: Removed // SECURITY: Removed console.log('✅ Role-based access control (RBAC)');
-    // SECURITY: Removed // SECURITY: Removed console.log('✅ Token blacklisting');
-    // SECURITY: Removed // SECURITY: Removed console.log('✅ Rate limiting');
-    // SECURITY: Removed // SECURITY: Removed console.log('✅ Multi-factor authentication support');
-    // SECURITY: Removed // SECURITY: Removed console.log('✅ IP binding (optional)');
-    // SECURITY: Removed // SECURITY: Removed console.log('✅ Comprehensive audit logging');
-    // SECURITY: Removed // SECURITY: Removed console.log('✅ API key authentication');
-    // SECURITY: Removed // SECURITY: Removed console.log('✅ Session management');
-    // SECURITY: Removed // SECURITY: Removed console.log('✅ Password security');
+    // SECURITY: console statement removedlog('\n🛡️  Security Features Enabled:');
+    // SECURITY: console statement removedlog('✅ JWT-based authentication');
+    // SECURITY: console statement removedlog('✅ Role-based access control (RBAC)');
+    // SECURITY: console statement removedlog('✅ Token blacklisting');
+    // SECURITY: console statement removedlog('✅ Rate limiting');
+    // SECURITY: console statement removedlog('✅ Multi-factor authentication support');
+    // SECURITY: console statement removedlog('✅ IP binding (optional)');
+    // SECURITY: console statement removedlog('✅ Comprehensive audit logging');
+    // SECURITY: console statement removedlog('✅ API key authentication');
+    // SECURITY: console statement removedlog('✅ Session management');
+    // SECURITY: console statement removedlog('✅ Password security');
     
-    // SECURITY: Removed // SECURITY: Removed console.log('\n📚 Authentication Endpoints:');
-    // SECURITY: Removed // SECURITY: Removed console.log('• POST /auth/login     - User login');
-    // SECURITY: Removed // SECURITY: Removed console.log('• POST /auth/refresh   - Refresh access token');
-    // SECURITY: Removed // SECURITY: Removed console.log('• POST /auth/logout    - User logout');
+    // SECURITY: console statement removedlog('\n📚 Authentication Endpoints:');
+    // SECURITY: console statement removedlog('• POST /auth/login     - User login');
+    // SECURITY: console statement removedlog('• POST /auth/refresh   - Refresh access token');
+    // SECURITY: console statement removedlog('• POST /auth/logout    - User logout');
     
-    // SECURITY: Removed // SECURITY: Removed console.log('\n🧪 Test Authentication:');
-    // SECURITY: Removed // SECURITY: Removed console.log('curl -X POST https://your-worker.workers.dev/auth/login \\');
-    // SECURITY: Removed // SECURITY: Removed console.log('  -H "Content-Type: application/json" \\');
-    // SECURITY: Removed // SECURITY: Removed console.log('  -d \'{"email": "admin@humber-operations.com", "password": "admin123", "tenantId": "tenant_humber_001"}\'');
+    // SECURITY: console statement removedlog('\n🧪 Test Authentication:');
+    // SECURITY: console statement removedlog('curl -X POST https://your-worker.workers.dev/auth/login \\');
+    // SECURITY: console statement removedlog('  -H "Content-Type: application/json" \\');
+    // SECURITY: console statement removedlog('  -d \'{"email": "admin@example.com", "password": "admin123", "tenantId": "tenant_humber_001"}\'');
     
-    // SECURITY: Removed // SECURITY: Removed console.log('\n⚠️  IMPORTANT SECURITY NOTES:');
-    // SECURITY: Removed // SECURITY: Removed console.log('🔸 Change all default passwords immediately in production');
-    // SECURITY: Removed // SECURITY: Removed console.log('🔸 Use proper password hashing (bcrypt) in production');
-    // SECURITY: Removed // SECURITY: Removed console.log('🔸 Set strong JWT secrets using wrangler secrets');
-    // SECURITY: Removed // SECURITY: Removed console.log('🔸 Enable MFA for admin accounts');
-    // SECURITY: Removed // SECURITY: Removed console.log('🔸 Monitor security audit logs regularly');
-    // SECURITY: Removed // SECURITY: Removed console.log('🔸 Implement proper key rotation policies');
+    // SECURITY: console statement removedlog('\n⚠️  IMPORTANT SECURITY NOTES:');
+    // SECURITY: console statement removedlog('🔸 Change all default passwords immediately in production');
+    // SECURITY: console statement removedlog('🔸 Use proper password hashing (bcrypt) in production');
+    // SECURITY: console statement removedlog('🔸 Set strong JWT secrets using wrangler secrets');
+    // SECURITY: console statement removedlog('🔸 Enable MFA for admin accounts');
+    // SECURITY: console statement removedlog('🔸 Monitor security audit logs regularly');
+    // SECURITY: console statement removedlog('🔸 Implement proper key rotation policies');
     
-    // SECURITY: Removed // SECURITY: Removed console.log('\n🎉 Authentication system initialized successfully!');
+    // SECURITY: console statement removedlog('\n🎉 Authentication system initialized successfully!');
     
   } catch (error) {
-    // SECURITY: Removed console.error('\n❌ Authentication initialization failed:', error);
+    // SECURITY: console statement removederror('\n❌ Authentication initialization failed:', error);
     process.exit(1);
   }
 }
 
 // Run the initialization
-main().catch(// SECURITY: Removed console.error);
+main().catch(// SECURITY: console statement removederror);
 
 async function main() {
   await initializeAuth();

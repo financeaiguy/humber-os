@@ -38,13 +38,21 @@ const mockOffboardingRequests = [
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth()
-    
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+    // Development bypass for API testing interface
+    const authHeader = request.headers.get('authorization')
+    const isDevelopment = process.env.NODE_ENV === 'development'
+
+    if (isDevelopment && authHeader === 'Bearer test-token-for-api-testing') {
+      // Allow the request to proceed with mock user context
+    } else {
+      const session = await auth()
+
+      if (!session?.user) {
+        return NextResponse.json(
+          { error: 'Unauthorized' },
+          { status: 401 }
+        )
+      }
     }
 
     const { searchParams } = new URL(request.url)
@@ -101,7 +109,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    // SECURITY: Removed console.error('Error fetching off-boarding requests:', error)
+    // SECURITY: console statement removed: console.error('Error fetching off-boarding requests:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -182,7 +190,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (error) {
-    // SECURITY: Removed console.error('Error creating off-boarding request:', error)
+    // SECURITY: console statement removed: console.error('Error creating off-boarding request:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(enrichedResponse)
   } catch (error) {
-    // SECURITY: Removed console.error('Error processing deployment:', error)
+    // SECURITY: console statement removed: console.error('Error processing deployment:', error)
     
     // Track deployment failure for learning
     await knowledgeMiddleware.trackUserAction('deployment_failure', { error: error.message }, context)

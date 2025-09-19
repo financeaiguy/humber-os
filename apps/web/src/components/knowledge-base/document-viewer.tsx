@@ -86,8 +86,7 @@ const mockDocuments: Document[] = [
     type: 'pdf',
     size: 2456789,
     url: '/docs/electrical-safety-v2.3.pdf',
-    preview: '/previews/electrical-safety.jpg',
-    content: 'Comprehensive electrical safety protocols for automotive manufacturing...',
+    content: 'Comprehensive electrical safety protocols for automotive manufacturing including lockout/tagout procedures, personal protective equipment requirements, risk assessment methodologies, emergency response protocols, and training requirements. This document establishes standardized safety practices to prevent electrical accidents and ensure compliance with OSHA regulations.',
     metadata: {
       author: 'Sarah Johnson',
       createdAt: '2025-01-10T10:00:00Z',
@@ -192,7 +191,7 @@ const mockDocuments: Document[] = [
 
 export function DocumentViewer({ isOpen, onClose, document: initialDocument, documents, onDocumentChange }: DocumentViewerProps) {
   const [currentDocument, setCurrentDocument] = useState<Document | null>(initialDocument || null)
-  const [viewMode, setViewMode] = useState<'preview' | 'content' | 'metadata' | 'analysis'>('preview')
+  const [viewMode, setViewMode] = useState<'preview' | 'content' | 'metadata' | 'analysis'>('content')
   const [zoom, setZoom] = useState(100)
   const [rotation, setRotation] = useState(0)
   const [searchTerm, setSearchTerm] = useState('')
@@ -252,7 +251,7 @@ export function DocumentViewer({ isOpen, onClose, document: initialDocument, doc
   const handleDownload = () => {
     if (currentDocument) {
       // Mock download
-      // SECURITY: Removed // SECURITY: Removed console.log('Downloading:', currentDocument.title)
+      // SECURITY: console statement removed: console.log('Downloading:', currentDocument.title)
       // In real implementation, would trigger actual download
       const link = document.createElement('a')
       link.href = currentDocument.url
@@ -466,16 +465,20 @@ export function DocumentViewer({ isOpen, onClose, document: initialDocument, doc
                         src={currentDocument.preview}
                         alt={currentDocument.title}
                         className="w-full h-auto rounded-lg"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none'
+                          const fallback = (e.target as HTMLImageElement).nextElementSibling as HTMLElement
+                          if (fallback) fallback.style.display = 'flex'
+                        }}
                       />
-                    ) : (
-                      <div className="w-full h-96 flex items-center justify-center bg-slate-100 rounded-lg">
-                        <div className="text-center">
-                          {getFileIcon(currentDocument.type)}
-                          <p className="mt-2 text-slate-600">Preview not available</p>
-                          <p className="text-sm text-slate-500">Download to view content</p>
-                        </div>
+                    ) : null}
+                    <div className="w-full h-96 flex items-center justify-center bg-slate-900/50 rounded-lg border border-slate-700" style={{ display: currentDocument.preview ? 'none' : 'flex' }}>
+                      <div className="text-center">
+                        {getFileIcon(currentDocument.type)}
+                        <p className="mt-2 text-slate-400">Preview not available</p>
+                        <p className="text-sm text-slate-500">Download to view content</p>
                       </div>
-                    )}
+                    </div>
                   </div>
                 </div>
               )}
@@ -604,8 +607,11 @@ export function DocumentViewer({ isOpen, onClose, document: initialDocument, doc
                 </div>
               )}
 
-              {viewMode === 'analysis' && currentDocument.aiAnalysis && (
+              {viewMode === 'analysis' && (
                 <div className="max-w-4xl mx-auto space-y-6">
+                  {currentDocument.aiAnalysis ? (
+                    <>
+                  {/* AI Analysis content starts here */}
                   {/* AI Summary */}
                   <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-xl p-6 border border-purple-500/20">
                     <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
@@ -675,6 +681,17 @@ export function DocumentViewer({ isOpen, onClose, document: initialDocument, doc
                       ))}
                     </div>
                   </div>
+                  </>
+                ) : (
+                    <div className="text-center py-12">
+                      <MessageSquare className="h-12 w-12 text-slate-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-white mb-2">AI Analysis not available</h3>
+                      <p className="text-slate-400">This document hasn't been processed for AI analysis yet.</p>
+                      <button className="mt-4 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors">
+                        Request Analysis
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

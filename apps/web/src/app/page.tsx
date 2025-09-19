@@ -147,9 +147,9 @@ export default function HomePage() {
         <div className="mt-6 text-sm text-slate-200">
           <p>Development credentials:</p>
           <ul className="mt-2 space-y-1">
-            <li>• Partner Admin: partner@ford.com / partner123</li>
-            <li>• Engineer: employee@humber.com / employee123</li>
-            <li>• Operator: operator@humber.com / operator123</li>
+            <li>• Partner Admin: partner@example.com / partner123</li>
+            <li>• Engineer: employee@example.com / employee123</li>
+            <li>• Operator: operator@example.com / operator123</li>
           </ul>
         </div>
       </div>

@@ -23,7 +23,9 @@ export function RetryError({
   const [retryCount, setRetryCount] = useState(0)
   const [showErrorDetails, setShowErrorDetails] = useState(false)
 
-  const errorMessage = typeof error === 'string' ? error : error.message
+  const errorMessage = typeof error === 'string' 
+    ? 'An error occurred. Please try again.' 
+    : 'An error occurred. Please try again.'
   const isNetworkError = errorMessage.toLowerCase().includes('network') || 
                         errorMessage.toLowerCase().includes('fetch')
   const isServerError = errorMessage.toLowerCase().includes('500') || 
@@ -39,7 +41,7 @@ export function RetryError({
     try {
       await onRetry()
     } catch (err) {
-      // SECURITY: Removed console.error('Retry failed:', err)
+      // SECURITY: console statement removed: console.error('Retry failed:', err)
     } finally {
       setIsRetrying(false)
     }
@@ -128,7 +130,7 @@ export function RetryError({
           <p className="text-red-400 font-medium">Error Loading Data</p>
           <p className="text-sm text-slate-400 mt-1">{errorMessage}</p>
           
-          {showDetails && error instanceof Error && error.message && (
+          {showDetails && error instanceof Error && process.env.NODE_ENV === 'development' && (
             <>
               <button
                 onClick={() => setShowErrorDetails(!showErrorDetails)}
@@ -144,7 +146,7 @@ export function RetryError({
                     exit={{ height: 0, opacity: 0 }}
                     className="text-xs text-slate-500 mt-2 overflow-x-auto bg-slate-900/50 rounded p-2"
                   >
-                    {error.message}
+                    {'Error details hidden for security'}
                   </motion.pre>
                 )}
               </AnimatePresence>

@@ -103,7 +103,7 @@ export class NotificationService {
     if (process.env.SENDGRID_API_KEY) {
       this.sendGridConfig = {
         apiKey: process.env.SENDGRID_API_KEY,
-        fromEmail: process.env.SENDGRID_FROM_EMAIL || 'notifications@humber.com',
+        fromEmail: process.env.SENDGRID_FROM_EMAIL || 'notifications@example.com',
         fromName: process.env.SENDGRID_FROM_NAME || 'Humber OS',
         templateIds: {
           clockIn: process.env.SENDGRID_TEMPLATE_CLOCK_IN,
@@ -311,13 +311,13 @@ export class NotificationService {
       case 'geofence_violation':
         // High priority - notify managers and HR
         recipients.sms = ['+1-555-0100', '+1-555-0101']; // Manager numbers
-        recipients.email = ['manager@humber.com', 'hr@humber.com'];
+        recipients.email = ['manager@example.com', 'hr@example.com'];
         recipients.push = ['manager-001', 'hr-001'];
         break;
       
       case 'overtime':
         // Notify HR and payroll
-        recipients.email = ['hr@humber.com', 'payroll@humber.com'];
+        recipients.email = ['hr@example.com', 'payroll@example.com'];
         recipients.push = ['hr-001'];
         break;
       
@@ -325,7 +325,7 @@ export class NotificationService {
       case 'clock_out':
         // Standard notifications
         recipients.sms = ['+1-555-0100']; // Direct manager
-        recipients.email = ['timesheet@humber.com'];
+        recipients.email = ['timesheet@example.com'];
         break;
     }
 

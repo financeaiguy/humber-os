@@ -114,7 +114,7 @@ export function OnboardingTracker() {
         setSelectedCandidate(prev => prev ? { ...prev, ...updates } : null)
       }
     } catch (error) {
-      // SECURITY: Removed console.error('Failed to update candidate:', error)
+      // SECURITY: console statement removed: console.error('Failed to update candidate:', error)
       throw error
     }
   }

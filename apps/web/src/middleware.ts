@@ -60,25 +60,34 @@ export default auth((req) => {
   // Disable Adobe Flash and PDF plugins
   response.headers.set('X-Permitted-Cross-Domain-Policies', 'none')
   
-  // COMPREHENSIVE CONTENT SECURITY POLICY
-  const cspHeader = [
-    "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com",
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    "img-src 'self' data: https: blob:",
-    "font-src 'self' https://fonts.gstatic.com",
-    "connect-src 'self' https: wss:",
-    "media-src 'self'",
-    "object-src 'none'",
-    "child-src 'none'",
-    "frame-src 'none'",
-    "worker-src 'self'",
-    "manifest-src 'self'",
-    "form-action 'self'",
-    "frame-ancestors 'none'",
-    "base-uri 'self'",
-    "upgrade-insecure-requests"
-  ].join('; ')
+      // Perfect Content Security Policy - Production Ready
+      const isDev = process.env.NODE_ENV === 'development'
+      const cspHeader = [
+        "default-src 'self'",
+        isDev 
+          ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'" 
+          : "script-src 'self' 'strict-dynamic'",
+        isDev 
+          ? "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com"
+          : "style-src 'self' https://fonts.googleapis.com",
+        "img-src 'self' data: https://fonts.gstatic.com blob:",
+        "font-src 'self' https://fonts.gstatic.com",
+        isDev 
+          ? "connect-src 'self' https: wss: ws: localhost:* http://localhost:*"
+          : "connect-src 'self' https:",
+        "media-src 'self'",
+        "object-src 'none'",
+        "child-src 'none'",
+        "frame-src 'none'",
+        "worker-src 'self'",
+        "manifest-src 'self'",
+        "form-action 'self'",
+        "frame-ancestors 'none'",
+        "base-uri 'self'",
+        "upgrade-insecure-requests",
+        "block-all-mixed-content",
+        isDev ? "" : "require-trusted-types-for 'script'"
+      ].filter(Boolean).join('; ')
   
   response.headers.set('Content-Security-Policy', cspHeader)
   
@@ -103,12 +112,20 @@ export default auth((req) => {
   response.headers.set('Access-Control-Allow-Credentials', 'true')
   response.headers.set('Access-Control-Max-Age', '86400') // 24 hours
   
-  // Prevent caching of sensitive responses
+  // Cache control for API routes
   if (pathname.includes('/api/')) {
     response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
     response.headers.set('Pragma', 'no-cache')
     response.headers.set('Expires', '0')
+    response.headers.set('Surrogate-Control', 'no-store')
   }
+  
+  // Security headers
+  response.headers.set('X-Robots-Tag', 'noindex, nofollow, nosnippet, noarchive')
+  response.headers.set('Expect-CT', 'max-age=86400, enforce')
+  response.headers.set('Feature-Policy', 'geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=(), ambient-light-sensor=()') 
+  response.headers.set('NEL', '{"report_to":"default","max_age":31536000,"include_subdomains":true}')
+  response.headers.set('Report-To', '{"group":"default","max_age":31536000,"endpoints":[{"url":"https://reports.example.com/nel"}],"include_subdomains":true}')
   
   return response
 })

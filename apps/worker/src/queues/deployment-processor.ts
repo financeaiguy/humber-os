@@ -118,7 +118,7 @@ export class DeploymentProcessor {
 
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: 'An error occurred',
       };
     }
   }

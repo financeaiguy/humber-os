@@ -15,7 +15,7 @@ const recruitmentAgencies = [
     type: 'Technical Recruiting',
     specialization: ['Software Engineers', 'Controls Engineers', 'Robotics'],
     contactPerson: 'Sarah Mitchell',
-    email: 'sarah@techtalentglobal.com',
+    email: 'sarah@example.com',
     phone: '+1 (555) 123-4567',
     location: 'Detroit, MI',
     status: 'active',
@@ -33,7 +33,7 @@ const recruitmentAgencies = [
     type: 'Engineering Specialists',
     specialization: ['Mechanical Engineers', 'Electrical Engineers'],
     contactPerson: 'Michael Chen',
-    email: 'mchen@engineeringelite.com',
+    email: 'mchen@example.com',
     phone: '+1 (555) 234-5678',
     location: 'Chicago, IL',
     status: 'active',
@@ -51,7 +51,7 @@ const recruitmentAgencies = [
     type: 'Industrial & Manufacturing',
     specialization: ['Piping Engineers', 'Process Engineers', 'Safety Engineers'],
     contactPerson: 'Emily Rodriguez',
-    email: 'emily@industrialstaffing.com',
+    email: 'emily@example.com',
     phone: '+1 (555) 345-6789',
     location: 'Houston, TX',
     status: 'pending',
@@ -148,7 +148,7 @@ export default function RecruitsPage() {
       const response = await recruitsApi.getRecruits({ limit: 20 })
       setRecruits(response.recruits || [])
     } catch (error) {
-      // SECURITY: Removed console.error('Error fetching recruits:', error)
+      // SECURITY: console statement removed: console.error('Error fetching recruits:', error)
     } finally {
       setIsLoading(false)
     }
@@ -169,7 +169,7 @@ export default function RecruitsPage() {
       // Show success message (you could use a toast here)
       alert('Recruit successfully moved to onboarding!')
     } catch (error) {
-      // SECURITY: Removed console.error('Error moving recruit to onboarding:', error)
+      // SECURITY: console statement removed: console.error('Error moving recruit to onboarding:', error)
       alert('Failed to move recruit to onboarding. Please try again.')
     } finally {
       setMovingToOnboarding(null)

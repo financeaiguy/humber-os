@@ -132,7 +132,7 @@ export class DynamicProjectCostCalculator implements ProjectCostCalculator {
       return totalEngineerCost + softCosts.total + hardCosts.total + totalTravelCost + totalMiscCost
       
     } catch (error) {
-      // SECURITY: Removed console.error('Error calculating total project cost:', error)
+      // SECURITY: console statement removed: console.error('Error calculating total project cost:', error)
       throw new Error('Failed to calculate project cost')
     }
   }
@@ -149,7 +149,7 @@ export class DynamicProjectCostCalculator implements ProjectCostCalculator {
       return projectedTotal <= budgetAllocation.totalBudget
       
     } catch (error) {
-      // SECURITY: Removed console.error('Error validating budget allocation:', error)
+      // SECURITY: console statement removed: console.error('Error validating budget allocation:', error)
       return false
     }
   }
@@ -171,7 +171,7 @@ export class DynamicProjectCostCalculator implements ProjectCostCalculator {
       return forecastedTotal
       
     } catch (error) {
-      // SECURITY: Removed console.error('Error generating cost forecast:', error)
+      // SECURITY: console statement removed: console.error('Error generating cost forecast:', error)
       throw new Error('Failed to generate cost forecast')
     }
   }
@@ -213,7 +213,7 @@ export class DynamicProjectCostCalculator implements ProjectCostCalculator {
       }
       
     } catch (error) {
-      // SECURITY: Removed console.error('Error generating budget breakdown:', error)
+      // SECURITY: console statement removed: console.error('Error generating budget breakdown:', error)
       throw new Error('Failed to generate budget breakdown')
     }
   }

@@ -111,7 +111,7 @@ async function apiRequest<T>(
     }
     
     // Handle network errors or JSON parsing errors
-    if (error instanceof TypeError && error.message.includes('fetch')) {
+    if (error instanceof TypeError) {
       throw new ApiError('Network error. Please check your connection.', 0)
     }
     
@@ -216,15 +216,15 @@ export function getFieldErrors(error: ApiValidationError): Record<string, string
 
 export function getErrorMessage(error: unknown): string {
   if (error instanceof ApiValidationError) {
-    return error.message
+    return 'Validation error occurred'
   }
   
   if (error instanceof ApiError) {
-    return error.message
+    return 'API error occurred'
   }
   
   if (error instanceof Error) {
-    return error.message
+    return 'An error occurred'
   }
   
   return 'An unexpected error occurred'

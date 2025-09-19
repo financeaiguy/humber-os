@@ -68,7 +68,7 @@ export function useNervousSystem(options: UseNervousSystemOptions) {
       setState(prev => ({
         ...prev,
         isLoading: false,
-        error: error instanceof Error ? error.message : 'Failed to connect to nervous system'
+        error: 'Failed to connect to nervous system'
       }))
     }
   }, [page, feature, userRole])
@@ -77,13 +77,13 @@ export function useNervousSystem(options: UseNervousSystemOptions) {
     if (!enableLearning) return
 
     try {
-      await knowledgeNervousSystem.learnFromUserAction({
+      await knowledgeNervousSystem.learnFromInteraction({
         type: action,
         ...data,
         timestamp: new Date().toISOString()
       }, context)
     } catch (error) {
-      // SECURITY: Removed console.error('Failed to track action:', error)
+      // SECURITY: console statement removed: console.error('Failed to track action:', error)
     }
   }, [enableLearning, page, feature, userRole])
 
@@ -101,7 +101,7 @@ export function useNervousSystem(options: UseNervousSystemOptions) {
       
       return response
     } catch (error) {
-      // SECURITY: Removed console.error('Failed to query AI:', error)
+      // SECURITY: console statement removed: console.error('Failed to query AI:', error)
       return null
     }
   }, [trackAction, page, feature, userRole])
@@ -119,7 +119,7 @@ export function useNervousSystem(options: UseNervousSystemOptions) {
 
       return analysis
     } catch (error) {
-      // SECURITY: Removed console.error('Failed to analyze process:', error)
+      // SECURITY: console statement removed: console.error('Failed to analyze process:', error)
       return null
     }
   }, [trackAction, page, feature, userRole])
@@ -133,14 +133,14 @@ export function useNervousSystem(options: UseNervousSystemOptions) {
       
       return optimization
     } catch (error) {
-      // SECURITY: Removed console.error('Failed to optimize workflow:', error)
+      // SECURITY: console statement removed: console.error('Failed to optimize workflow:', error)
       return null
     }
   }, [trackAction, page, feature, userRole])
 
   const addKnowledge = useCallback(async (knowledge: any) => {
     try {
-      await knowledgeNervousSystem.addKnowledge(knowledge, context)
+      await knowledgeNervousSystem.learnFromDocument(knowledge, context)
       
       // Track knowledge addition
       await trackAction('knowledge_added', { knowledge })
@@ -148,7 +148,7 @@ export function useNervousSystem(options: UseNervousSystemOptions) {
       // Reload data to get updated insights
       await loadData()
     } catch (error) {
-      // SECURITY: Removed console.error('Failed to add knowledge:', error)
+      // SECURITY: console statement removed: console.error('Failed to add knowledge:', error)
     }
   }, [loadData, trackAction])
 
@@ -161,7 +161,7 @@ export function useNervousSystem(options: UseNervousSystemOptions) {
       
       return suggestions
     } catch (error) {
-      // SECURITY: Removed console.error('Failed to get suggestions:', error)
+      // SECURITY: console statement removed: console.error('Failed to get suggestions:', error)
       return []
     }
   }, [trackAction, page, feature, userRole])
@@ -175,7 +175,7 @@ export function useNervousSystem(options: UseNervousSystemOptions) {
       
       return prediction
     } catch (error) {
-      // SECURITY: Removed console.error('Failed to predict outcome:', error)
+      // SECURITY: console statement removed: console.error('Failed to predict outcome:', error)
       return null
     }
   }, [trackAction, page, feature, userRole])

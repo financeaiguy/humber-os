@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
       await sendForApproval(savedExpense, type, projectId)
     }
 
-    // SECURITY: Removed // SECURITY: Removed console.log(`💰 ${type} expense created:`, savedExpense.id, savedExpense.amount)
+    // SECURITY: console statement removed: console.log(`💰 ${type} expense created:`, savedExpense.id, savedExpense.amount)
 
     return NextResponse.json({
       success: true,
@@ -166,7 +166,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    // SECURITY: Removed console.error('Get expenses error:', error)
+    // SECURITY: console statement removed: console.error('Get expenses error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch expenses' },
       { status: 500 }
@@ -199,13 +199,13 @@ export async function PUT(request: NextRequest) {
       expense.approvedBy = approverId
       expense.approvedAt = new Date().toISOString()
       
-      // SECURITY: Removed // SECURITY: Removed console.log(`✅ Expense approved: ${expenseId} by ${approverId}`)
+      // SECURITY: console statement removed: console.log(`✅ Expense approved: ${expenseId} by ${approverId}`)
       
     } else if (action === 'reject') {
       expense.approved = false
       // Add rejection reason to notes or separate field
       
-      // SECURITY: Removed // SECURITY: Removed console.log(`❌ Expense rejected: ${expenseId} by ${approverId}`)
+      // SECURITY: console statement removed: console.log(`❌ Expense rejected: ${expenseId} by ${approverId}`)
     }
 
     return NextResponse.json({
@@ -215,7 +215,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (error) {
-    // SECURITY: Removed console.error('Update expense error:', error)
+    // SECURITY: console statement removed: console.error('Update expense error:', error)
     return NextResponse.json(
       { error: 'Failed to update expense' },
       { status: 500 }
@@ -312,12 +312,8 @@ async function checkAutoApproval(expense: TravelExpense | MiscExpense, type: str
 
 async function sendForApproval(expense: TravelExpense | MiscExpense, type: string, projectId: string) {
   // Mock approval notification - replace with actual notification service
-  // SECURITY: Removed // SECURITY: Removed console.log(`📧 Sending expense for approval:`, {
-    expenseId: expense.id,
-    type,
-    amount: expense.amount,
-    projectId
-  })
+  // SECURITY: console statement removed
+  // Sending expense for approval: expenseId, type, amount, projectId
 }
 
 async function findExpenseById(expenseId: string): Promise<TravelExpense | MiscExpense | null> {

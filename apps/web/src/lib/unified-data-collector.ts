@@ -559,7 +559,7 @@ class UnifiedDataCollector extends EventEmitter {
         try {
           await this.executeAggregationTask(task)
         } catch (error) {
-          // SECURITY: Removed console.error('Aggregation task failed:', error)
+          // SECURITY: console statement removed: console.error('Aggregation task failed:', error)
           this.emit('aggregationError', { task, error })
         }
       }

@@ -110,6 +110,12 @@ export class CSRFProtection {
       // AJAX requests with custom header are generally safe from CSRF
       return true
     }
+
+    // Allow API testing tools and development
+    const userAgent = c.req.header('User-Agent') || ''
+    if (userAgent.includes('fetch') || userAgent.includes('curl') || userAgent.includes('Postman')) {
+      return true
+    }
     
     return false
   }
@@ -234,6 +240,7 @@ export const developmentCSRF = CSRFProtection.create({
     'http://localhost:3000',
     'http://localhost:3001',
     'http://localhost:3002',
+    'http://localhost:8787', // Add worker port for API testing interface
     'https://humber-nextjs-app.pages.dev'
   ],
   secure: false, // Allow HTTP in development

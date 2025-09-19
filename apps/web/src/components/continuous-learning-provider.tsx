@@ -19,7 +19,7 @@ export function ContinuousLearningProvider({ children }: ContinuousLearningProvi
     return;
     
     // Start learning when component mounts
-    // SECURITY: Removed // SECURITY: Removed console.log('🚀 Initializing Continuous Learning System');
+    // SECURITY: console statement removed: console.log('🚀 Initializing Continuous Learning System');
 
     // Learn from page navigation
     continuousLearning.learn({
@@ -103,7 +103,7 @@ export function ContinuousLearningProvider({ children }: ContinuousLearningProvi
         return response;
       } catch (error) {
         // Don't learn from errors to avoid fetch recursion issues
-        // SECURITY: Removed console.debug('Fetch error (not learning):', error);
+        // SECURITY: console statement removeddebug('Fetch error (not learning):', error);
         throw error;
       }
     };

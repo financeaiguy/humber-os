@@ -36,7 +36,7 @@ export async function securityHeaders(c: Context, next: Next) {
  */
 export function sanitizeError(error: any, context: string): { error: string; message: string } {
   // Log full error internally
-  // SECURITY: Removed console.error(`Error in ${context}:`, error);
+  // SECURITY: console statement removederror(`Error in ${context}:`, error);
   
   // Return sanitized error to client
   if (error instanceof z.ZodError) {
@@ -46,14 +46,14 @@ export function sanitizeError(error: any, context: string): { error: string; mes
     };
   }
   
-  if (error.message?.includes('duplicate') || error.message?.includes('unique')) {
+  if (error.name === 'DuplicateError' || error.name === 'UniqueConstraintError') {
     return {
       error: 'Conflict',
       message: 'This resource already exists'
     };
   }
   
-  if (error.message?.includes('not found')) {
+  if (error.name === 'NotFoundError') {
     return {
       error: 'Not found',
       message: 'The requested resource was not found'
@@ -203,9 +203,9 @@ export async function auditLog(
     
     // Also log to console in development
     if (env.ENVIRONMENT === 'development') {
-      // SECURITY: Removed // SECURITY: Removed console.log('AUDIT:', logEntry);
+      // SECURITY: console statement removedlog('AUDIT:', logEntry);
     }
   } catch (error) {
-    // SECURITY: Removed console.error('Failed to write audit log:', error);
+    // SECURITY: console statement removederror('Failed to write audit log:', error);
   }
 }

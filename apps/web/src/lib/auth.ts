@@ -21,6 +21,6 @@ export async function getSession(request: NextRequest): Promise<Session | null> 
     userId: 'user_dev_123',
     tenantId: 'tenant_dev_123',
     userRole: 'ADMIN',
-    email: 'dev@humberops.com'
+    email: 'dev@example.com'
   }
 }

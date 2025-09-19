@@ -1,5 +1,6 @@
 'use client'
 
+import { chatEvents } from '@/lib/chat-events'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   BookOpen, 
@@ -12,8 +13,6 @@ import {
   Upload,
   MessageSquare,
   X,
-  Send,
-  Paperclip,
   Grid,
   List,
   Filter,
@@ -52,7 +51,6 @@ const mockDocuments = [
     type: 'pdf' as const,
     size: 2456789,
     url: '/docs/electrical-safety-v2.3.pdf',
-    preview: '/previews/electrical-safety.jpg',
     content: 'Comprehensive electrical safety protocols for automotive manufacturing environments including lockout/tagout procedures, PPE requirements, hazard identification, emergency response protocols, and regulatory compliance guidelines.',
     metadata: {
       author: 'Sarah Johnson',
@@ -68,6 +66,19 @@ const mockDocuments = [
       viewCount: 1203,
       rating: 4.8,
       comments: 15
+    },
+    aiAnalysis: {
+      summary: 'Comprehensive safety document covering electrical hazard prevention, lockout/tagout procedures, and emergency response protocols.',
+      keyTopics: ['Lockout/Tagout', 'PPE Requirements', 'Emergency Response', 'Risk Assessment', 'Training Requirements'],
+      relatedDocuments: ['general-safety-handbook', 'emergency-procedures', 'training-manual'],
+      extractedData: {
+        procedures: 15,
+        checklistItems: 42,
+        emergencyContacts: 8
+      },
+      sentiment: 'neutral' as const,
+      complexity: 'medium' as const,
+      completeness: 95
     }
   },
   {
@@ -91,6 +102,19 @@ const mockDocuments = [
       viewCount: 892,
       rating: 4.6,
       comments: 8
+    },
+    aiAnalysis: {
+      summary: 'Technical standards document outlining PLC programming conventions, naming standards, and code organization principles.',
+      keyTopics: ['Naming Conventions', 'Code Structure', 'Documentation', 'Testing Procedures', 'Version Control'],
+      relatedDocuments: ['automation-guidelines', 'hmi-standards', 'testing-procedures'],
+      extractedData: {
+        codeExamples: 23,
+        standards: 31,
+        bestPractices: 18
+      },
+      sentiment: 'positive' as const,
+      complexity: 'high' as const,
+      completeness: 88
     }
   },
   {
@@ -113,6 +137,19 @@ const mockDocuments = [
       viewCount: 445,
       rating: 4.9,
       comments: 3
+    },
+    aiAnalysis: {
+      summary: 'Structured checklist template covering all aspects of project handover including documentation, training, and sign-offs.',
+      keyTopics: ['Documentation Review', 'Training Completion', 'System Testing', 'Client Sign-off', 'Support Transition'],
+      relatedDocuments: ['quality-standards', 'training-templates', 'client-communication'],
+      extractedData: {
+        checklistItems: 67,
+        phases: 5,
+        signOffs: 12
+      },
+      sentiment: 'positive' as const,
+      complexity: 'low' as const,
+      completeness: 100
     }
   },
   {
@@ -136,6 +173,19 @@ const mockDocuments = [
       viewCount: 234,
       rating: 4.4,
       comments: 5
+    },
+    aiAnalysis: {
+      summary: 'Comprehensive configuration guide for robotic welding systems covering setup, calibration, and maintenance procedures.',
+      keyTopics: ['System Configuration', 'Calibration Procedures', 'Safety Protocols', 'Maintenance Schedules', 'Programming'],
+      relatedDocuments: ['robotic-systems-manual', 'welding-standards', 'safety-protocols'],
+      extractedData: {
+        configurationSteps: 34,
+        safetyChecks: 18,
+        maintenanceItems: 25
+      },
+      sentiment: 'neutral' as const,
+      complexity: 'high' as const,
+      completeness: 82
     }
   },
   {
@@ -158,6 +208,19 @@ const mockDocuments = [
       viewCount: 567,
       rating: 4.7,
       comments: 12
+    },
+    aiAnalysis: {
+      summary: 'Video training series demonstrating quality control testing procedures and equipment operation techniques.',
+      keyTopics: ['Testing Procedures', 'Equipment Operation', 'Quality Standards', 'Visual Inspection', 'Documentation'],
+      relatedDocuments: ['quality-standards', 'testing-equipment-manual', 'inspection-checklist'],
+      extractedData: {
+        videoSegments: 8,
+        procedures: 12,
+        equipmentTypes: 6
+      },
+      sentiment: 'positive' as const,
+      complexity: 'medium' as const,
+      completeness: 90
     }
   },
   {
@@ -181,6 +244,19 @@ const mockDocuments = [
       viewCount: 678,
       rating: 4.5,
       comments: 7
+    },
+    aiAnalysis: {
+      summary: 'Professional communication templates for client interactions covering project updates, status reports, and milestone communications.',
+      keyTopics: ['Project Updates', 'Status Reports', 'Milestone Communications', 'Professional Writing', 'Client Relations'],
+      relatedDocuments: ['project-management-guide', 'communication-standards', 'client-handbook'],
+      extractedData: {
+        templates: 15,
+        communicationTypes: 8,
+        examples: 22
+      },
+      sentiment: 'positive' as const,
+      complexity: 'low' as const,
+      completeness: 94
     }
   }
 ]
@@ -204,12 +280,9 @@ export default function KnowledgeBasePage() {
   const [sortBy, setSortBy] = useState('updated')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [showUploadModal, setShowUploadModal] = useState(false)
-  const [showChatWidget, setShowChatWidget] = useState(false)
   const [showDocumentViewer, setShowDocumentViewer] = useState(false)
   const [selectedDocument, setSelectedDocument] = useState<any>(null)
   const [showAIPanel, setShowAIPanel] = useState(false)
-  const [chatMessages, setChatMessages] = useState<Array<{id: string, role: 'user' | 'assistant', content: string, sources?: any[]}>>([]) 
-  const [chatInput, setChatInput] = useState('')
   const [isUploading, setIsUploading] = useState(false)
   const [knowledgeStats, setKnowledgeStats] = useState<any>(null)
   const [aiInsights, setAiInsights] = useState<any[]>([])
@@ -223,26 +296,78 @@ export default function KnowledgeBasePage() {
   const loadKnowledgeData = async () => {
     try {
       // Use integrated API service for better tracking and AI insights
-      const stats = await knowledgeNervousSystem.getKnowledgeStats()
-      setKnowledgeStats(stats)
+      try {
+        const stats = await knowledgeNervousSystem.getKnowledgeStats()
+        setKnowledgeStats(stats)
+      } catch (statsError) {
+        // Set default stats if loading fails
+        setKnowledgeStats({
+          totalNodes: 156,
+          totalRelationships: 324,
+          modelsActive: 3,
+          averageConfidence: 0.85
+        })
+      }
       
-      // Get AI insights using the integrated API service
-      const insights = await api.knowledge.insights({
-        currentPage: 'knowledge',
-        currentFeature: 'knowledge-management',
-        userRole: 'engineer'
-      })
-      setAiInsights(insights)
+      // Get AI insights using the knowledge nervous system
+      try {
+        const insights = await knowledgeNervousSystem.getInsights({
+          sessionId: 'knowledge-session',
+          currentPage: 'knowledge',
+          currentFeature: 'knowledge-management',
+          userRole: 'engineer',
+          timestamp: new Date().toISOString(),
+          environment: 'development'
+        })
+        setAiInsights(insights)
+      } catch (insightsError) {
+        // Set demo insights if loading fails
+        setAiInsights([
+          {
+            id: 'demo-1',
+            type: 'pattern',
+            content: { pattern: 'Users frequently search for safety protocols during project setup', summary: 'High engagement with safety documentation' },
+            confidence: 0.89
+          },
+          {
+            id: 'demo-2', 
+            type: 'trend',
+            content: { pattern: 'Document upload patterns show peak activity on Mondays', summary: 'Weekly workflow optimization opportunity' },
+            confidence: 0.76
+          }
+        ])
+      }
       
-      // Get recommendations using the integrated API service
-      const recs = await api.knowledge.recommendations({
-        currentPage: 'knowledge',
-        currentFeature: 'knowledge-management', 
-        userRole: 'engineer'
-      })
-      setRecommendations(recs)
+      // Get recommendations using the knowledge nervous system
+      try {
+        const recs = await knowledgeNervousSystem.getRecommendations({
+          sessionId: 'knowledge-session',
+          currentPage: 'knowledge',
+          currentFeature: 'knowledge-management', 
+          userRole: 'engineer',
+          timestamp: new Date().toISOString(),
+          environment: 'development'
+        })
+        setRecommendations(recs)
+      } catch (recsError) {
+        // Set demo recommendations if loading fails
+        setRecommendations([
+          {
+            id: 'rec-1',
+            title: 'Update electrical safety protocols to latest standards',
+            source: 'Compliance Analysis',
+            priority: 'High'
+          },
+          {
+            id: 'rec-2',
+            title: 'Create template for project handover checklists',
+            source: 'Workflow Optimization',
+            priority: 'Medium'
+          }
+        ])
+      }
     } catch (error) {
-      // SECURITY: Removed console.error('Failed to load knowledge data:', error)
+      // SECURITY: console statement removed: console.error('Failed to load knowledge data:', error)
     }
   }
 
@@ -416,64 +541,13 @@ export default function KnowledgeBasePage() {
       alert('Document uploaded successfully!')
       
     } catch (error) {
-      // SECURITY: Removed console.error('Upload failed:', error)
+      // SECURITY: console statement removed: console.error('Upload failed:', error)
       alert('Upload failed. Please try again.')
     } finally {
       setIsUploading(false)
     }
   }
 
-  const handleChatSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!chatInput.trim()) return
-
-    const userMessage = {
-      id: Date.now().toString(),
-      role: 'user' as const,
-      content: chatInput
-    }
-
-    setChatMessages(prev => [...prev, userMessage])
-    const query = chatInput
-    setChatInput('')
-
-    try {
-      // Use the AI nervous system
-      const aiResponse = await askAI(query, {
-        currentPage: 'knowledge',
-        currentFeature: 'ai-chat'
-      })
-      
-      const response = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant' as const,
-        content: aiResponse.content || `Based on the knowledge base, I can help you with that. Here's what I found relevant to "${query}":\n\n• Electrical safety protocols require proper lockout/tagout procedures\n• PLC programming standards emphasize safety interlocks\n• Project management templates are available for timeline planning\n\nWould you like me to elaborate on any of these topics?`,
-        sources: aiResponse.sources || [
-          { title: 'Electrical Safety Protocols', relevance: 0.89 },
-          { title: 'PLC Programming Standards', relevance: 0.82 }
-        ]
-      }
-      
-      setChatMessages(prev => [...prev, response])
-      
-      continuousLearning.learn({
-        type: 'chat_response',
-        query: query,
-        response: response.content,
-        sources: response.sources,
-        timestamp: new Date().toISOString()
-      }, 'interaction')
-    } catch (error) {
-      // SECURITY: Removed console.error('AI query failed:', error)
-      // Fallback response
-      const fallbackResponse = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant' as const,
-        content: `I'm having trouble accessing the knowledge base right now. However, I can still help you with general questions about safety protocols, engineering standards, and project management. Could you be more specific about what you're looking for?`
-      }
-      setChatMessages(prev => [...prev, fallbackResponse])
-    }
-  }
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -543,7 +617,7 @@ export default function KnowledgeBasePage() {
             <span>AI Insights</span>
           </button>
           <button
-            onClick={() => setShowChatWidget(true)}
+            onClick={() => chatEvents.openChat()}
             className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg font-medium hover:from-emerald-600 hover:to-teal-600 transition-all duration-300"
           >
             <MessageSquare className="h-4 w-4" />
@@ -984,96 +1058,6 @@ export default function KnowledgeBasePage() {
         </div>
       )}
 
-      {/* Chat Widget */}
-      {showChatWidget && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-slate-800 rounded-2xl border border-slate-700 w-full max-w-2xl h-[600px] flex flex-col"
-          >
-            {/* Chat Header */}
-            <div className="flex items-center justify-between p-4 border-b border-slate-700">
-              <div className="flex items-center space-x-3">
-                <div className="h-8 w-8 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center">
-                  <Brain className="h-4 w-4 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-white">Knowledge Assistant</h3>
-                  <p className="text-xs text-slate-400">Powered by Humber OS AI Nervous System</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setShowChatWidget(false)}
-                className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
-              >
-                <X className="h-4 w-4 text-slate-400" />
-              </button>
-            </div>
-            
-            {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {chatMessages.length === 0 ? (
-                <div className="text-center py-8">
-                  <Brain className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                  <h4 className="text-lg font-medium text-white mb-2">Ask me anything!</h4>
-                  <p className="text-slate-400 text-sm">
-                    I can help you find information from your knowledge base including safety protocols, 
-                    technical standards, project guidelines, and provide AI-powered insights from the Humber OS nervous system.
-                  </p>
-                </div>
-              ) : (
-                chatMessages.map((msg) => (
-                  <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                      msg.role === 'user' 
-                        ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white' 
-                        : 'bg-slate-900/50 text-slate-100 border border-slate-700'
-                    }`}>
-                      <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                      {msg.sources && msg.sources.length > 0 && (
-                        <div className="mt-3 pt-3 border-t border-slate-600">
-                          <p className="text-xs text-slate-400 mb-2">Sources:</p>
-                          {msg.sources.map((source, idx) => (
-                            <div key={idx} className="text-xs text-slate-300 mb-1 flex items-center space-x-2">
-                              <Paperclip className="h-3 w-3" />
-                              <span>{source.title}</span>
-                              <span className="text-slate-500">({Math.round(source.relevance * 100)}% relevant)</span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-            
-            {/* Chat Input */}
-            <div className="p-4 border-t border-slate-700">
-              <form onSubmit={handleChatSubmit} className="flex items-center space-x-2">
-                <div className="flex-1 relative">
-                  <input
-                    type="text"
-                    value={chatInput}
-                    onChange={(e) => setChatInput(e.target.value)}
-                    placeholder="Ask about safety protocols, technical standards, project guidelines, or anything..."
-                    className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 pr-12"
-                  />
-                  <Paperclip className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-                </div>
-                <button
-                  type="submit"
-                  disabled={!chatInput.trim()}
-                  className="p-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Send className="h-4 w-4" />
-                </button>
-              </form>
-            </div>
-          </motion.div>
-        </div>
-      )}
     </div>
   )
 }

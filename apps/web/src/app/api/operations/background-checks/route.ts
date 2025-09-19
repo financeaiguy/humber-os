@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       message: 'Background checks completed successfully'
     })
   } catch (error) {
-    // SECURITY: Removed console.error('Error processing background checks:', error)
+    // SECURITY: console statement removed: console.error('Error processing background checks:', error)
     return NextResponse.json(
       {
         success: false,

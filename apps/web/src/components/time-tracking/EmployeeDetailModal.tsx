@@ -91,7 +91,7 @@ const mockEmployeeDetail: EmployeeDetail = {
   id: 1,
   name: 'Sarah Johnson',
   role: 'Senior Electrical Engineer',
-  email: 'sarah.johnson@humber.com',
+  email: 'employee@example.com',
   phone: '+1 (555) 123-4567',
   employeeId: 'HMB-2024-0342',
   department: 'Electrical Systems',

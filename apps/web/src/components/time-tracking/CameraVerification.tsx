@@ -67,12 +67,26 @@ export default function CameraVerification({
     setError(null)
 
     try {
-      // Check camera permission first
-      const permission = await navigator.permissions.query({ name: 'camera' as PermissionName })
-      setCameraPermission(permission.state as any)
+      // Check if mediaDevices API is available
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Camera access not supported in this browser. Please use Chrome, Firefox, Safari, or Edge.')
+      }
 
-      if (permission.state === 'denied') {
-        throw new Error('Camera access denied. Please enable camera permissions in your browser settings.')
+      // Check permission status but don't block on it
+      let permissionStatus: string | undefined
+      try {
+        if (navigator.permissions && navigator.permissions.query) {
+          const permission = await navigator.permissions.query({ name: 'camera' as PermissionName })
+          permissionStatus = permission.state
+          setCameraPermission(permission.state as any)
+
+          // Only warn if explicitly denied, don't throw
+          if (permission.state === 'denied') {
+            console.log('Camera permission previously denied, will try to request anyway')
+          }
+        }
+      } catch (permError) {
+        console.log('Permissions API not available, continuing')
       }
 
       // Stop any existing stream
@@ -80,19 +94,39 @@ export default function CameraVerification({
         streamRef.current.getTracks().forEach(track => track.stop())
       }
 
-      // Request camera access with high quality constraints
-      const constraints: MediaStreamConstraints = {
-        video: {
-          width: { ideal: 1280, min: 640 },
-          height: { ideal: 720, min: 480 },
-          facingMode: facingMode,
-          frameRate: { ideal: 30 },
-        },
-        audio: false
-      }
+      // Use proper constraints with fallback
+      let stream: MediaStream
 
-      const stream = await navigator.mediaDevices.getUserMedia(constraints)
+      try {
+        // First try with desired constraints
+        const constraints: MediaStreamConstraints = {
+          video: {
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            facingMode: facingMode
+          },
+          audio: false
+        }
+
+        stream = await navigator.mediaDevices.getUserMedia(constraints)
+      } catch (err: any) {
+        // If first attempt fails, try with minimal constraints
+        console.log('First camera attempt failed, trying minimal constraints')
+
+        try {
+          const minimalConstraints: MediaStreamConstraints = {
+            video: true,
+            audio: false
+          }
+
+          stream = await navigator.mediaDevices.getUserMedia(minimalConstraints)
+        } catch (finalErr: any) {
+          // Both attempts failed
+          throw finalErr
+        }
+      }
       streamRef.current = stream
+      setCameraPermission('granted')
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream
@@ -105,8 +139,24 @@ export default function CameraVerification({
       // Update permission state
       setCameraPermission('granted')
     } catch (err: any) {
-      // SECURITY: Removed console.error('Camera access error:', err)
-      setError(err.message || 'Failed to access camera')
+      let errorMessage = 'Failed to access camera'
+
+      // Provide more helpful error messages based on the error
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        errorMessage = 'Camera access was denied. Please allow camera access when prompted by your browser, or click the camera icon in the address bar.'
+      } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+        errorMessage = 'No camera found. Please ensure your device has a camera connected.'
+      } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+        errorMessage = 'Camera is being used by another application. Please close other apps using the camera and try again.'
+      } else if (err.name === 'OverconstrainedError' || err.name === 'ConstraintNotSatisfiedError') {
+        errorMessage = 'Camera requirements could not be met. Trying with basic settings...'
+      } else if (err.name === 'TypeError') {
+        errorMessage = 'Camera access failed. Please ensure you are using HTTPS or localhost.'
+      } else if (err.message) {
+        errorMessage = err.message
+      }
+
+      setError(errorMessage)
       setIsLoading(false)
       setCameraPermission('denied')
     }
@@ -230,7 +280,7 @@ export default function CameraVerification({
         throw new Error(validation.error)
       }
       
-      // SECURITY: Removed // SECURITY: Removed console.log(`Photo captured: ${validation.sizeKB}KB at ${Math.round(quality * 100)}% quality`)
+      // SECURITY: console statement removed: console.log(`Photo captured: ${validation.sizeKB}KB at ${Math.round(quality * 100)}% quality`)
       setCapturedImage(imageData)
 
       // Prepare metadata
@@ -255,7 +305,7 @@ export default function CameraVerification({
 
       return { imageData, metadata }
     } catch (err: any) {
-      // SECURITY: Removed console.error('Photo capture error:', err)
+      // SECURITY: console statement removed: console.error('Photo capture error:', err)
       setError('Failed to capture photo')
       return null
     }
@@ -347,7 +397,7 @@ export default function CameraVerification({
       await onCapture(capturedImage, metadata)
       onClose()
     } catch (err: any) {
-      // SECURITY: Removed console.error('Failed to submit photo:', err)
+      // SECURITY: console statement removed: console.error('Failed to submit photo:', err)
       setError('Failed to submit photo. Please try again.')
     } finally {
       setIsProcessing(false)
@@ -438,12 +488,26 @@ export default function CameraVerification({
 
             {error && (
               <div className="absolute inset-0 flex items-center justify-center bg-slate-900">
-                <div className="text-center p-6">
+                <div className="text-center p-6 max-w-md">
                   <AlertCircle className="h-12 w-12 text-red-400 mx-auto mb-4" />
-                  <p className="text-red-400 mb-4">{error}</p>
+                  <p className="text-red-400 mb-2 font-medium">{error}</p>
+
+                  {/* Additional help for permission issues */}
+                  {error.includes('denied') || error.includes('blocked') ? (
+                    <div className="mt-4 p-4 bg-slate-800 rounded-lg text-left">
+                      <p className="text-slate-300 text-sm mb-2">To enable camera access:</p>
+                      <ol className="text-slate-400 text-sm space-y-1">
+                        <li>1. Look for a camera icon in your browser's address bar</li>
+                        <li>2. Click it and select "Allow" or "Always allow"</li>
+                        <li>3. Click "Try Again" below</li>
+                      </ol>
+                      <p className="text-slate-500 text-xs mt-2">If you don't see the icon, you may need to go to browser settings → Site settings → Camera</p>
+                    </div>
+                  ) : null}
+
                   <button
                     onClick={startCamera}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                   >
                     Try Again
                   </button>

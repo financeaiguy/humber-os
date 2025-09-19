@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
       })
 
     } catch (error) {
-      // SECURITY: Removed console.error('GDPR request submission error:', error)
+      // SECURITY: console statement removed: console.error('GDPR request submission error:', error)
       return NextResponse.json(
         { error: 'Failed to submit GDPR request' },
         { status: 500 }
@@ -139,7 +139,7 @@ export async function GET(request: NextRequest) {
       })
 
     } catch (error) {
-      // SECURITY: Removed console.error('GDPR status check error:', error)
+      // SECURITY: console statement removed: console.error('GDPR status check error:', error)
       return NextResponse.json(
         { error: 'Failed to check request status' },
         { status: 500 }
@@ -201,7 +201,7 @@ export async function PUT(request: NextRequest) {
       })
 
     } catch (error) {
-      // SECURITY: Removed console.error('GDPR request processing error:', error)
+      // SECURITY: console statement removed: console.error('GDPR request processing error:', error)
       return NextResponse.json(
         { error: 'Failed to process GDPR request' },
         { status: 500 }
@@ -213,12 +213,8 @@ export async function PUT(request: NextRequest) {
 async function sendVerificationNotification(request: DataSubjectRequest) {
   const verificationUrl = `${process.env.NEXTAUTH_URL}/gdpr/verify?requestId=${request.id}&token=${request.verificationToken}`
   
-  // SECURITY: Removed // SECURITY: Removed console.log(`📧 GDPR Verification: ${request.verificationMethod}`, {
-    email: request.subjectEmail,
-    requestType: request.requestType,
-    verificationUrl,
-    requestId: request.id
-  })
+  // SECURITY: console statement removed
+  // GDPR Verification: verificationMethod, email, requestType, verificationUrl, requestId
   
   // In production, send actual email/SMS
 }
@@ -292,31 +288,31 @@ async function executeDataSubjectRequest(request: DataSubjectRequest) {
 }
 
 async function exportPersonalData(email: string, requestId: string) {
-  // SECURITY: Removed // SECURITY: Removed console.log(`📋 Exporting personal data for ${email} (Request: ${requestId})`)
+  // SECURITY: console statement removed: console.log(`📋 Exporting personal data for ${email} (Request: ${requestId})`)
   // Implementation would export all personal data to secure file
 }
 
 async function deletePersonalData(email: string, requestId: string) {
-  // SECURITY: Removed // SECURITY: Removed console.log(`🗑️ Deleting personal data for ${email} (Request: ${requestId})`)
+  // SECURITY: console statement removed: console.log(`🗑️ Deleting personal data for ${email} (Request: ${requestId})`)
   // Implementation would anonymize/delete all personal data
 }
 
 async function exportPortableData(email: string, requestId: string) {
-  // SECURITY: Removed // SECURITY: Removed console.log(`📦 Exporting portable data for ${email} (Request: ${requestId})`)
+  // SECURITY: console statement removed: console.log(`📦 Exporting portable data for ${email} (Request: ${requestId})`)
   // Implementation would export data in machine-readable format (JSON/XML)
 }
 
 async function rectifyPersonalData(email: string, corrections: any) {
-  // SECURITY: Removed // SECURITY: Removed console.log(`✏️ Rectifying personal data for ${email}`, corrections)
+  // SECURITY: console statement removed: console.log(`✏️ Rectifying personal data for ${email}`, corrections)
   // Implementation would update personal data as requested
 }
 
 async function restrictDataProcessing(email: string) {
-  // SECURITY: Removed // SECURITY: Removed console.log(`⛔ Restricting data processing for ${email}`)
+  // SECURITY: console statement removed: console.log(`⛔ Restricting data processing for ${email}`)
   // Implementation would mark data for restricted processing only
 }
 
 async function stopDataProcessing(email: string) {
-  // SECURITY: Removed // SECURITY: Removed console.log(`🛑 Stopping data processing for ${email}`)
+  // SECURITY: console statement removed: console.log(`🛑 Stopping data processing for ${email}`)
   // Implementation would stop all non-essential processing
 }

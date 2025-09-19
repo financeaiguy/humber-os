@@ -50,7 +50,7 @@ const clients = [
     location: 'Dearborn, MI',
     contact: {
       name: 'Maria Garcia',
-      email: 'maria.garcia@ford.com',
+      email: 'demo@example.com',
       phone: '+1 (313) 555-0456'
     },
     projects: {
@@ -76,7 +76,7 @@ const clients = [
     location: 'Auburn Hills, MI',
     contact: {
       name: 'Robert Wilson',
-      email: 'robert.wilson@stellantis.com',
+      email: 'demo@example.com',
       phone: '+1 (248) 555-0789'
     },
     projects: {
@@ -102,7 +102,7 @@ const clients = [
     location: 'Howell, MI',
     contact: {
       name: 'Takeshi Yamamoto',
-      email: 'takeshi.yamamoto@hirotec.com',
+      email: 'demo@example.com',
       phone: '+1 (517) 555-0321'
     },
     projects: {

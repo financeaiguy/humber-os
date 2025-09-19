@@ -3,12 +3,23 @@
 import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { Sidebar } from '@/components/sidebar'
-import { SessionManager } from '@/components/session-manager'
 import dynamic from 'next/dynamic'
+import { chatEvents } from '@/lib/chat-events'
+
+const Sidebar = dynamic(() => import('@/components/sidebar').then(mod => ({ default: mod.Sidebar })), {
+  ssr: false,
+  loading: () => null
+})
+const SessionManager = dynamic(() => import('@/components/session-manager').then(mod => ({ default: mod.SessionManager })), {
+  ssr: false,
+  loading: () => null
+})
 
 // Lazy load heavy components
-import { ProfessionalChat } from '@/components/professional-chat'
+const ProfessionalChat = dynamic(() => import('@/components/professional-chat').then(mod => ({ default: mod.ProfessionalChat })), {
+  ssr: false,
+  loading: () => null
+})
 // import { GlobalHelpTrigger } from '@/components/help-center'
 import { EmployeeHeader } from '@/components/employee-header'
 import { useSession } from '@/components/session-context'
@@ -46,6 +57,23 @@ export function LayoutClient({ children }: LayoutClientProps) {
     
     setIsJobsMode(designMode === 'jobs' && !isOperationalPage && !isAuthPage)
   }, [pathname, isAuthPage])
+
+  // Add event listeners for global chat control
+  useEffect(() => {
+    const handleOpenChat = () => setIsChatOpen(true)
+    const handleCloseChat = () => setIsChatOpen(false)
+    const handleToggleChat = () => setIsChatOpen(prev => !prev)
+
+    chatEvents.addEventListener('open-chat', handleOpenChat)
+    chatEvents.addEventListener('close-chat', handleCloseChat)
+    chatEvents.addEventListener('toggle-chat', handleToggleChat)
+
+    return () => {
+      chatEvents.removeEventListener('open-chat', handleOpenChat)
+      chatEvents.removeEventListener('close-chat', handleCloseChat)
+      chatEvents.removeEventListener('toggle-chat', handleToggleChat)
+    }
+  }, [])
   
   // Don't show sidebar or chat on auth pages
   if (isAuthPage) {
@@ -82,9 +110,9 @@ export function LayoutClient({ children }: LayoutClientProps) {
             <div className="mt-6 pt-6 border-t border-slate-700/50">
               <p className="text-sm text-slate-500 mb-3">Development credentials:</p>
               <div className="space-y-1 text-xs text-slate-400">
-                <div>• Partner Admin: partner@ford.com / partner123</div>
-                <div>• Engineer: employee@humber.com / employee123</div>
-                <div>• Operator: operator@humber.com / operator123</div>
+                <div>• Partner Admin: partner@example.com / partner123</div>
+                <div>• Engineer: employee@example.com / employee123</div>
+                <div>• Operator: operator@example.com / operator123</div>
               </div>
             </div>
           </div>
@@ -233,7 +261,7 @@ export function LayoutClient({ children }: LayoutClientProps) {
               Licensing
             </Link>
             <span className="text-slate-700 hidden sm:inline">•</span>
-            <a href="mailto:legal@humberops.com" className="text-slate-500 hover:text-blue-400 transition-colors">
+            <a href="mailto:legal@example.com" className="text-slate-500 hover:text-blue-400 transition-colors">
               Legal Contact
             </a>
           </div>

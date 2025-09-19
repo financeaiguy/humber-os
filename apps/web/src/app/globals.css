@@ -62,10 +62,9 @@
     padding: 0;
   }
   
-  /* FORCE ALL TEXT ELEMENTS TO BE BRIGHT */
-  p, span, div, h1, h2, h3, h4, h5, h6, label, td, th, li, a {
-    color: inherit !important;
-    min-color-contrast: 7 !important;
+  /* Ensure heading visibility without forcing all elements */
+  h1, h2, h3, h4, h5, h6 {
+    color: rgb(226 232 240);
   }
   
   /* Override all gray text colors globally */
@@ -74,8 +73,8 @@
     color: rgb(226 232 240) !important; /* slate-200 */
   }
   
-  /* NUCLEAR OPTION: Force all text to be visible */
-  * {
+  /* More selective text color for better visibility without breaking component styles */
+  body, html {
     color: rgb(226 232 240);
   }
   
@@ -368,13 +367,13 @@ input:-webkit-autofill:active {
 
 /* Recharts Tooltip Visibility Fixes */
 .recharts-tooltip-wrapper {
-  z-index: 9999 !important;
-  position: relative !important;
+  z-index: 999999 !important;
+  position: absolute !important;
   pointer-events: none !important;
 }
 
 .recharts-tooltip-content {
-  z-index: 9999 !important;
+  z-index: 999999 !important;
   position: relative !important;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
   border-radius: 8px !important;
@@ -383,7 +382,7 @@ input:-webkit-autofill:active {
 }
 
 .recharts-tooltip-cursor {
-  z-index: 9998 !important;
+  z-index: 999998 !important;
 }
 
 /* Ensure tooltips are visible over all content */
@@ -394,6 +393,17 @@ input:-webkit-autofill:active {
 
 .recharts-surface {
   overflow: visible !important;
+}
+
+/* Fix tooltip container stacking */
+.recharts-default-tooltip {
+  z-index: 999999 !important;
+}
+
+/* Ensure chart containers don't create stacking contexts that trap tooltips */
+div:has(.recharts-wrapper) {
+  position: relative;
+  z-index: auto !important;
 }
 
 /* Fix for dark theme tooltips - Override Recharts defaults */

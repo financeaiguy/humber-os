@@ -8,12 +8,12 @@ import Link from 'next/link'
 import { signIn } from '@/lib/auth-client'
 
 const mockCredentials = [
-  { email: 'admin@humber.com', password: 'admin123', role: 'System Admin', description: 'Full system access' },
-  { email: 'engineer@humber.com', password: 'engineer123', role: 'Engineer', description: 'Engineering management' },
-  { email: 'operator@humber.com', password: 'operator123', role: 'Operator', description: 'Operations control' },
-  { email: 'customer@gm.com', password: 'customer123', role: 'Customer (GM)', description: 'Client portal access' },
-  { email: 'partner@ford.com', password: 'partner123', role: 'Partner (Ford)', description: 'Partner management' },
-  { email: 'employee@humber.com', password: 'employee123', role: 'Employee', description: 'Self-service portal' },
+  { email: 'admin@example.com', password: 'admin123', role: 'System Admin', description: 'Full system access' },
+  { email: 'engineer@example.com', password: 'engineer123', role: 'Engineer', description: 'Engineering management' },
+  { email: 'operator@example.com', password: 'operator123', role: 'Operator', description: 'Operations control' },
+  { email: 'customer@example.com', password: 'customer123', role: 'Customer (Demo)', description: 'Client portal access' },
+  { email: 'partner@example.com', password: 'partner123', role: 'Partner (Demo)', description: 'Partner management' },
+  { email: 'employee@example.com', password: 'employee123', role: 'Employee', description: 'Self-service portal' },
 ]
 
 export default function SignInPage() {
@@ -57,8 +57,8 @@ export default function SignInPage() {
         setError(result.error || 'Invalid credentials')
       }
     } catch (error) {
-      // SECURITY: Removed // SECURITY: Removed console.error('Signin error:', error)
-      setError(error instanceof Error ? error.message : 'Something went wrong')
+      // SECURITY: console statement removed: console.error('Signin error:', error)
+      setError('Authentication failed. Please check your credentials.')
     } finally {
       setLoading(false)
     }
@@ -80,8 +80,8 @@ export default function SignInPage() {
         setError(result.error || 'Invalid credentials')
       }
     } catch (error) {
-      // SECURITY: Removed // SECURITY: Removed console.error('Signin error:', error)
-      setError(error instanceof Error ? error.message : 'Something went wrong')
+      // SECURITY: console statement removed: console.error('Signin error:', error)
+      setError('Authentication failed. Please check your credentials.')
     } finally {
       setLoading(false)
     }

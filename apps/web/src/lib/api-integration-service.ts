@@ -111,21 +111,21 @@ export class APIIntegrationService {
       }
 
     } catch (error) {
-      // SECURITY: Removed console.error('API call failed:', error)
+      // SECURITY: console statement removed: console.error('API call failed:', error)
 
       // Track API call error
       if (enableLearning) {
         await this.trackAPICall('api_call_error', {
           endpoint,
           method,
-          error: error instanceof Error ? error.message : 'Network error'
+          error: 'Network request failed'
         }, context)
       }
 
       return {
         success: false,
         error: 'Network error',
-        message: error instanceof Error ? error.message : 'Failed to make API call',
+        message: 'Failed to make API call',
         _metadata: {
           processedAt: new Date().toISOString(),
           sessionId: context.sessionId,
@@ -214,7 +214,7 @@ export class APIIntegrationService {
       return {
         success: false,
         error: 'Upload failed',
-        message: error instanceof Error ? error.message : 'Failed to upload document',
+        message: 'Failed to upload document',
         _metadata: {
           processedAt: new Date().toISOString(),
           sessionId: this.generateSessionId(),
@@ -241,7 +241,7 @@ export class APIIntegrationService {
         context: fullContext
       })
     } catch (error) {
-      // SECURITY: Removed console.error('Failed to get AI insights:', error)
+      // SECURITY: console statement removed: console.error('Failed to get AI insights:', error)
       return []
     }
   }
@@ -260,7 +260,7 @@ export class APIIntegrationService {
 
       return await knowledgeNervousSystem.getRecommendations(fullContext)
     } catch (error) {
-      // SECURITY: Removed console.error('Failed to get recommendations:', error)
+      // SECURITY: console statement removed: console.error('Failed to get recommendations:', error)
       return []
     }
   }
@@ -273,7 +273,7 @@ export class APIIntegrationService {
         timestamp: new Date().toISOString()
       }, context)
     } catch (error) {
-      // SECURITY: Removed console.error('Failed to track API call:', error)
+      // SECURITY: console statement removed: console.error('Failed to track API call:', error)
     }
   }
 

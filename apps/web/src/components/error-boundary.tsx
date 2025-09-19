@@ -34,7 +34,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // SECURITY: Removed console.error('ErrorBoundary caught an error:', error, errorInfo)
+    // SECURITY: console statement removed: console.error('ErrorBoundary caught an error:', error, errorInfo)
     this.setState({ errorInfo })
     
     // Send error to monitoring service in production
@@ -120,14 +120,16 @@ export class ErrorBoundary extends Component<Props, State> {
                           <div className="mb-3">
                             <p className="text-xs text-red-400 font-mono mb-1">Error Message:</p>
                             <p className="text-sm text-slate-300 font-mono">
-                              {this.state.error.message}
+                              {'An unexpected error occurred. Please contact support if this persists.'}
                             </p>
                           </div>
                           {this.state.errorInfo && (
                             <div>
                               <p className="text-xs text-red-400 font-mono mb-1">Stack Trace:</p>
                               <pre className="text-xs text-slate-400 font-mono overflow-x-auto">
-                                {this.state.errorInfo.componentStack}
+                                {process.env.NODE_ENV === 'development' 
+                                  ? this.state.errorInfo.componentStack 
+                                  : '[Stack trace hidden in production]'}
                               </pre>
                             </div>
                           )}

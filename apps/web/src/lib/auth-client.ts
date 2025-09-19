@@ -1,33 +1,31 @@
 'use client'
 
+import { signIn as nextAuthSignIn } from 'next-auth/react'
+
 export async function signIn(email: string, password: string) {
   try {
-    // SECURITY: Removed // SECURITY: Removed console.log('Attempting sign in for:', email)
-    
-    const response = await fetch('/api/auth/signin', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
+    // Check if nextAuthSignIn is available
+    if (!nextAuthSignIn) {
+      console.error('NextAuth signIn not available')
+      return { success: false, error: 'Authentication not configured' }
+    }
+
+    const result = await nextAuthSignIn('credentials', {
+      email,
+      password,
+      redirect: false,
     })
 
-    const result = await response.json()
-    
-    // SECURITY: Removed // SECURITY: Removed console.log('Sign in result:', result)
+    if (result?.error) {
+      return { success: false, error: 'Invalid credentials' }
+    }
 
-    if (response.ok && result.success) {
-      // Redirect on successful authentication
-      window.location.href = '/'
+    if (result?.ok) {
       return { success: true }
     }
 
-    return { success: false, error: result.error || 'Authentication failed' }
+    return { success: false, error: 'Authentication failed' }
   } catch (error) {
-    // SECURITY: Removed console.error('Sign in error:', error)
     return { success: false, error: 'Something went wrong' }
   }
 }

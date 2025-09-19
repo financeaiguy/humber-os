@@ -29,11 +29,11 @@ import {
 const CustomTooltip = memo(({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-slate-900 p-3 rounded-lg shadow-xl border border-slate-700">
+      <div className="bg-slate-900 p-3 rounded-lg shadow-xl border border-slate-700" style={{ zIndex: 999999, position: 'relative' }}>
         <p className="text-white font-semibold mb-1">{label}</p>
         {payload.map((entry: any, index: number) => (
           <p key={index} className="text-sm" style={{ color: entry.color }}>
-            {entry.name}: {typeof entry.value === 'number' && entry.value > 1000 
+            {entry.name}: {typeof entry.value === 'number' && entry.value > 1000
               ? `$${(entry.value / 1000).toFixed(0)}K`
               : entry.value}
           </p>

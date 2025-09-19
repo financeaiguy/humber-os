@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
     invoicePayments.push(paymentRecord)
     paymentRecords.set(invoiceId, invoicePayments)
 
-    // SECURITY: Removed // SECURITY: Removed console.log(`💳 Payment link created for invoice ${invoiceId}: ${paymentResponse.paymentUrl}`)
+    // SECURITY: console statement removed: console.log(`💳 Payment link created for invoice ${invoiceId}: ${paymentResponse.paymentUrl}`)
 
     return NextResponse.json({
       success: true,
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    // SECURITY: Removed console.error('Payment creation error:', error)
+    // SECURITY: console statement removed: console.error('Payment creation error:', error)
     return NextResponse.json(
       { error: 'Failed to create payment' },
       { status: 500 }
@@ -163,9 +163,9 @@ export async function PUT(request: NextRequest) {
       // Send payment confirmation
       await sendPaymentConfirmation(paymentRecord)
       
-      // SECURITY: Removed // SECURITY: Removed console.log(`✅ Payment completed for invoice ${paymentRecord.invoiceId}`)
+      // SECURITY: console statement removed: console.log(`✅ Payment completed for invoice ${paymentRecord.invoiceId}`)
     } else if (status === 'failed') {
-      // SECURITY: Removed // SECURITY: Removed console.log(`❌ Payment failed for invoice ${paymentRecord.invoiceId}`)
+      // SECURITY: console statement removed: console.log(`❌ Payment failed for invoice ${paymentRecord.invoiceId}`)
     }
 
     return NextResponse.json({
@@ -175,7 +175,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (error) {
-    // SECURITY: Removed console.error('Payment update error:', error)
+    // SECURITY: console statement removed: console.error('Payment update error:', error)
     return NextResponse.json(
       { error: 'Failed to update payment' },
       { status: 500 }
@@ -226,7 +226,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    // SECURITY: Removed console.error('Get payments error:', error)
+    // SECURITY: console statement removed: console.error('Get payments error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch payments' },
       { status: 500 }
@@ -292,7 +292,7 @@ async function getInvoiceDetails(invoiceId: string) {
     id: invoiceId,
     invoiceNumber: 'HMB-202411-0001',
     projectName: 'GM Assembly Line Automation',
-    clientEmail: 'customer@gm.com',
+    clientEmail: 'customer@example.com',
     total: 25000.00,
     status: 'sent'
   }
@@ -308,20 +308,20 @@ async function findPaymentById(paymentId: string): Promise<PaymentRecord | null>
 
 async function updateInvoicePaymentStatus(invoiceId: string, paidAmount: number) {
   // Mock invoice update - replace with actual database update
-  // SECURITY: Removed // SECURITY: Removed console.log(`💰 Updating invoice ${invoiceId} with payment of $${paidAmount}`)
+  // SECURITY: console statement removed: console.log(`💰 Updating invoice ${invoiceId} with payment of $${paidAmount}`)
   
   // Check if invoice is fully paid and update status accordingly
   const invoice = await getInvoiceDetails(invoiceId)
   if (invoice && paidAmount >= invoice.total) {
-    // SECURITY: Removed // SECURITY: Removed console.log(`📄 Invoice ${invoiceId} marked as paid`)
+    // SECURITY: console statement removed: console.log(`📄 Invoice ${invoiceId} marked as paid`)
   } else {
-    // SECURITY: Removed // SECURITY: Removed console.log(`📄 Invoice ${invoiceId} marked as partially paid`)
+    // SECURITY: console statement removed: console.log(`📄 Invoice ${invoiceId} marked as partially paid`)
   }
 }
 
 async function sendPaymentConfirmation(paymentRecord: PaymentRecord) {
   // Mock notification sending - replace with actual email service
-  // SECURITY: Removed // SECURITY: Removed console.log(`📧 Sending payment confirmation for ${paymentRecord.id}`)
+  // SECURITY: console statement removed: console.log(`📧 Sending payment confirmation for ${paymentRecord.id}`)
 }
 
 // Secure payment ID generation moved to secure-token-generator.ts

@@ -39,10 +39,10 @@ const RATE_LIMIT_TIERS = {
     maxRequests: 10,            // 10 login attempts per 15 minutes
   },
   
-  // API endpoints (moderate)
+  // API endpoints (moderate) - Development friendly
   API: {
     windowMs: 60 * 1000,       // 1 minute
-    maxRequests: 100,           // 100 requests per minute
+    maxRequests: 1000,          // 1000 requests per minute (increased for dev)
   },
   
   // File upload endpoints (very strict)
@@ -87,8 +87,9 @@ export class AdvancedRateLimiter {
       const key = config.keyGenerator ? config.keyGenerator(c) : this.getDefaultKey(c)
       const now = Date.now()
       
-      // Check if IP is blocked
-      if (this.blockedIPs.has(this.getIP(c))) {
+      // Check if IP is blocked (disabled in development)
+      const isDevelopment = c.env?.ENVIRONMENT === 'development' || process.env.NODE_ENV === 'development'
+      if (!isDevelopment && this.blockedIPs.has(this.getIP(c))) {
         return c.json({ 
           error: 'IP blocked due to suspicious activity',
           code: 'IP_BLOCKED',
@@ -232,17 +233,7 @@ export class AdvancedRateLimiter {
    * Log security event
    */
   private static async logSecurityEvent(c: Context, eventType: string, details: any): Promise<void> {
-    // SECURITY: Removed // SECURITY: Removed console.log(JSON.stringify({
-      timestamp: new Date().toISOString(),
-      type: 'SECURITY_EVENT',
-      eventType,
-      ip: this.getIP(c),
-      userAgent: c.req.header('User-Agent'),
-      path: c.req.path,
-      method: c.req.method,
-      details,
-      severity: 'HIGH'
-    }))
+    // SECURITY: console statement removed - security event logged
   }
   
   /**

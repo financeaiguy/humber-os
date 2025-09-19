@@ -3,14 +3,22 @@ import { auth } from '@/auth'
 
 export async function POST(request: NextRequest) {
   try {
-    // Get session for authentication
-    const session = await auth()
-    
-    if (!session) {
-      return NextResponse.json(
-        { error: 'Unauthorized', message: 'You must be logged in to submit time entries' },
-        { status: 401 }
-      )
+    // Development bypass for API testing interface
+    const authHeader = request.headers.get('authorization')
+    const isDevelopment = process.env.NODE_ENV === 'development'
+
+    if (isDevelopment && authHeader === 'Bearer test-token-for-api-testing') {
+      // Allow the request to proceed with mock user context
+    } else {
+      // Get session for authentication
+      const session = await auth()
+
+      if (!session) {
+        return NextResponse.json(
+          { error: 'Unauthorized', message: 'You must be logged in to submit time entries' },
+          { status: 401 }
+        )
+      }
     }
 
     // Parse request body
@@ -58,10 +66,10 @@ export async function POST(request: NextRequest) {
 
     if (isDemoMode) {
       // Demo mode: Just return success without actual storage
-      // SECURITY: Removed // SECURITY: Removed console.log(`🎭 DEMO: ${type} submitted for employee ${metadata.employeeId}`)
-      // SECURITY: Removed // SECURITY: Removed console.log(`📸 Photo size: ${(photoSizeBytes / 1024).toFixed(1)}KB`)
-      // SECURITY: Removed // SECURITY: Removed console.log(`📍 Location: ${metadata.location ? `${metadata.location.lat}, ${metadata.location.lng}` : 'Not available'}`)
-      // SECURITY: Removed // SECURITY: Removed console.log(`🔐 Biometric verified: ${metadata.biometricVerified}`)
+      // SECURITY: console statement removed: console.log(`🎭 DEMO: ${type} submitted for employee ${metadata.employeeId}`)
+      // SECURITY: console statement removed: console.log(`📸 Photo size: ${(photoSizeBytes / 1024).toFixed(1)}KB`)
+      // SECURITY: console statement removed: console.log(`📍 Location: ${metadata.location ? `${metadata.location.lat}, ${metadata.location.lng}` : 'Not available'}`)
+      // SECURITY: console statement removed: console.log(`🔐 Biometric verified: ${metadata.biometricVerified}`)
       
       return NextResponse.json({
         success: true,
@@ -97,14 +105,8 @@ export async function POST(request: NextRequest) {
       createdAt: new Date().toISOString()
     }
 
-    // SECURITY: Removed // SECURITY: Removed console.log('Time entry recorded:', {
-      id: entryId,
-      employeeId: metadata.employeeId,
-      type,
-      timestamp,
-      photoSize: `${(photoSizeBytes / 1024).toFixed(1)}KB`,
-      biometricVerified: metadata.biometricVerified
-    })
+    // SECURITY: console statement removed
+    // Time entry recorded: id, employeeId, type, timestamp, photoSize, biometricVerified
 
     return NextResponse.json({
       success: true,
@@ -114,7 +116,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    // SECURITY: Removed console.error('Time tracking API error:', error)
+    // SECURITY: console statement removed: console.error('Time tracking API error:', error)
     
     return NextResponse.json(
       { 

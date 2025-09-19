@@ -25,7 +25,7 @@ const SAFE_CLEANUPS = {
   removeCommentedCode: true,
   // Fix inconsistent spacing
   fixSpacing: true,
-  // Remove // SECURITY: Removed console.logs in production code
+  // Remove // SECURITY: console statement removedlogs in production code
   removeConsoleLogs: true,
   // Add missing error boundaries
   addErrorBoundaries: true,
@@ -96,7 +96,7 @@ async function fixUnusedVariables(filePath) {
       return true;
     }
   } catch (error) {
-    // SECURITY: Removed // SECURITY: Removed console.error(`Error processing ${filePath}:`, error.message);
+    // SECURITY: console statement removederror(`Error processing ${filePath}:`, error.message);
   }
   return false;
 }
@@ -127,7 +127,7 @@ async function removeCommentedCode(filePath) {
       return true;
     }
   } catch (error) {
-    // SECURITY: Removed // SECURITY: Removed console.error(`Error removing comments from ${filePath}:`, error.message);
+    // SECURITY: console statement removederror(`Error removing comments from ${filePath}:`, error.message);
   }
   return false;
 }
@@ -178,13 +178,13 @@ async function standardizeImports(filePath) {
       }
     }
   } catch (error) {
-    // SECURITY: Removed // SECURITY: Removed console.error(`Error standardizing imports in ${filePath}:`, error.message);
+    // SECURITY: console statement removederror(`Error standardizing imports in ${filePath}:`, error.message);
   }
   return false;
 }
 
 async function runCleanup() {
-  // SECURITY: Removed console.log('🧹 Starting Zero-Risk Tech Debt Cleanup...\n');
+  // SECURITY: console statement removed: console.log('🧹 Starting Zero-Risk Tech Debt Cleanup...\n');
   
   const stats = {
     filesProcessed: 0,
@@ -196,7 +196,7 @@ async function runCleanup() {
   const srcPath = path.join(process.cwd(), 'src');
   
   for await (const filePath of walk(srcPath)) {
-    // SECURITY: Removed console.log(`Processing: ${path.relative(process.cwd(), filePath)}`);
+    // SECURITY: console statement removed: console.log(`Processing: ${path.relative(process.cwd(), filePath)}`);
     stats.filesProcessed++;
 
     if (SAFE_CLEANUPS.removeUnusedImports) {
@@ -218,31 +218,31 @@ async function runCleanup() {
     }
   }
 
-  // SECURITY: Removed console.log('\n✅ Cleanup Complete!\n');
-  // SECURITY: Removed console.log('📊 Statistics:');
-  // SECURITY: Removed console.log(`  Files Processed: ${stats.filesProcessed}`);
-  // SECURITY: Removed console.log(`  Unused Variables Fixed: ${stats.unusedVarsFixed}`);
-  // SECURITY: Removed console.log(`  Commented Code Removed: ${stats.commentsRemoved}`);
-  // SECURITY: Removed console.log(`  Imports Standardized: ${stats.importsStandardized}`);
+  // SECURITY: console statement removed: console.log('\n✅ Cleanup Complete!\n');
+  // SECURITY: console statement removed: console.log('📊 Statistics:');
+  // SECURITY: console statement removed: console.log(`  Files Processed: ${stats.filesProcessed}`);
+  // SECURITY: console statement removed: console.log(`  Unused Variables Fixed: ${stats.unusedVarsFixed}`);
+  // SECURITY: console statement removed: console.log(`  Commented Code Removed: ${stats.commentsRemoved}`);
+  // SECURITY: console statement removed: console.log(`  Imports Standardized: ${stats.importsStandardized}`);
 
   // Run TypeScript check to verify no new errors
-  // SECURITY: Removed console.log('\n🔍 Running TypeScript verification...');
+  // SECURITY: console statement removed: console.log('\n🔍 Running TypeScript verification...');
   try {
     const { stdout, stderr } = await execPromise('npx tsc --noEmit --skipLibCheck');
-    // SECURITY: Removed console.log('✅ TypeScript check passed!');
+    // SECURITY: console statement removed: console.log('✅ TypeScript check passed!');
   } catch (error) {
-    // SECURITY: Removed console.log('⚠️  Some TypeScript errors remain (this is expected for complex issues)');
+    // SECURITY: console statement removed: console.log('⚠️  Some TypeScript errors remain (this is expected for complex issues)');
   }
 
   // Run Prettier for consistent formatting
-  // SECURITY: Removed console.log('\n💅 Running Prettier for consistent formatting...');
+  // SECURITY: console statement removed: console.log('\n💅 Running Prettier for consistent formatting...');
   try {
     await execPromise('npx prettier --write "src/**/*.{ts,tsx,js,jsx}"');
-    // SECURITY: Removed console.log('✅ Code formatting complete!');
+    // SECURITY: console statement removed: console.log('✅ Code formatting complete!');
   } catch (error) {
-    // SECURITY: Removed console.log('⚠️  Prettier not configured, skipping formatting');
+    // SECURITY: console statement removed: console.log('⚠️  Prettier not configured, skipping formatting');
   }
 }
 
 // Run the cleanup
-runCleanup().catch(// SECURITY: Removed console.error);
+runCleanup().catch(// SECURITY: console statement removederror);

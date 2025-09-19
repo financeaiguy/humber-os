@@ -123,7 +123,7 @@ export class FinancialMath {
       return { valid: true, value: decimal }
       
     } catch (error) {
-      return { valid: false, error: `Invalid amount: ${error.message}` }
+      return { valid: false, error: 'Invalid amount format' }
     }
   }
   

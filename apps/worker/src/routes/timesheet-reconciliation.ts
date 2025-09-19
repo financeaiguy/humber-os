@@ -415,7 +415,7 @@ reconciliationRouter.post('/upload-spreadsheet', async (c) => {
         results.push({
           engineerIdentifier: row.engineerEmail || row.engineerName,
           status: 'failed',
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: 'Processing failed',
         });
       }
     }

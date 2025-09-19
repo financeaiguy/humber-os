@@ -49,10 +49,8 @@ export class KnowledgeMiddleware {
     }
 
     if (this.options.logLevel === 'detailed') {
-      // SECURITY: Removed // SECURITY: Removed console.log(`🧠 Knowledge Middleware - ${endpoint}: ${action}`, {
-        context,
-        data: data ? Object.keys(data) : undefined
-      })
+      // SECURITY: console statement removed
+      // Knowledge Middleware endpoint action: context, data keys
     }
 
     return context
@@ -73,7 +71,7 @@ export class KnowledgeMiddleware {
 
       await knowledgeNervousSystem.learnFromUserAction(actionData, context)
     } catch (error) {
-      // SECURITY: Removed console.error('Failed to track user action:', error)
+      // SECURITY: console statement removed: console.error('Failed to track user action:', error)
     }
   }
 
@@ -92,7 +90,7 @@ export class KnowledgeMiddleware {
         processData: this.sanitizeData(processData)
       })
     } catch (error) {
-      // SECURITY: Removed console.error('Failed to analyze business process:', error)
+      // SECURITY: console statement removed: console.error('Failed to analyze business process:', error)
       return null
     }
   }
@@ -113,7 +111,7 @@ export class KnowledgeMiddleware {
 
       return insights || []
     } catch (error) {
-      // SECURITY: Removed console.error('Failed to generate insights:', error)
+      // SECURITY: console statement removed: console.error('Failed to generate insights:', error)
       return []
     }
   }
@@ -137,7 +135,7 @@ export class KnowledgeMiddleware {
           enrichedResponse._recommendations = recommendations
         }
       } catch (error) {
-        // SECURITY: Removed console.error('Failed to enrich response:', error)
+        // SECURITY: console statement removed: console.error('Failed to enrich response:', error)
       }
     }
 

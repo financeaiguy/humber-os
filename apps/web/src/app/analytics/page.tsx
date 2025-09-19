@@ -33,7 +33,7 @@ export default function AnalyticsPage() {
   const { isReady, hasInsights, trackAction } = useAnalyticsNervousSystem()
 
   return (
-    <div className="space-y-8">
+    <div className="min-h-screen bg-slate-950 p-8 space-y-8">
       {/* Page Header with Nervous System Integration */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg p-6">
         <div className="flex items-center justify-between">
@@ -61,38 +61,38 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Nervous System Dashboard */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-slate-800 rounded-lg shadow-sm border border-slate-700 p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <Activity className="w-6 h-6 text-blue-600" />
+          <Activity className="w-6 h-6 text-blue-400" />
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Nervous System Status</h2>
-            <p className="text-sm text-gray-600">Real-time AI intelligence and learning capabilities</p>
+            <h2 className="text-xl font-semibold text-slate-100">Nervous System Status</h2>
+            <p className="text-sm text-slate-400">Real-time AI intelligence and learning capabilities</p>
           </div>
         </div>
         <NervousSystemDashboard />
       </div>
 
       {/* Business Analytics */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-slate-800 rounded-lg shadow-sm border border-slate-700 p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <TrendingUp className="w-6 h-6 text-green-600" />
+          <TrendingUp className="w-6 h-6 text-green-400" />
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Business Intelligence</h2>
-            <p className="text-sm text-gray-600">Comprehensive KPIs and performance metrics</p>
+            <h2 className="text-xl font-semibold text-slate-100">Business Intelligence</h2>
+            <p className="text-sm text-slate-400">Comprehensive KPIs and performance metrics</p>
           </div>
         </div>
         
         <Suspense fallback={
           <div className="w-full space-y-6">
-            <div className="animate-pulse bg-gray-200 rounded-xl h-[200px]" />
+            <div className="animate-pulse bg-slate-700 rounded-xl h-[200px]" />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="animate-pulse bg-gray-200 rounded-xl h-[120px]" />
+                <div key={i} className="animate-pulse bg-slate-700 rounded-xl h-[120px]" />
               ))}
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="animate-pulse bg-gray-200 rounded-xl h-[350px]" />
+                <div key={i} className="animate-pulse bg-slate-700 rounded-xl h-[350px]" />
               ))}
             </div>
           </div>

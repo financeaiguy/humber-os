@@ -18,9 +18,10 @@ declare module "next-auth" {
 
 // Mock users data with plaintext passwords for demo (in production, use proper hashing)
 const mockUsers = [
+  // Original accounts
   {
     id: "1",
-    email: "admin@humber.com",
+    email: "admin@example.com",
     password: "admin123",
     name: "System Administrator",
     role: "PARTNER_ADMIN" as UserRole,
@@ -30,7 +31,7 @@ const mockUsers = [
   },
   {
     id: "2",
-    email: "engineer@humber.com",
+    email: "engineer@example.com",
     password: "engineer123",
     name: "Engineering Manager",
     role: "PARTNER_ADMIN" as UserRole,
@@ -40,7 +41,7 @@ const mockUsers = [
   },
   {
     id: "3",
-    email: "operator@humber.com",
+    email: "operator@example.com",
     password: "operator123",
     name: "Operations Manager",
     role: "PARTNER_OPERATOR" as UserRole,
@@ -50,7 +51,7 @@ const mockUsers = [
   },
   {
     id: "4",
-    email: "customer@gm.com",
+    email: "customer@example.com",
     password: "customer123",
     name: "GM Client Manager",
     role: "PARTNER_OPERATOR" as UserRole,
@@ -60,7 +61,7 @@ const mockUsers = [
   },
   {
     id: "5",
-    email: "partner@ford.com",
+    email: "partner@example.com",
     password: "partner123",
     name: "Ford Partnership Manager",
     role: "PARTNER_ADMIN" as UserRole,
@@ -70,12 +71,73 @@ const mockUsers = [
   },
   {
     id: "6",
-    email: "employee@humber.com",
+    email: "employee@example.com",
     password: "employee123",
     name: "Field Engineer",
     role: "ENGINEER_EMPLOYEE" as UserRole,
     partnerId: "humber-operations",
     partnerName: "Humber Operations",
+    isActive: true,
+  },
+  // New demo accounts
+  {
+    id: "7",
+    email: "demo.admin@example.com",
+    password: "demo123",
+    name: "Demo Administrator",
+    role: "PARTNER_ADMIN" as UserRole,
+    partnerId: "demo-operations",
+    partnerName: "Demo Operations",
+    isActive: true,
+  },
+  {
+    id: "8",
+    email: "demo.engineer@example.com",
+    password: "demo123",
+    name: "Demo Engineer",
+    role: "PARTNER_ADMIN" as UserRole,
+    partnerId: "demo-engineering",
+    partnerName: "Demo Engineering",
+    isActive: true,
+  },
+  {
+    id: "9",
+    email: "demo.operator@example.com",
+    password: "demo123",
+    name: "Demo Operator",
+    role: "PARTNER_OPERATOR" as UserRole,
+    partnerId: "demo-operations",
+    partnerName: "Demo Operations",
+    isActive: true,
+  },
+  {
+    id: "10",
+    email: "demo.customer@example.com",
+    password: "demo123",
+    name: "Demo Customer",
+    role: "PARTNER_OPERATOR" as UserRole,
+    partnerId: "demo-client",
+    partnerName: "Demo Client Company",
+    isActive: true,
+  },
+  {
+    id: "11",
+    email: "demo.partner@example.com",
+    password: "demo123",
+    name: "Demo Partner",
+    role: "PARTNER_ADMIN" as UserRole,
+    partnerId: "demo-partner",
+    partnerName: "Demo Partner Company",
+    isActive: true,
+  },
+  {
+    id: "12",
+    email: "demo.employee@example.com",
+    password: "demo123",
+    name: "Demo Employee",
+    role: "ENGINEER_EMPLOYEE" as UserRole,
+    partnerId: "demo-operations",
+    partnerName: "Demo Operations",
     isActive: true,
   },
 ]
@@ -88,7 +150,7 @@ export const config: NextAuthConfig = {
     signIn: "/auth/signin",
     error: "/auth/error",
   },
-  useSecureCookies: process.env.NODE_ENV === 'production',
+  useSecureCookies: false,
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user
@@ -119,7 +181,7 @@ export const config: NextAuthConfig = {
         token.partnerId = user.partnerId
         token.partnerName = user.partnerName
         
-        // SECURITY: Removed // SECURITY: Removed console.log('✅ JWT created for user:', user.email)
+        // SECURITY: console statement removed: console.log('✅ JWT created for user:', user.email)
       }
       
       return token
@@ -137,7 +199,7 @@ export const config: NextAuthConfig = {
     },
     signIn({ user }) {
       // Log successful sign-ins
-      // SECURITY: Removed // SECURITY: Removed console.log('✅ User signed in:', user.email)
+      // SECURITY: console statement removed: console.log('✅ User signed in:', user.email)
       return true
     },
   },

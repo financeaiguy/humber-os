@@ -421,7 +421,7 @@ export default function PrivacyPolicyPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-blue-300 font-semibold mb-2">Privacy Officer</p>
-                  <p className="text-blue-200">Email: privacy@humberops.com</p>
+                  <p className="text-blue-200">Email: privacy@example.com</p>
                   <p className="text-blue-200">Phone: 1-800-HUMBER-1</p>
                   <p className="text-blue-200">Response time: 48 hours</p>
                 </div>

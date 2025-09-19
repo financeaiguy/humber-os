@@ -106,7 +106,7 @@ export function useRealTimeOnboarding(options: UseRealTimeOnboardingOptions = {}
       setLastUpdate(new Date())
       
     } catch (err) {
-      // SECURITY: Removed console.error('Failed to fetch candidates:', err)
+      // SECURITY: console statement removed: console.error('Failed to fetch candidates:', err)
       setError(err instanceof Error ? err.message : 'Unknown error')
     } finally {
       setLoading(false)
@@ -223,7 +223,7 @@ export function useRealTimeOnboarding(options: UseRealTimeOnboardingOptions = {}
       setTimeout(() => fetchCandidates(false), 1000)
       
     } catch (err) {
-      // SECURITY: Removed console.error('Failed to update candidate:', err)
+      // SECURITY: console statement removed: console.error('Failed to update candidate:', err)
       throw err
     }
   }, [fetchCandidates])
@@ -251,7 +251,7 @@ export function useRealTimeOnboarding(options: UseRealTimeOnboardingOptions = {}
       
       return result.candidate
     } catch (err) {
-      // SECURITY: Removed console.error('Failed to add candidate:', err)
+      // SECURITY: console statement removed: console.error('Failed to add candidate:', err)
       throw err
     }
   }, [showNotification])

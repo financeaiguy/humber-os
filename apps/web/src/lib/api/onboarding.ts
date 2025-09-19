@@ -114,7 +114,7 @@ async function withRetry<T>(
         config.maxDelay
       )
       
-      // SECURITY: Removed console.warn(`API attempt ${attempt} failed, retrying in ${delay}ms:`, error.message)
+      // SECURITY: console statement removed: console.warn(`API attempt ${attempt} failed, retrying in ${delay}ms:`, error.message)
       await new Promise(resolve => setTimeout(resolve, delay))
     }
   }
@@ -155,13 +155,13 @@ async function apiRequest<T>(
     // Validate response schema
     const result = schema.safeParse(data)
     if (!result.success) {
-      // SECURITY: Removed console.error('Invalid API response schema:', result.error)
+      // SECURITY: console statement removed: console.error('Invalid API response schema:', result.error)
       throw new ApiServerError('Invalid response format from server', 500)
     }
 
     return result.data
   } catch (error) {
-    if (error instanceof TypeError && error.message.includes('fetch')) {
+    if (error instanceof TypeError) {
       throw new ApiNetworkError('Network connection failed')
     }
     throw error
@@ -239,11 +239,11 @@ export function getErrorMessage(error: unknown): string {
   }
   
   if (error instanceof ApiServerError) {
-    return error.message || 'Server error occurred. Please try again later.'
+    return 'Server error occurred. Please try again later.'
   }
   
   if (error instanceof Error) {
-    return error.message
+    return 'An error occurred'
   }
   
   return 'An unexpected error occurred. Please try again.'

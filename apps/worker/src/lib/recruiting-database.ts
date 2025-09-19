@@ -201,7 +201,7 @@ export class RecruitingDatabase {
         throw error
       }
       
-      // SECURITY: Removed console.error('Database error creating recruit:', error)
+      // SECURITY: console statement removederror('Database error creating recruit:', error)
       throw new RecruitingError(
         'Failed to create recruit',
         RECRUITING_ERROR_CODES.INTERNAL_ERROR,
@@ -331,7 +331,7 @@ export class RecruitingDatabase {
           }
 
         } catch (decryptionError) {
-          // SECURITY: Removed console.error(`Failed to decrypt recruit ${record.id}:`, decryptionError)
+          // SECURITY: console statement removederror(`Failed to decrypt recruit ${record.id}:`, decryptionError)
           // Skip corrupted records
         }
       }
@@ -339,7 +339,7 @@ export class RecruitingDatabase {
       return { recruits, total }
 
     } catch (error) {
-      // SECURITY: Removed console.error('Database error getting recruits:', error)
+      // SECURITY: console statement removederror('Database error getting recruits:', error)
       throw new RecruitingError(
         'Failed to retrieve recruits',
         RECRUITING_ERROR_CODES.INTERNAL_ERROR,
@@ -422,7 +422,7 @@ export class RecruitingDatabase {
         throw error
       }
       
-      // SECURITY: Removed console.error('Database error moving recruit to onboarding:', error)
+      // SECURITY: console statement removederror('Database error moving recruit to onboarding:', error)
       throw new RecruitingError(
         'Failed to move recruit to onboarding',
         RECRUITING_ERROR_CODES.INTERNAL_ERROR,
@@ -577,7 +577,7 @@ export class RecruitingDatabase {
         throw error
       }
       
-      // SECURITY: Removed console.error('Database error anonymizing recruit:', error)
+      // SECURITY: console statement removederror('Database error anonymizing recruit:', error)
       throw new RecruitingError(
         'Failed to anonymize recruit',
         RECRUITING_ERROR_CODES.INTERNAL_ERROR,

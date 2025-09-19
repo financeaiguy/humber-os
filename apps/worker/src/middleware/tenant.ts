@@ -127,7 +127,7 @@ export async function tenantMiddleware(c: Context<{ Bindings: TenantEnv; Variabl
     const dbBinding = DB_BINDINGS[tenantConfig.dbBinding]
     
     if (!dbBinding || !c.env[dbBinding]) {
-      // SECURITY: Removed console.error(`Invalid DB binding for tenant ${tenantId}: ${tenantConfig.dbBinding}`)
+      // SECURITY: console statement removederror(`Invalid DB binding for tenant ${tenantId}: ${tenantConfig.dbBinding}`)
       return c.json({ 
         error: 'Database configuration error',
         message: 'Unable to connect to tenant database'
@@ -156,7 +156,7 @@ export async function tenantMiddleware(c: Context<{ Bindings: TenantEnv; Variabl
     
     await next()
   } catch (error) {
-    // SECURITY: Removed console.error('Tenant middleware error:', error)
+    // SECURITY: console statement removederror('Tenant middleware error:', error)
     return c.json({ 
       error: 'Tenant routing failed',
       message: 'Unable to process tenant request'
@@ -220,7 +220,7 @@ async function getCachedTenantConfig(
       return TenantConfigSchema.parse(cached)
     }
   } catch (error) {
-    // SECURITY: Removed console.error('Cache retrieval error:', error)
+    // SECURITY: console statement removederror('Cache retrieval error:', error)
   }
   return null
 }
@@ -240,7 +240,7 @@ async function cacheTenantConfig(
       { expirationTtl: 3600 } // 1 hour TTL
     )
   } catch (error) {
-    // SECURITY: Removed console.error('Cache storage error:', error)
+    // SECURITY: console statement removederror('Cache storage error:', error)
   }
 }
 
@@ -268,7 +268,7 @@ async function getTenantConfig(
       return TenantConfigSchema.parse(result)
     }
   } catch (error) {
-    // SECURITY: Removed console.error('Database query error:', error)
+    // SECURITY: console statement removederror('Database query error:', error)
   }
   return null
 }
@@ -292,7 +292,7 @@ async function logTenantAccess(
       ...access
     })
   } catch (error) {
-    // SECURITY: Removed console.error('Failed to log tenant access:', error)
+    // SECURITY: console statement removederror('Failed to log tenant access:', error)
   }
 }
 
@@ -366,7 +366,7 @@ async function findAvailableDatabase(db: D1Database): Promise<string | null> {
     // Return binding with least tenants (or first available if none assigned)
     return selectedBinding || Object.keys(DB_BINDINGS)[0]
   } catch (error) {
-    // SECURITY: Removed console.error('Error finding available database:', error)
+    // SECURITY: console statement removederror('Error finding available database:', error)
     return Object.keys(DB_BINDINGS)[0] // Fallback to first database
   }
 }

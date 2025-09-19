@@ -37,11 +37,11 @@ export async function PUT(request: NextRequest) {
 
     // For now, we'll simulate KV storage with a simple in-memory store
     // In production, replace this with actual KV binding
-    // SECURITY: Removed // SECURITY: Removed console.log('📝 KV Store - Setting session:', sessionToken.substring(0, Math.min(8, sessionToken.length)) + '...')
+    // SECURITY: console statement removed: console.log('📝 KV Store - Setting session:', sessionToken.substring(0, Math.min(8, sessionToken.length)) + '...')
     
     return NextResponse.json({ success: true })
   } catch (error) {
-    // SECURITY: Removed console.error('KV Store - Set session error:', error)
+    // SECURITY: console statement removed: console.error('KV Store - Set session error:', error)
     return NextResponse.json(
       { error: 'Failed to store session' },
       { status: 500 }
@@ -70,14 +70,14 @@ export async function POST(request: NextRequest) {
 
     // For now, we'll simulate that sessions don't exist in KV
     // This will cause fallback to localStorage
-    // SECURITY: Removed // SECURITY: Removed console.log('🔍 KV Store - Getting session:', sessionToken.substring(0, Math.min(8, sessionToken.length)) + '...')
+    // SECURITY: console statement removed: console.log('🔍 KV Store - Getting session:', sessionToken.substring(0, Math.min(8, sessionToken.length)) + '...')
     
     return NextResponse.json(
       { error: 'Session not found in KV store' },
       { status: 404 }
     )
   } catch (error) {
-    // SECURITY: Removed console.error('KV Store - Get session error:', error)
+    // SECURITY: console statement removed: console.error('KV Store - Get session error:', error)
     return NextResponse.json(
       { error: 'Failed to retrieve session' },
       { status: 500 }
@@ -101,7 +101,7 @@ export async function DELETE(request: NextRequest) {
       // In a Cloudflare Worker environment, you would use:
       // await env.HUMBER_SESSIONS.delete(`session:${sessionToken}`)
       
-      // SECURITY: Removed // SECURITY: Removed console.log('🗑️ KV Store - Deleting session:', sessionToken.substring(0, Math.min(8, sessionToken.length)) + '...')
+      // SECURITY: console statement removed: console.log('🗑️ KV Store - Deleting session:', sessionToken.substring(0, Math.min(8, sessionToken.length)) + '...')
     } else if (action === 'deleteUser' && userId) {
       // In a Cloudflare Worker environment, you would use:
       // const list = await env.HUMBER_SESSIONS.list({ prefix: `session:` })
@@ -115,12 +115,12 @@ export async function DELETE(request: NextRequest) {
       //   }
       // }
       
-      // SECURITY: Removed // SECURITY: Removed console.log('🗑️ KV Store - Deleting all sessions for user:', userId)
+      // SECURITY: console statement removed: console.log('🗑️ KV Store - Deleting all sessions for user:', userId)
     }
     
     return NextResponse.json({ success: true })
   } catch (error) {
-    // SECURITY: Removed console.error('KV Store - Delete session error:', error)
+    // SECURITY: console statement removed: console.error('KV Store - Delete session error:', error)
     return NextResponse.json(
       { error: 'Failed to delete session' },
       { status: 500 }

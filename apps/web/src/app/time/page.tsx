@@ -41,7 +41,7 @@ const timeEntries = [
     },
     notifications: {
       manager: { sent: true, method: 'SMS', number: '+1-555-0100' },
-      hr: { sent: true, method: 'Email', email: 'hr@humber.com' },
+      hr: { sent: true, method: 'Email', email: 'hr@example.com' },
       client: { sent: false, method: 'API', endpoint: 'gm.workforce.api' }
     },
     anomalies: [],
@@ -64,7 +64,7 @@ const timeEntries = [
     },
     notifications: {
       manager: { sent: true, method: 'SMS', number: '+1-555-0101' },
-      hr: { sent: false, method: 'Email', email: 'hr@humber.com' },
+      hr: { sent: false, method: 'Email', email: 'hr@example.com' },
       client: { sent: true, method: 'Webhook', endpoint: 'ford.timetrack.webhook' }
     },
     anomalies: [],
@@ -87,7 +87,7 @@ const timeEntries = [
     },
     notifications: {
       manager: { sent: true, method: 'SMS', number: '+1-555-0102' },
-      hr: { sent: true, method: 'Email', email: 'hr@humber.com' },
+      hr: { sent: true, method: 'Email', email: 'hr@example.com' },
       client: { sent: false, method: 'None', endpoint: null }
     },
     anomalies: ['Outside geofence', 'No biometric verification'],
@@ -143,7 +143,7 @@ const notificationChannels = [
     enabled: true,
     config: {
       apiKey: 'SG.***',
-      fromEmail: 'timetrack@humber.com'
+      fromEmail: 'timetrack@example.com'
     },
     recipients: ['HR', 'Payroll', 'Client'],
     events: ['Daily Summary', 'Weekly Report', 'Exceptions']
@@ -661,7 +661,8 @@ export default function TimeTrackingPage() {
                 <X className="h-5 w-5 text-slate-400" />
               </button>
             </div>
-            <EmployeeClockView 
+            <EmployeeClockView
+              key={Date.now()} // Force fresh mount each time
               onClose={() => setShowClockModal(false)}
             />
           </div>
