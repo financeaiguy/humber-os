@@ -30,7 +30,7 @@ export default auth((req) => {
   
   // If not authenticated and trying to access protected route
   if (!req.auth && !isPublicRoute) {
-    const signInUrl = new URL('/auth/signin', req.url)
+    const signInUrl = new URL('/api/auth/signin', req.url)
     signInUrl.searchParams.set('callbackUrl', pathname)
     return NextResponse.redirect(signInUrl)
   }

@@ -146,10 +146,7 @@ export const config: NextAuthConfig = {
   theme: {
     logo: "/logo.png",
   },
-  pages: {
-    signIn: "/auth/signin",
-    error: "/auth/error",
-  },
+  // Use NextAuth's built-in pages instead of custom ones
   useSecureCookies: false,
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
