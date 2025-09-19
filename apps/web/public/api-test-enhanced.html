@@ -186,6 +186,7 @@
                     <label>Server:</label>
                     <select id="recruits-server">
                         <option value="http://localhost:3000">Next.js (Port 3000)</option>
+                        <option value="http://localhost:3003">Next.js (Port 3003)</option>
                         <option value="http://localhost:8787">Worker (Port 8787)</option>
                     </select>
                 </div>
@@ -454,7 +455,8 @@
 
             // Test server connectivity
             try {
-                const response = await fetch('http://localhost:3000/api/recruits?limit=1');
+                const serverUrl = document.getElementById('recruits-server').value;
+                const response = await fetch(`${serverUrl}/api/recruits?limit=1`);
                 if (response.ok) {
                     document.getElementById('server-status').textContent = '✅ Online';
                 } else {

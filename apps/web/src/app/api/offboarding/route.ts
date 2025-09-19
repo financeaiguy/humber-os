@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 
-export const runtime = 'edge'
-
 // Mock database for off-boarding requests
 // In production, this would be replaced with actual database operations
 const mockOffboardingRequests = [
