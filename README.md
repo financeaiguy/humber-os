@@ -23,7 +23,7 @@ Humber Operations AI is a comprehensive enterprise platform that revolutionizes 
 
 ```mermaid
 graph TB
-    subgraph "🌐 Frontend Layer (Next.js)"
+    subgraph "Frontend Layer (Next.js)"
         UI[Web Application<br/>localhost:3003]
         UI --> |Recruits UI| REC[Recruiting Interface]
         UI --> |Bull Pen UI| BP[Bull Pen Dashboard]
@@ -31,37 +31,37 @@ graph TB
         UI --> |Analytics UI| ANA[Analytics Dashboard]
     end
 
-    subgraph "⚡ API Gateway Layer (Cloudflare Worker)"
+    subgraph "API Gateway Layer (Cloudflare Worker)"
         WORKER[Hono API Worker<br/>localhost:8787]
         WORKER --> |/docs| DOCS[API Documentation]
         WORKER --> |/api-test| TEST[Interactive Testing]
     end
 
-    subgraph "🔧 Backend Services (9 Systems)"
-        AUTH[🔐 Authentication Service]
-        REC_API[👥 Recruiting API Service]
-        TIME_API[⏰ Time Tracking API]
-        BULL_API[🎯 Bull Pen API]
-        DOC_API[📄 Document Management]
-        CHAT_API[🤖 AI Chat Service]
-        NOTIF[📧 Notification Service]
-        REPORT[📊 Report Generation]
+    subgraph "Backend Services (9 Systems)"
+        AUTH[Authentication Service]
+        REC_API[Recruiting API Service]
+        TIME_API[Time Tracking API]
+        BULL_API[Bull Pen API]
+        DOC_API[Document Management]
+        CHAT_API[AI Chat Service]
+        NOTIF[Notification Service]
+        REPORT[Report Generation]
     end
 
-    subgraph "💾 Data Layer"
-        DB_MASTER[(🏛️ Master Database<br/>D1)]
-        DB_TENANT_1[(👥 Tenant DB 001)]
-        DB_TENANT_2[(👥 Tenant DB 002)]
-        DB_TENANT_N[(👥 Tenant DB ...)]
-        KV_SESSIONS[(🔑 Session Store<br/>KV)]
-        KV_CACHE[(⚡ Cache Store<br/>KV)]
-        R2_DOCS[(📁 Document Storage<br/>R2)]
-        VECTOR[(🧠 Vector Search<br/>Vectorize)]
-        DO_REALTIME[(🔄 Real-time State<br/>Durable Objects)]
-        DO_PRESENCE[(👥 User Presence<br/>Durable Objects)]
+    subgraph "Data Layer"
+        DB_MASTER[(Master Database<br/>D1)]
+        DB_TENANT_1[(Tenant DB 001)]
+        DB_TENANT_2[(Tenant DB 002)]
+        DB_TENANT_N[(Tenant DB ...)]
+        KV_SESSIONS[(Session Store<br/>KV)]
+        KV_CACHE[(Cache Store<br/>KV)]
+        R2_DOCS[(Document Storage<br/>R2)]
+        VECTOR[(Vector Search<br/>Vectorize)]
+        DO_REALTIME[(Real-time State<br/>Durable Objects)]
+        DO_PRESENCE[(User Presence<br/>Durable Objects)]
     end
 
-    subgraph "🔄 Message Queues"
+    subgraph "Message Queues"
         Q_OPS[Operations Queue]
         Q_RECON[Reconciliation Queue]
         Q_VET[Vetting Queue]
@@ -69,11 +69,11 @@ graph TB
         Q_AUDIT[Audit Queue]
     end
 
-    subgraph "🌐 External Services"
-        SENDGRID[📧 SendGrid Email]
-        TWILIO[📱 Twilio SMS]
-        BG_CHECK[🔍 Background Check APIs]
-        VISA_SVC[📋 Visa Processing]
+    subgraph "External Services"
+        SENDGRID[SendGrid Email]
+        TWILIO[Twilio SMS]
+        BG_CHECK[Background Check APIs]
+        VISA_SVC[Visa Processing]
     end
 
     UI --> WORKER
@@ -967,34 +967,34 @@ curl http://localhost:8787/bull-pen/dashboard \
 
 ```mermaid
 graph TB
-    subgraph "📊 Real-time System Dashboard"
-        subgraph "🎯 KPI Overview"
-            ACTIVE_ENG[96 Active Engineers<br/>🟢 Available: 23<br/>🟡 Processing: 15<br/>🔵 Buffered: 31<br/>🟠 Deployed: 27]
+    subgraph "Real-time System Dashboard"
+        subgraph "KPI Overview"
+            ACTIVE_ENG[96 Active Engineers<br/>Available: 23<br/>Processing: 15<br/>Buffered: 31<br/>Deployed: 27]
             
-            PIPELINE[Recruiting Pipeline<br/>📥 Sourced: 45<br/>📋 Screened: 32<br/>💼 Interviewed: 18<br/>✉️ Offers: 8<br/>✅ Accepted: 6]
+            PIPELINE[Recruiting Pipeline<br/>Sourced: 45<br/>Screened: 32<br/>Interviewed: 18<br/>Offers: 8<br/>Accepted: 6]
             
-            PERFORMANCE[System Performance<br/>⚡ API: 89ms avg<br/>💾 DB: 23ms avg<br/>🔐 Encryption: 5ms avg<br/>📈 Uptime: 99.98%]
+            PERFORMANCE[System Performance<br/>API: 89ms avg<br/>DB: 23ms avg<br/>Encryption: 5ms avg<br/>Uptime: 99.98%]
         end
         
-        subgraph "🔐 Security Status"
-            THREATS[Security Threats<br/>🟢 No Active Threats<br/>🛡️ 2,847 Blocked Today<br/>📊 Trust Score: 95%<br/>🔍 0 Incidents]
+        subgraph "Security Status"
+            THREATS[Security Threats<br/>No Active Threats<br/>2,847 Blocked Today<br/>Trust Score: 95%<br/>0 Incidents]
             
-            COMPLIANCE[Compliance Status<br/>✅ GDPR: 100%<br/>✅ BIPA: 100%<br/>✅ CCPA: 100%<br/>✅ SOX: 98%]
+            COMPLIANCE[Compliance Status<br/>GDPR: 100%<br/>BIPA: 100%<br/>CCPA: 100%<br/>SOX: 98%]
             
-            AUDIT[Audit Activity<br/>📝 1,234 Events Today<br/>🔍 89 PII Access Logs<br/>📋 23 Consent Updates<br/>🗑️ 5 Data Deletions]
+            AUDIT[Audit Activity<br/>1,234 Events Today<br/>89 PII Access Logs<br/>23 Consent Updates<br/>5 Data Deletions]
         end
         
-        subgraph "💰 Financial Overview"
-            REVENUE[Revenue Metrics<br/>💵 MRR: $1.62M<br/>📈 Growth: +12%<br/>💼 Per Engineer: $15.4K<br/>📊 Margin: 34%]
+        subgraph "Financial Overview"
+            REVENUE[Revenue Metrics<br/>MRR: $1.62M<br/>Growth: +12%<br/>Per Engineer: $15.4K<br/>Margin: 34%]
             
-            BILLING[Billing Status<br/>💳 Invoiced: $487K<br/>⏳ Pending: $89K<br/>✅ Collected: $398K<br/>📋 Outstanding: $67K]
+            BILLING[Billing Status<br/>Invoiced: $487K<br/>Pending: $89K<br/>Collected: $398K<br/>Outstanding: $67K]
         end
     end
 
-    subgraph "🚨 Alert System"
-        CRITICAL[🔴 Critical Alerts<br/>0 Active]
-        WARNING[🟡 Warning Alerts<br/>3 Active]
-        INFO[🔵 Info Alerts<br/>12 Active]
+    subgraph "Alert System"
+        CRITICAL[Critical Alerts<br/>0 Active]
+        WARNING[Warning Alerts<br/>3 Active]
+        INFO[Info Alerts<br/>12 Active]
     end
 
     ACTIVE_ENG --> CRITICAL
@@ -1015,7 +1015,7 @@ graph TB
 
 ```mermaid
 graph TB
-    subgraph "🛡️ Security Layers"
+    subgraph "Security Layers"
         subgraph "Network Security"
             CF[Cloudflare Protection<br/>DDoS + WAF]
             RATE[Rate Limiting<br/>Per User/Tenant]
@@ -1108,7 +1108,7 @@ graph TB
 
 ```mermaid
 graph TB
-    subgraph "🌍 Global Edge Network"
+    subgraph "Global Edge Network"
         subgraph "North America"
             US_E[US East<br/>Primary Data Center]
             US_W[US West<br/>Backup & DR]
@@ -1277,21 +1277,21 @@ npm run typecheck
 ```mermaid
 graph TB
     subgraph "Core Systems"
-        A[👥 Recruiting System<br/>GDPR/BIPA Compliant<br/>7 API Endpoints]
-        B[⏰ Time Tracking<br/>3-Layer Security<br/>Real-time Verification]
-        C[🎯 Bull Pen Management<br/>5 Engineer Categories<br/>Assignment Engine]
-        D[🚀 Project Management<br/>Interactive Cards<br/>Status-Aware Actions]
-        E[🔄 Offboarding System<br/>7 Offboarding Types<br/>Automated Workflows]
+        A[Recruiting System<br/>GDPR/BIPA Compliant<br/>7 API Endpoints]
+        B[Time Tracking<br/>3-Layer Security<br/>Real-time Verification]
+        C[Bull Pen Management<br/>5 Engineer Categories<br/>Assignment Engine]
+        D[Project Management<br/>Interactive Cards<br/>Status-Aware Actions]
+        E[Offboarding System<br/>7 Offboarding Types<br/>Automated Workflows]
     end
     
     subgraph "Analytics & AI"
-        F[📊 Analytics & Reporting<br/>Real-time Dashboards<br/>Automated Reports]
-        G[🤖 AI & Automation<br/>RAG Knowledge Base<br/>Workflow Automation]
+        F[Analytics & Reporting<br/>Real-time Dashboards<br/>Automated Reports]
+        G[AI & Automation<br/>RAG Knowledge Base<br/>Workflow Automation]
     end
     
     subgraph "Security & Infrastructure"
-        H[🔐 Security & Compliance<br/>Zero Trust Architecture<br/>Regulatory Compliance]
-        I[📡 API Gateway<br/>65+ Endpoints<br/>Interactive Testing]
+        H[Security & Compliance<br/>Zero Trust Architecture<br/>Regulatory Compliance]
+        I[API Gateway<br/>65+ Endpoints<br/>Interactive Testing]
     end
     
     A --> F
