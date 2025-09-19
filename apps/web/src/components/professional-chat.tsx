@@ -269,17 +269,23 @@ export function ProfessionalChat({ isOpen, onToggle }: ProfessionalChatProps) {
         })
       })
 
-      if (response.ok) {
-        const data = await response.json() as {
-          messageId: string;
-          content: string;
-          sourceDocuments?: Array<{
-            metadata?: { documentTitle?: string; category?: string };
-            documentTitle?: string;
-            score: number;
-          }>;
-        }
-        
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('Chat API error:', response.status, errorText)
+        throw new Error(`API Error: ${response.status}`)
+      }
+
+      const data = await response.json() as {
+        messageId: string;
+        content: string;
+        sourceDocuments?: Array<{
+          metadata?: { documentTitle?: string; category?: string };
+          documentTitle?: string;
+          score: number;
+        }>;
+      }
+
+      if (data && data.content) {
         // Simulate streaming effect
         const assistantMessage: ChatMessage = {
           id: data.messageId,
@@ -289,10 +295,10 @@ export function ProfessionalChat({ isOpen, onToggle }: ProfessionalChatProps) {
             title: doc.metadata?.documentTitle || doc.documentTitle,
             relevance: doc.score,
             type: doc.metadata?.category || 'document'
-          })),
+        })),
           timestamp: Date.now(),
           isStreaming: true
-        }
+        };
 
         setMessages(prev => [...prev, assistantMessage])
 
@@ -310,15 +316,14 @@ export function ProfessionalChat({ isOpen, onToggle }: ProfessionalChatProps) {
         throw new Error('Failed to get response')
       }
     } catch (error) {
-      // SECURITY: console statement removed: console.error('Chat error:', error)
-      
+      console.error('Chat error:', error)
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: 'I apologize, but I encountered an error processing your request. Please try again.',
         timestamp: Date.now()
       }
-      
+
       setMessages(prev => [...prev, errorMessage])
     } finally {
       setIsLoading(false)
@@ -499,44 +504,44 @@ export function ProfessionalChat({ isOpen, onToggle }: ProfessionalChatProps) {
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
                 chatMode === 'documents'
                   ? 'bg-blue-500/20 text-blue-300 shadow-lg border border-blue-500/30'
-                  : 'text-white hover:text-white hover:bg-white/20 border border-transparent'
+                  : 'text-white/90 hover:text-white hover:bg-gray-700/70 border border-gray-500 bg-gray-700/40'
               }`}
             >
-              <FileText className="h-4 w-4 text-current" />
-              <span className="text-current">Knowledge Base</span>
+              <FileText className="h-4 w-4" />
+              <span>Knowledge Base</span>
             </button>
             <button
               onClick={() => setChatMode('engineer')}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
                 chatMode === 'engineer'
                   ? 'bg-green-500/20 text-green-300 shadow-lg border border-green-500/30'
-                  : 'text-white hover:text-white hover:bg-white/20 border border-transparent'
+                  : 'text-white/90 hover:text-white hover:bg-gray-700/70 border border-gray-500 bg-gray-700/40'
               }`}
             >
-              <Users className="h-4 w-4 text-current" />
-              <span className="text-current">Bull Pen</span>
+              <Users className="h-4 w-4" />
+              <span>Bull Pen</span>
             </button>
             <button
               onClick={() => setChatMode('general')}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
                 chatMode === 'general'
                   ? 'bg-purple-500/20 text-purple-300 shadow-lg border border-purple-500/30'
-                  : 'text-white hover:text-white hover:bg-white/20 border border-transparent'
+                  : 'text-white/90 hover:text-white hover:bg-gray-700/70 border border-gray-500 bg-gray-700/40'
               }`}
             >
-              <Brain className="h-4 w-4 text-current" />
-              <span className="text-current">Operations</span>
+              <Brain className="h-4 w-4" />
+              <span>Operations</span>
             </button>
             <button
               onClick={() => setChatMode('help')}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
                 chatMode === 'help'
                   ? 'bg-orange-500/20 text-orange-300 shadow-lg border border-orange-500/30'
-                  : 'text-white hover:text-white hover:bg-white/20 border border-transparent'
+                  : 'text-white/90 hover:text-white hover:bg-gray-700/70 border border-gray-500 bg-gray-700/40'
               }`}
             >
-              <HelpCircle className="h-4 w-4 text-current" />
-              <span className="text-current">Help Center</span>
+              <HelpCircle className="h-4 w-4" />
+              <span>Help Center</span>
             </button>
           </div>
           
@@ -1300,18 +1305,18 @@ export function ProfessionalChat({ isOpen, onToggle }: ProfessionalChatProps) {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-xs text-slate-400 mb-2">Response Length</label>
-                    <select className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white text-sm">
+                    <select defaultValue="detailed" className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white text-sm">
                       <option value="concise">Concise (Quick answers)</option>
-                      <option value="detailed" selected>Detailed (Comprehensive)</option>
+                      <option value="detailed">Detailed (Comprehensive)</option>
                       <option value="extensive">Extensive (Very thorough)</option>
                     </select>
                   </div>
                   
                   <div>
                     <label className="block text-xs text-slate-400 mb-2">Technical Level</label>
-                    <select className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white text-sm">
+                    <select defaultValue="intermediate" className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white text-sm">
                       <option value="basic">Basic (Simple explanations)</option>
-                      <option value="intermediate" selected>Intermediate (Technical details)</option>
+                      <option value="intermediate">Intermediate (Technical details)</option>
                       <option value="expert">Expert (Advanced technical)</option>
                     </select>
                   </div>

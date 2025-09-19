@@ -451,7 +451,7 @@ export function ComprehensiveChatHistory({ isOpen, onClose, onSelectConversation
               className={`flex-1 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
                 activeTab === 'my-conversations'
                   ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  : 'text-white/90 hover:text-white hover:bg-gray-700/70 border border-gray-500 bg-gray-700/40'
               }`}
             >
               <User className="h-4 w-4" />
@@ -467,7 +467,7 @@ export function ComprehensiveChatHistory({ isOpen, onClose, onSelectConversation
               className={`flex-1 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
                 activeTab === 'all-conversations'
                   ? 'bg-green-500/20 text-green-300 border border-green-500/30'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  : 'text-white/90 hover:text-white hover:bg-gray-700/70 border border-gray-500 bg-gray-700/40'
               }`}
             >
               <Globe className="h-4 w-4" />
@@ -483,7 +483,7 @@ export function ComprehensiveChatHistory({ isOpen, onClose, onSelectConversation
               className={`flex-1 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
                 activeTab === 'shared-conversations'
                   ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  : 'text-white/90 hover:text-white hover:bg-gray-700/70 border border-gray-500 bg-gray-700/40'
               }`}
             >
               <Share2 className="h-4 w-4" />

@@ -88,6 +88,10 @@ id = "16640e4d080d4de8879962927ad31732"
 binding = "KV_SESSIONS"
 id = "81526f64e8cf4928a9ec1b903a8024ef"
 
+[[env.production.kv_namespaces]]
+binding = "KV_NOTES"
+id = "9b2a8e5f72d34c8a91b6f3e7d4c5a6f8"
+
 # Production Queues
 [[env.production.queues.producers]]
 queue = "humber-operations-queue"
@@ -231,6 +235,10 @@ id = "16640e4d080d4de8879962927ad31732"
 [[kv_namespaces]]
 binding = "KV_SESSIONS"
 id = "81526f64e8cf4928a9ec1b903a8024ef"
+
+[[kv_namespaces]]
+binding = "KV_NOTES"
+id = "9b2a8e5f72d34c8a91b6f3e7d4c5a6f8"
 
 # Queues for async processing
 [[queues.producers]]

@@ -18,7 +18,11 @@ import { useFormValidation, formatLegalIdentifier, getFieldDisplayName } from '@
 import { DocumentViewer } from '../knowledge-base/document-viewer'
 
 interface OnboardingData {
-  // Phase 1: Basic Information
+  // Phase 1: Basic Information - FIRST FIELD: Employee/Contractor Selection
+  employeeType: 'EMPLOYEE' | 'CONTRACTOR' | 'PART_TIME' | 'INTERN'
+  contractType: 'STANDARD' | 'BLOCKCHAIN' | 'HYBRID'
+  
+  // Basic details
   recruitmentDate: string
   visaStatus: string
   travelLimitations: string
@@ -28,7 +32,6 @@ interface OnboardingData {
     number: string
   }
   totalExperience: number
-  employeeType: 'full-time' | 'contractor' | 'part-time' | 'intern'
   
   // Auto-populated from recruitment (will be fetched)
   firstName: string
@@ -38,6 +41,12 @@ interface OnboardingData {
   currentLocation: string
   desiredSalary: number
   availableStartDate: string
+  
+  // Contract-specific fields
+  hourlyRate?: number
+  contractDuration?: string
+  workArrangement: 'REMOTE' | 'HYBRID' | 'ONSITE'
+  polygonWalletAddress?: string
 }
 
 interface NewOnboardingModalProps {
@@ -64,6 +73,10 @@ export default function NewOnboardingModal({
   const { errors, validateField, validateForm, clearFieldError, setFieldError, clearErrors } = useFormValidation()
   
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({
+    // FIRST FIELD: Employee/Contractor Selection
+    employeeType: 'EMPLOYEE',
+    contractType: 'STANDARD',
+    
     recruitmentDate: '',
     visaStatus: '',
     travelLimitations: '',
@@ -73,14 +86,19 @@ export default function NewOnboardingModal({
       number: ''
     },
     totalExperience: 0,
-    employeeType: 'full-time',
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
     currentLocation: '',
     desiredSalary: 0,
-    availableStartDate: ''
+    availableStartDate: '',
+    
+    // Contract-specific fields
+    hourlyRate: 0,
+    contractDuration: '',
+    workArrangement: 'HYBRID',
+    polygonWalletAddress: ''
   })
   
   // Phase 2: Offer Letter Details State
@@ -275,19 +293,80 @@ export default function NewOnboardingModal({
         candidatePhone: onboardingData.phone
       }
       
-      // Send to AI/Chat widget for generation
-      const response = await fetch('/api/onboarding/generate-offer', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(offerData)
-      })
+      // Generate both offer letter AND contract
+      const [offerResponse, contractResponse] = await Promise.all([
+        // Generate offer letter
+        fetch('/api/onboarding/generate-offer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(offerData)
+        }),
+        
+        // Generate smart contract
+        fetch('/api/contracts/generate', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer test-token-for-api-testing'
+          },
+          body: JSON.stringify({
+            employeeId: `emp_${Date.now()}`,
+            employeeName: `${onboardingData.firstName} ${onboardingData.lastName}`,
+            employeeEmail: onboardingData.email,
+            employeeType: onboardingData.employeeType,
+            position: offerDetails.jobTitle || 'Engineer',
+            department: offerDetails.department || 'Engineering',
+            location: onboardingData.currentLocation || 'Chicago, IL',
+            startDate: offerDetails.startDate || onboardingData.availableStartDate,
+            salary: onboardingData.employeeType === 'EMPLOYEE' ? onboardingData.desiredSalary : undefined,
+            hourlyRate: onboardingData.employeeType === 'CONTRACTOR' ? onboardingData.hourlyRate : undefined,
+            contractDuration: onboardingData.contractDuration,
+            workArrangement: onboardingData.workArrangement,
+            enableBlockchain: onboardingData.contractType === 'BLOCKCHAIN',
+            polygonNetwork: 'testnet',
+            walletAddress: onboardingData.polygonWalletAddress,
+            milestones: onboardingData.employeeType === 'CONTRACTOR' ? [
+              {
+                description: 'Initial project setup and requirements analysis',
+                amount: Math.floor((onboardingData.hourlyRate || 85) * 40 * 4 * 0.3), // 30% of monthly
+                dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+              },
+              {
+                description: 'Mid-project deliverables and progress review',
+                amount: Math.floor((onboardingData.hourlyRate || 85) * 40 * 4 * 0.4), // 40% of monthly
+                dueDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString()
+              },
+              {
+                description: 'Final deliverables and project completion',
+                amount: Math.floor((onboardingData.hourlyRate || 85) * 40 * 4 * 0.3), // 30% of monthly
+                dueDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
+              }
+            ] : undefined
+          })
+        })
+      ])
       
-      if (!response.ok) throw new Error('Failed to generate offer letter')
+      if (!offerResponse.ok) throw new Error('Failed to generate offer letter')
+      if (!contractResponse.ok) throw new Error('Failed to generate contract')
       
-      const { pdfUrl, contractAddress } = await response.json()
+      const [offerResult, contractResult] = await Promise.all([
+        offerResponse.json(),
+        contractResponse.json()
+      ])
       
-      setOfferLetterPDF(pdfUrl)
+      // Store both offer letter and contract data
+      setOfferLetterPDF(offerResult.pdfUrl)
       setOfferLetterGenerated(true)
+      
+      // Store contract data for later use
+      setOfferDetails(prev => ({
+        ...prev,
+        contractId: contractResult.data.contractId,
+        contractPreviewUrl: contractResult.data.previewUrl,
+        contractDownloadUrl: contractResult.data.downloadUrl,
+        contractSignatureUrl: contractResult.data.signatureUrl,
+        blockchainContract: contractResult.data.blockchainContract
+      }))
       
       // If smart contract enabled, store the contract address
       if (offerDetails.enableSmartContract && contractAddress) {
@@ -313,6 +392,37 @@ export default function NewOnboardingModal({
       link.href = offerLetterPDF
       link.download = `offer-letter-${onboardingData.firstName}-${onboardingData.lastName}.pdf`
       link.click()
+    }
+  }
+
+  const handleSendForSignature = async () => {
+    if (!offerDetails.contractId) return
+    
+    try {
+      const response = await fetch(`/api/contracts/signature/${offerDetails.contractId}`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer test-token-for-api-testing'
+        },
+        body: JSON.stringify({
+          employeeEmail: onboardingData.email,
+          employeeName: `${onboardingData.firstName} ${onboardingData.lastName}`,
+          contractType: `${onboardingData.employeeType === 'CONTRACTOR' ? 'CONTRACTOR' : 'EMPLOYEE'} ${onboardingData.contractType}`,
+          message: `Please review and sign your ${onboardingData.employeeType === 'CONTRACTOR' ? 'contractor agreement' : 'employment contract'}. ${onboardingData.contractType === 'BLOCKCHAIN' ? 'This contract includes Polygon blockchain integration for automated payments and immutable terms.' : ''}`
+        })
+      })
+      
+      if (!response.ok) throw new Error('Failed to send signature request')
+      
+      const result = await response.json()
+      
+      // Show success message
+      alert(`Signature request sent successfully to ${onboardingData.email}!\n\nTracking URL: ${result.data.trackingUrl}`)
+      
+    } catch (error) {
+      console.error('Error sending signature request:', error)
+      alert('Failed to send signature request. Please try again.')
     }
   }
 
@@ -815,21 +925,129 @@ export default function NewOnboardingModal({
                           <option value="OTHER">Other</option>
                         </select>
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                          <Briefcase className="h-4 w-4 inline mr-1" />
-                          Employee Type
-                        </label>
-                        <select
-                          value={onboardingData.employeeType}
-                          onChange={(e) => handleInputChange('employeeType', e.target.value)}
-                          className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:border-blue-500 focus:outline-none"
-                        >
-                          <option value="full-time">Full-time Employee</option>
-                          <option value="contractor">Contractor</option>
-                          <option value="part-time">Part-time</option>
-                          <option value="intern">Intern</option>
-                        </select>
+                      {/* FIRST FIELD: Employee/Contractor Selection - Most Important */}
+                      <div className="col-span-2 mb-8 p-6 bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-xl border border-blue-500/30">
+                        <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                          <User className="h-5 w-5 mr-2 text-blue-400" />
+                          Employment Classification
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-2">
+                              <Briefcase className="h-4 w-4 inline mr-1" />
+                              Employee Type *
+                            </label>
+                            <select
+                              value={onboardingData.employeeType}
+                              onChange={(e) => handleInputChange('employeeType', e.target.value)}
+                              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:border-blue-500 focus:outline-none"
+                            >
+                              <option value="EMPLOYEE">Full-time Employee</option>
+                              <option value="CONTRACTOR">Independent Contractor</option>
+                              <option value="PART_TIME">Part-time Employee</option>
+                              <option value="INTERN">Intern</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-2">
+                              <ScrollText className="h-4 w-4 inline mr-1" />
+                              Contract Type *
+                            </label>
+                            <select
+                              value={onboardingData.contractType}
+                              onChange={(e) => handleInputChange('contractType', e.target.value)}
+                              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:border-blue-500 focus:outline-none"
+                            >
+                              <option value="STANDARD">Standard Contract</option>
+                              <option value="BLOCKCHAIN">Blockchain Contract (Polygon)</option>
+                              <option value="HYBRID">Hybrid Contract</option>
+                            </select>
+                          </div>
+                        </div>
+                        
+                        {/* Show additional fields based on selection */}
+                        {onboardingData.employeeType === 'CONTRACTOR' && (
+                          <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-slate-800/50 rounded-lg">
+                            <div>
+                              <label className="block text-sm font-medium text-slate-300 mb-2">
+                                <DollarSign className="h-4 w-4 inline mr-1" />
+                                Hourly Rate
+                              </label>
+                              <input
+                                type="number"
+                                value={onboardingData.hourlyRate || ''}
+                                onChange={(e) => handleInputChange('hourlyRate', e.target.value)}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:border-blue-500 focus:outline-none"
+                                placeholder="85"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-slate-300 mb-2">
+                                <Calendar className="h-4 w-4 inline mr-1" />
+                                Contract Duration
+                              </label>
+                              <select
+                                value={onboardingData.contractDuration || ''}
+                                onChange={(e) => handleInputChange('contractDuration', e.target.value)}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:border-blue-500 focus:outline-none"
+                              >
+                                <option value="">Select Duration</option>
+                                <option value="3 months">3 months</option>
+                                <option value="6 months">6 months</option>
+                                <option value="1 year">1 year</option>
+                                <option value="2 years">2 years</option>
+                                <option value="ongoing">Ongoing</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-slate-300 mb-2">
+                                <MapPin className="h-4 w-4 inline mr-1" />
+                                Work Arrangement
+                              </label>
+                              <select
+                                value={onboardingData.workArrangement}
+                                onChange={(e) => handleInputChange('workArrangement', e.target.value)}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:border-blue-500 focus:outline-none"
+                              >
+                                <option value="REMOTE">Remote</option>
+                                <option value="HYBRID">Hybrid</option>
+                                <option value="ONSITE">On-site</option>
+                              </select>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Blockchain contract fields */}
+                        {onboardingData.contractType === 'BLOCKCHAIN' && (
+                          <div className="mt-4 p-4 bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-lg border border-purple-500/30">
+                            <h4 className="text-sm font-semibold text-purple-300 mb-3 flex items-center">
+                              <Shield className="h-4 w-4 mr-2" />
+                              Polygon Blockchain Integration
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-slate-300 mb-2">
+                                  <Key className="h-4 w-4 inline mr-1" />
+                                  Polygon Wallet Address (Optional)
+                                </label>
+                                <input
+                                  type="text"
+                                  value={onboardingData.polygonWalletAddress || ''}
+                                  onChange={(e) => handleInputChange('polygonWalletAddress', e.target.value)}
+                                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:border-blue-500 focus:outline-none font-mono text-sm"
+                                  placeholder="0x742d35Cc6634C0532925a3b8D404fddBD4f5B8A2"
+                                />
+                              </div>
+                              <div className="flex items-end">
+                                <div className="text-xs text-slate-400">
+                                  <p>• Automated milestone payments</p>
+                                  <p>• Immutable contract terms</p>
+                                  <p>• Multi-signature approval</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -1148,21 +1366,79 @@ export default function NewOnboardingModal({
                       </button>
                       
                       {offerLetterGenerated && (
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={handlePreviewPDF}
-                            className="flex items-center px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
-                          >
-                            <Eye className="h-4 w-4 mr-2" />
-                            Preview
-                          </button>
-                          <button
-                            onClick={handleDownloadPDF}
-                            className="flex items-center px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
-                          >
-                            <Download className="h-4 w-4 mr-2" />
-                            Download PDF
-                          </button>
+                        <div className="space-y-4">
+                          {/* Offer Letter Actions */}
+                          <div>
+                            <h4 className="text-sm font-medium text-slate-300 mb-2">Offer Letter</h4>
+                            <div className="flex items-center space-x-2">
+                              <button
+                                onClick={handlePreviewPDF}
+                                className="flex items-center px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+                              >
+                                <Eye className="h-4 w-4 mr-2" />
+                                Preview
+                              </button>
+                              <button
+                                onClick={handleDownloadPDF}
+                                className="flex items-center px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                              >
+                                <Download className="h-4 w-4 mr-2" />
+                                Download PDF
+                              </button>
+                            </div>
+                          </div>
+                          
+                          {/* Contract Actions */}
+                          {offerDetails.contractId && (
+                            <div>
+                              <h4 className="text-sm font-medium text-slate-300 mb-2 flex items-center">
+                                <ScrollText className="h-4 w-4 mr-2" />
+                                {onboardingData.employeeType === 'CONTRACTOR' ? 'Contractor Agreement' : 'Employment Contract'}
+                                {onboardingData.contractType === 'BLOCKCHAIN' && (
+                                  <span className="ml-2 px-2 py-1 bg-purple-600 text-xs rounded-full">Blockchain</span>
+                                )}
+                              </h4>
+                              <div className="flex items-center space-x-2">
+                                <button
+                                  onClick={() => window.open(offerDetails.contractPreviewUrl, '_blank')}
+                                  className="flex items-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                                >
+                                  <Eye className="h-4 w-4 mr-2" />
+                                  Preview Contract
+                                </button>
+                                <button
+                                  onClick={() => window.open(offerDetails.contractDownloadUrl, '_blank')}
+                                  className="flex items-center px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                                >
+                                  <Download className="h-4 w-4 mr-2" />
+                                  Download PDF
+                                </button>
+                                <button
+                                  onClick={handleSendForSignature}
+                                  className="flex items-center px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+                                >
+                                  <FileSignature className="h-4 w-4 mr-2" />
+                                  Send for Signature
+                                </button>
+                              </div>
+                              
+                              {/* Blockchain Contract Info */}
+                              {offerDetails.blockchainContract && (
+                                <div className="mt-3 p-3 bg-purple-900/30 rounded-lg border border-purple-500/30">
+                                  <div className="text-xs text-purple-300 space-y-1">
+                                    <p><strong>Network:</strong> Polygon {offerDetails.blockchainContract.network}</p>
+                                    <p><strong>Contract Address:</strong> 
+                                      <span className="font-mono ml-1">{offerDetails.blockchainContract.contractAddress}</span>
+                                    </p>
+                                    <p><strong>Deployment Cost:</strong> {offerDetails.blockchainContract.deploymentCost}</p>
+                                    {onboardingData.employeeType === 'CONTRACTOR' && (
+                                      <p><strong>Features:</strong> Milestone payments, Multi-signature, Escrow</p>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>

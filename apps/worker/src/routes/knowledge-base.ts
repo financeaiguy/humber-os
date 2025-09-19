@@ -7,6 +7,7 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { z } from 'zod'
 import { VectorizeIndex, VectorizeVector } from '@cloudflare/workers-types'
+import { getLocalVectorizeIndex, generateMockEmbedding } from '../lib/local-vectorize'
 
 interface Env {
   VECTORIZE_INDEX: VectorizeIndex
@@ -97,16 +98,26 @@ app.post('/documents', async (c) => {
     // Generate unique ID for the document
     const docId = crypto.randomUUID()
 
-    // Generate embedding using Workers AI
-    const embeddingResponse = await AI.run(
-      '@cf/baai/bge-small-en-v1.5',
-      {
-        text: `${title}\n\n${content}`
-      }
-    )
+    // Check if we're in local development
+    const isLocal = c.req.header('host')?.includes('localhost') ||
+                   c.req.header('host')?.includes('127.0.0.1') ||
+                   c.req.header('host')?.includes('8787')
 
-    // Extract the embedding vector
-    const vector = embeddingResponse.data[0]
+    let vector: number[]
+
+    if (isLocal) {
+      // Use mock embedding for local development
+      vector = await generateMockEmbedding(`${title}\n\n${content}`)
+    } else {
+      // Generate embedding using Workers AI
+      const embeddingResponse = await AI.run(
+        '@cf/baai/bge-small-en-v1.5',
+        {
+          text: `${title}\n\n${content}`
+        }
+      )
+      vector = embeddingResponse.data[0]
+    }
 
     // Prepare vector with metadata
     const vectorData: VectorizeVector = {
@@ -122,23 +133,33 @@ app.post('/documents', async (c) => {
       }
     }
 
-    // Insert into Vectorize
-    await VECTORIZE_INDEX.insert([vectorData])
+    // Insert into Vectorize or local storage
+    if (isLocal) {
+      const localIndex = getLocalVectorizeIndex()
+      await localIndex.insert([vectorData])
+    } else {
+      await VECTORIZE_INDEX.insert([vectorData])
+    }
 
     // Also store in D1 for full-text retrieval
     if (c.env.DB) {
-      await c.env.DB.prepare(`
-        INSERT INTO knowledge_base (id, title, content, category, tags, metadata, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `).bind(
-        docId,
-        title,
-        content,
-        category,
-        JSON.stringify(tags || []),
-        JSON.stringify(metadata || {}),
-        new Date().toISOString()
-      ).run()
+      try {
+        await c.env.DB.prepare(`
+          INSERT INTO knowledge_base (id, title, content, category, tags, metadata, created_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
+        `).bind(
+          docId,
+          title,
+          content,
+          category,
+          JSON.stringify(tags || []),
+          JSON.stringify(metadata || {}),
+          new Date().toISOString()
+        ).run()
+      } catch (dbError) {
+        // Log error but don't fail if DB insert fails in local dev
+        console.error('DB insert error (non-fatal in local dev):', dbError)
+      }
     }
 
     return c.json({
@@ -173,15 +194,26 @@ app.post('/search', async (c) => {
     const { query, limit, filter } = validation.data
     const { VECTORIZE_INDEX, AI } = c.env
 
-    // Generate embedding for the search query
-    const embeddingResponse = await AI.run(
-      '@cf/baai/bge-small-en-v1.5',
-      {
-        text: query
-      }
-    )
+    // Check if we're in local development
+    const isLocal = c.req.header('host')?.includes('localhost') ||
+                   c.req.header('host')?.includes('127.0.0.1') ||
+                   c.req.header('host')?.includes('8787')
 
-    const queryVector = embeddingResponse.data[0]
+    let queryVector: number[]
+
+    if (isLocal) {
+      // Use mock embedding for local development
+      queryVector = await generateMockEmbedding(query)
+    } else {
+      // Generate embedding for the search query
+      const embeddingResponse = await AI.run(
+        '@cf/baai/bge-small-en-v1.5',
+        {
+          text: query
+        }
+      )
+      queryVector = embeddingResponse.data[0]
+    }
 
     // Build filter conditions
     const filterConditions: any = {}
@@ -193,10 +225,19 @@ app.post('/search', async (c) => {
     }
 
     // Perform vector search
-    const results = await VECTORIZE_INDEX.query(queryVector, {
-      topK: limit,
-      filter: Object.keys(filterConditions).length > 0 ? filterConditions : undefined
-    })
+    let results
+    if (isLocal) {
+      const localIndex = getLocalVectorizeIndex()
+      results = await localIndex.query(queryVector, {
+        topK: limit,
+        filter: Object.keys(filterConditions).length > 0 ? filterConditions : undefined
+      })
+    } else {
+      results = await VECTORIZE_INDEX.query(queryVector, {
+        topK: limit,
+        filter: Object.keys(filterConditions).length > 0 ? filterConditions : undefined
+      })
+    }
 
     // Format results
     const formattedResults = results.matches.map(match => ({
@@ -236,36 +277,69 @@ app.get('/documents/:id/similar', async (c) => {
     // First, get the original document from D1
     let originalDoc = null
     if (DB) {
-      const result = await DB.prepare(`
-        SELECT * FROM knowledge_base WHERE id = ?
-      `).bind(docId).first()
-      originalDoc = result
+      try {
+        const result = await DB.prepare(`
+          SELECT * FROM knowledge_base WHERE id = ?
+        `).bind(docId).first()
+        originalDoc = result
+      } catch (dbError) {
+        console.error('DB query error:', dbError)
+      }
     }
 
-    if (!originalDoc) {
+    // In local dev, we can proceed without the DB record
+    if (!originalDoc && !isLocal) {
       return c.json({
         success: false,
         error: 'Document not found'
       }, 404)
     }
 
-    // Get the vector for this document
-    const vector = await VECTORIZE_INDEX.getByIds([docId])
-    
-    if (!vector || vector.length === 0) {
-      return c.json({
-        success: false,
-        error: 'Vector not found for document'
-      }, 404)
-    }
+    // Check if we're in local development
+    const isLocal = c.req.header('host')?.includes('localhost') ||
+                   c.req.header('host')?.includes('127.0.0.1') ||
+                   c.req.header('host')?.includes('8787')
 
-    // Find similar documents
-    const results = await VECTORIZE_INDEX.query(vector[0].values, {
-      topK: limit + 1, // +1 because it will include itself
-      filter: {
-        id: { $ne: docId } // Exclude the original document
+    let vector
+    let results
+
+    if (isLocal) {
+      const localIndex = getLocalVectorizeIndex()
+      vector = await localIndex.getByIds([docId])
+
+      if (!vector || vector.length === 0) {
+        return c.json({
+          success: false,
+          error: 'Vector not found for document'
+        }, 404)
       }
-    })
+
+      // Find similar documents
+      results = await localIndex.query(vector[0].values, {
+        topK: limit + 1, // +1 because it will include itself
+        filter: {
+          id: { $ne: docId } // Exclude the original document
+        }
+      })
+    } else {
+      // Get the vector for this document
+      vector = await VECTORIZE_INDEX.getByIds([docId])
+
+      if (!vector || vector.length === 0) {
+        return c.json({
+          success: false,
+          error: 'Vector not found for document'
+        }, 404)
+      }
+
+      // Find similar documents
+      results = await VECTORIZE_INDEX.query(vector[0].values, {
+        topK: limit + 1, // +1 because it will include itself
+        filter: {
+          id: { $ne: docId } // Exclude the original document
+        }
+      })
+    }
 
     const formattedResults = results.matches.map(match => ({
       id: match.id,
@@ -302,14 +376,28 @@ app.delete('/documents/:id', async (c) => {
     const docId = c.req.param('id')
     const { VECTORIZE_INDEX, DB } = c.env
 
-    // Delete from Vectorize
-    await VECTORIZE_INDEX.deleteByIds([docId])
+    // Check if we're in local development
+    const isLocal = c.req.header('host')?.includes('localhost') ||
+                   c.req.header('host')?.includes('127.0.0.1') ||
+                   c.req.header('host')?.includes('8787')
+
+    // Delete from Vectorize or local storage
+    if (isLocal) {
+      const localIndex = getLocalVectorizeIndex()
+      await localIndex.deleteByIds([docId])
+    } else {
+      await VECTORIZE_INDEX.deleteByIds([docId])
+    }
 
     // Delete from D1
     if (DB) {
-      await DB.prepare(`
-        DELETE FROM knowledge_base WHERE id = ?
-      `).bind(docId).run()
+      try {
+        await DB.prepare(`
+          DELETE FROM knowledge_base WHERE id = ?
+        `).bind(docId).run()
+      } catch (dbError) {
+        console.error('DB delete error (non-fatal in local dev):', dbError)
+      }
     }
 
     return c.json({
@@ -350,17 +438,30 @@ app.post('/bulk-import', async (c) => {
       const { title, content, category, tags, metadata } = validation.data
       const docId = crypto.randomUUID()
 
-      // Generate embedding
-      const embeddingResponse = await AI.run(
-        '@cf/baai/bge-small-en-v1.5',
-        {
-          text: `${title}\n\n${content}`
-        }
-      )
+      // Check if we're in local development
+      const isLocal = c.req.header('host')?.includes('localhost') ||
+                     c.req.header('host')?.includes('127.0.0.1') ||
+                     c.req.header('host')?.includes('8787')
+
+      let embeddingVector: number[]
+
+      if (isLocal) {
+        // Use mock embedding for local development
+        embeddingVector = await generateMockEmbedding(`${title}\n\n${content}`)
+      } else {
+        // Generate embedding
+        const embeddingResponse = await AI.run(
+          '@cf/baai/bge-small-en-v1.5',
+          {
+            text: `${title}\n\n${content}`
+          }
+        )
+        embeddingVector = embeddingResponse.data[0]
+      }
 
       vectors.push({
         id: docId,
-        values: embeddingResponse.data[0],
+        values: embeddingVector,
         metadata: {
           title,
           content: content.substring(0, 500),
@@ -384,21 +485,35 @@ app.post('/bulk-import', async (c) => {
       }
     }
 
-    // Bulk insert into Vectorize
-    await VECTORIZE_INDEX.insert(vectors)
+    // Check if we're in local development
+    const isLocal = c.req.header('host')?.includes('localhost') ||
+                   c.req.header('host')?.includes('127.0.0.1') ||
+                   c.req.header('host')?.includes('8787')
+
+    // Bulk insert into Vectorize or local storage
+    if (isLocal) {
+      const localIndex = getLocalVectorizeIndex()
+      await localIndex.insert(vectors)
+    } else {
+      await VECTORIZE_INDEX.insert(vectors)
+    }
 
     // Bulk insert into D1
     if (DB && dbInserts.length > 0) {
-      const stmt = DB.prepare(`
-        INSERT INTO knowledge_base (id, title, content, category, tags, metadata, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `)
-      
-      await DB.batch(
-        dbInserts.map(doc => 
-          stmt.bind(doc.id, doc.title, doc.content, doc.category, doc.tags, doc.metadata, doc.createdAt)
+      try {
+        const stmt = DB.prepare(`
+          INSERT INTO knowledge_base (id, title, content, category, tags, metadata, created_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
+        `)
+
+        await DB.batch(
+          dbInserts.map(doc =>
+            stmt.bind(doc.id, doc.title, doc.content, doc.category, doc.tags, doc.metadata, doc.createdAt)
+          )
         )
-      )
+      } catch (dbError) {
+        console.error('DB bulk insert error (non-fatal in local dev):', dbError)
+      }
     }
 
     return c.json({

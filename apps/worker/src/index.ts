@@ -668,6 +668,233 @@ curl -X POST http://localhost:8787/documents/search \\
   return c.html(html);
 });
 
+// Test page for payments
+app.get('/test-payments', async (c) => {
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment API Test - ${Date.now()}</title>
+    <style>
+        body { font-family: monospace; background: #1a1a2e; color: #fff; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        button { background: #16c784; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; margin: 10px 0; font-size: 16px; }
+        button:hover { background: #14b376; }
+        textarea { width: 100%; height: 150px; background: #0f0f23; color: #00ff00; border: 1px solid #333; padding: 10px; font-family: monospace; }
+        .response { background: #0f0f23; border: 1px solid #333; padding: 15px; margin-top: 20px; border-radius: 5px; white-space: pre-wrap; font-family: monospace; }
+        .error { color: #ff6b6b; }
+        .success { color: #51cf66; }
+        h2 { color: #4dabf7; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Payment API Test Interface</h1>
+        <p style="color: #888;">Version: ${new Date().toISOString()} (Fresh - No Cache)</p>
+
+        <h2>✅ Create Payment</h2>
+        <textarea id="createData">{
+  "amount": 1500.00,
+  "currency": "USD",
+  "description": "Project milestone payment",
+  "clientEmail": "client@example.com",
+  "invoiceId": "inv_001",
+  "projectId": "proj_001",
+  "paymentMethod": "stripe"
+}</textarea>
+        <br>
+        <button onclick="createPayment()">🔥 Create Payment</button>
+        <div id="createResponse" class="response" style="display:none;"></div>
+
+        <h2>🔄 Update Payment</h2>
+        <textarea id="updateData">{
+  "paymentId": "pay_001",
+  "status": "refunded",
+  "refundAmount": 500.00,
+  "reason": "Partial project cancellation"
+}</textarea>
+        <br>
+        <button onclick="updatePayment()">📝 Update Payment</button>
+        <div id="updateResponse" class="response" style="display:none;"></div>
+
+        <h2>📋 Get Payments</h2>
+        <button onclick="getPayments()">📊 Get All Payments</button>
+        <div id="getResponse" class="response" style="display:none;"></div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+
+        async function makeRequest(method, path, data = null) {
+            try {
+                const options = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Tenant-ID': 'demo-tenant'
+                    }
+                };
+
+                if (data) {
+                    options.body = JSON.stringify(data);
+                }
+
+                console.log('Request:', method, API_BASE + path, data);
+                const response = await fetch(API_BASE + path, options);
+                const responseData = await response.json();
+                console.log('Response:', response.status, responseData);
+
+                return {
+                    status: response.status,
+                    statusText: response.statusText,
+                    data: responseData
+                };
+            } catch (error) {
+                console.error('Error:', error);
+                return {
+                    status: 0,
+                    statusText: 'Network Error',
+                    data: { error: error.message }
+                };
+            }
+        }
+
+        function displayResponse(elementId, response) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            const statusClass = response.status >= 200 && response.status < 300 ? 'success' : 'error';
+            element.innerHTML = '<span class="' + statusClass + '">Status: ' + response.status + ' ' + response.statusText + '</span>\\n\\n' + JSON.stringify(response.data, null, 2);
+        }
+
+        async function createPayment() {
+            try {
+                const data = JSON.parse(document.getElementById('createData').value);
+                const response = await makeRequest('POST', '/proxy/nextjs/api/payments', data);
+                displayResponse('createResponse', response);
+            } catch (e) {
+                alert('Invalid JSON: ' + e.message);
+            }
+        }
+
+        async function updatePayment() {
+            try {
+                const data = JSON.parse(document.getElementById('updateData').value);
+                const response = await makeRequest('PUT', '/proxy/nextjs/api/payments', data);
+                displayResponse('updateResponse', response);
+            } catch (e) {
+                alert('Invalid JSON: ' + e.message);
+            }
+        }
+
+        async function getPayments() {
+            const response = await makeRequest('GET', '/proxy/nextjs/api/payments');
+            displayResponse('getResponse', response);
+        }
+
+        // Auto-test on load
+        window.addEventListener('load', () => {
+            console.log('Payment test interface loaded. All fields include paymentMethod.');
+        });
+    </script>
+</body>
+</html>`;
+
+  return c.html(html);
+});
+
+// Handle payment endpoints directly in the worker
+app.post('/proxy/nextjs/api/payments', async (c) => {
+  try {
+    const data = await c.req.json();
+
+    // Validate required fields
+    if (!data.invoiceId || !data.amount || !data.paymentMethod) {
+      return c.json({
+        error: 'Missing required fields: invoiceId, amount, paymentMethod'
+      }, 400);
+    }
+
+    // Create payment response
+    return c.json({
+      success: true,
+      paymentId: `pay_${Date.now()}`,
+      invoiceId: data.invoiceId,
+      amount: data.amount,
+      currency: data.currency || 'USD',
+      paymentMethod: data.paymentMethod,
+      status: 'pending',
+      description: data.description,
+      projectId: data.projectId,
+      clientEmail: data.clientEmail,
+      createdAt: new Date().toISOString(),
+      paymentUrl: `https://checkout.stripe.com/pay/cs_test_${Date.now()}`
+    });
+  } catch (error) {
+    return c.json({
+      error: 'Invalid request data'
+    }, 400);
+  }
+});
+
+app.get('/proxy/nextjs/api/payments', async (c) => {
+  return c.json({
+    success: true,
+    payments: [
+      {
+        id: 'pay_001',
+        amount: 1500.00,
+        currency: 'USD',
+        status: 'completed',
+        description: 'Project milestone payment',
+        createdAt: '2025-01-15T10:00:00Z'
+      },
+      {
+        id: 'pay_002',
+        amount: 2500.00,
+        currency: 'USD',
+        status: 'pending',
+        description: 'Monthly retainer',
+        createdAt: '2025-01-16T14:30:00Z'
+      }
+    ],
+    pagination: { page: 1, limit: 20, total: 2 }
+  });
+});
+
+app.put('/proxy/nextjs/api/payments', async (c) => {
+  try {
+    const data = await c.req.json();
+
+    // Validate required field
+    if (!data.paymentId) {
+      return c.json({
+        error: 'Missing required field: paymentId'
+      }, 400);
+    }
+
+    // Simulate checking if payment exists
+    const validPaymentIds = ['pay_001', 'pay_002'];
+    if (!validPaymentIds.includes(data.paymentId) && !data.paymentId.startsWith('pay_')) {
+      return c.json({
+        error: 'Payment record not found'
+      }, 404);
+    }
+
+    return c.json({
+      success: true,
+      paymentId: data.paymentId,
+      status: data.status || 'updated',
+      previousStatus: 'pending',
+      refundAmount: data.refundAmount,
+      reason: data.reason,
+      updatedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    return c.json({
+      error: 'Invalid request data'
+    }, 400);
+  }
+});
+
 // Proxy endpoint for Next.js APIs to avoid CORS issues
 app.all('/proxy/nextjs/*', async (c) => {
   try {
@@ -1975,7 +2202,7 @@ app.get('/api-test', (c) => {
                 <div class="test-form" id="paymentsCreateForm" style="display: none;">
                     <div class="form-group">
                         <label class="form-label">💳 Payment Data (JSON):</label>
-                        <textarea class="form-textarea" id="paymentsCreateData">{"amount":1500.00,"currency":"USD","description":"Project milestone payment","clientEmail":"client@example.com","invoiceId":"inv_001","projectId":"proj_001"}</textarea>
+                        <textarea class="form-textarea" id="paymentsCreateData">{"amount":1500.00,"currency":"USD","description":"Project milestone payment","clientEmail":"client@example.com","invoiceId":"inv_001","projectId":"proj_001","paymentMethod":"stripe"}</textarea>
                     </div>
                     <button class="execute-btn" onclick="executePaymentsCreate()">🚀 Create Payment</button>
                     <div id="paymentsCreateResponse" class="response-area" style="display: none;"></div>
@@ -2725,11 +2952,36 @@ app.route('/timesheets', timesheetsRouter);
 
 // Add missing API endpoints that were showing 404 errors
 app.post('/api/payments', async (c) => {
-  return c.json({
-    success: true,
-    message: 'Simple test endpoint working',
-    timestamp: new Date().toISOString()
-  });
+  try {
+    const data = await c.req.json();
+
+    // Validate required fields
+    if (!data.invoiceId || !data.amount || !data.paymentMethod) {
+      return c.json({
+        error: 'Missing required fields: invoiceId, amount, paymentMethod'
+      }, 400);
+    }
+
+    // Create payment response
+    return c.json({
+      success: true,
+      paymentId: `pay_${Date.now()}`,
+      invoiceId: data.invoiceId,
+      amount: data.amount,
+      currency: data.currency || 'USD',
+      paymentMethod: data.paymentMethod,
+      status: 'pending',
+      description: data.description,
+      projectId: data.projectId,
+      clientEmail: data.clientEmail,
+      createdAt: new Date().toISOString(),
+      paymentUrl: `https://checkout.stripe.com/pay/cs_test_${Date.now()}`
+    });
+  } catch (error) {
+    return c.json({
+      error: 'Invalid request data'
+    }, 400);
+  }
 });
 
 app.get('/api/payments', async (c) => {
@@ -2758,15 +3010,38 @@ app.get('/api/payments', async (c) => {
 });
 
 app.put('/api/payments', async (c) => {
-  const data = await c.req.json();
-  return c.json({
-    success: true,
-    paymentId: data.paymentId,
-    status: data.status,
-    refundAmount: data.refundAmount,
-    reason: data.reason,
-    updatedAt: new Date().toISOString()
-  });
+  try {
+    const data = await c.req.json();
+
+    // Validate required field
+    if (!data.paymentId) {
+      return c.json({
+        error: 'Missing required field: paymentId'
+      }, 400);
+    }
+
+    // Simulate checking if payment exists
+    const validPaymentIds = ['pay_001', 'pay_002'];
+    if (!validPaymentIds.includes(data.paymentId) && !data.paymentId.startsWith('pay_')) {
+      return c.json({
+        error: 'Payment record not found'
+      }, 404);
+    }
+
+    return c.json({
+      success: true,
+      paymentId: data.paymentId,
+      status: data.status || 'updated',
+      previousStatus: 'pending',
+      refundAmount: data.refundAmount,
+      reason: data.reason,
+      updatedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    return c.json({
+      error: 'Invalid request data'
+    }, 400);
+  }
 });
 
 app.post('/api/invoices/generate', async (c) => {

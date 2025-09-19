@@ -22,6 +22,7 @@ export * from './onboarding';
 export * from './notifications';
 export * from './reports';
 export * from './walkthrough';
+export * from './notes';
 // export * from './tooltips'; // Temporarily disabled due to UserRole conflict
 
 // Enhanced Environment Interface with Multi-Tenant Support
@@ -44,6 +45,7 @@ export interface Env {
   KV_CACHE: KVNamespace;
   KV_TENANT_CACHE: KVNamespace;
   KV_SESSIONS: KVNamespace;
+  KV_NOTES: KVNamespace;
   
   // Queues
   OPERATIONS_QUEUE: Queue;

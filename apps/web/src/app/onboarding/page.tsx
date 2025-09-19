@@ -10,6 +10,7 @@ import {
   CreditCard, Users, Building, Calendar, TrendingUp, ChevronRight,
   Plus, X, MessageSquare
 } from 'lucide-react'
+import { noteService } from '@/lib/note-service'
 import dynamic from 'next/dynamic'
 
 // Lazy load heavy modals
@@ -161,40 +162,64 @@ export default function OnboardingPage() {
     setShowNoteModal(true)
   }
 
-  const handleNoteSubmit = () => {
+  const handleNoteSubmit = async () => {
     if (!noteText.trim()) {
       alert('Please enter a note before proceeding.')
       return
     }
 
-    if (noteAction === 'pause') {
-      setOnboardingData(prevData =>
-        prevData.map(emp =>
-          emp.id === noteEmployee.id
-            ? { ...emp, status: 'paused', pauseNote: noteText }
-            : emp
+    try {
+      // Create note in KV storage
+      if (noteAction === 'pause') {
+        await noteService.createPauseNote(
+          noteEmployee.id.toString(),
+          noteEmployee.name,
+          noteText,
+          noteEmployee.currentStep,
+          `Step ${noteEmployee.completedSteps + 1}`
         )
-      )
-      if (selectedEmployee && selectedEmployee.id === noteEmployee.id) {
-        setSelectedEmployee({ ...selectedEmployee, status: 'paused', pauseNote: noteText })
+
+        // Update local state
+        setOnboardingData(prevData =>
+          prevData.map(emp =>
+            emp.id === noteEmployee.id
+              ? { ...emp, status: 'paused', pauseNote: noteText }
+              : emp
+          )
+        )
+        if (selectedEmployee && selectedEmployee.id === noteEmployee.id) {
+          setSelectedEmployee({ ...selectedEmployee, status: 'paused', pauseNote: noteText })
+        }
+      } else if (noteAction === 'flag') {
+        await noteService.createFlagNote(
+          noteEmployee.id.toString(),
+          noteEmployee.name,
+          noteText,
+          noteEmployee.currentStep,
+          `Step ${noteEmployee.completedSteps + 1}`
+        )
+
+        // Update local state
+        setOnboardingData(prevData =>
+          prevData.map(emp =>
+            emp.id === noteEmployee.id
+              ? { ...emp, flaggedForReview: true, priority: 'high', flagNote: noteText }
+              : emp
+          )
+        )
       }
-    } else if (noteAction === 'flag') {
-      setOnboardingData(prevData =>
-        prevData.map(emp =>
-          emp.id === noteEmployee.id
-            ? { ...emp, flaggedForReview: true, priority: 'high', flagNote: noteText }
-            : emp
-        )
-      )
-    }
 
-    setShowNoteModal(false)
-    setNoteAction(null)
-    setNoteEmployee(null)
-    setNoteText('')
+      setShowNoteModal(false)
+      setNoteAction(null)
+      setNoteEmployee(null)
+      setNoteText('')
 
-    if (noteAction === 'flag' && showDetailsModal) {
-      setShowDetailsModal(false)
+      if (noteAction === 'flag' && showDetailsModal) {
+        setShowDetailsModal(false)
+      }
+    } catch (error) {
+      console.error('Failed to save note:', error)
+      alert('Failed to save note. Please try again.')
     }
   }
 
@@ -695,6 +720,77 @@ export default function OnboardingPage() {
                   Send Reminder
                 </button>
               </div>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    )}
+
+    {/* Note Entry Modal */}
+    {showNoteModal && (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-slate-800 rounded-2xl border border-slate-700 max-w-md w-full mx-4 overflow-hidden"
+        >
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <div className={`p-2 rounded-lg ${noteAction === 'pause' ? 'bg-yellow-500/20' : 'bg-red-500/20'}`}>
+                  <MessageSquare className={`h-5 w-5 ${noteAction === 'pause' ? 'text-yellow-400' : 'text-red-400'}`} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white">
+                    {noteAction === 'pause' ? 'Pause Onboarding' : 'Flag for Review'}
+                  </h3>
+                  <p className="text-sm text-slate-400">
+                    {noteEmployee?.name}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={closeNoteModal}
+                className="text-slate-400 hover:text-white transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                {noteAction === 'pause' ? 'Reason for pausing:' : 'Issue or concern:'}
+              </label>
+              <textarea
+                value={noteText}
+                onChange={(e) => setNoteText(e.target.value)}
+                placeholder={noteAction === 'pause'
+                  ? "Please describe why you're pausing this onboarding process..."
+                  : "Please describe the issue that needs partner review..."
+                }
+                className="w-full h-24 px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors resize-none"
+                autoFocus
+              />
+            </div>
+
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={closeNoteModal}
+                className="px-4 py-2 text-slate-400 hover:text-white transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleNoteSubmit}
+                disabled={!noteText.trim()}
+                className={`px-4 py-2 rounded-lg text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                  noteAction === 'pause'
+                    ? 'bg-yellow-600 hover:bg-yellow-700'
+                    : 'bg-red-600 hover:bg-red-700'
+                }`}
+              >
+                {noteAction === 'pause' ? 'Pause Onboarding' : 'Flag for Review'}
+              </button>
             </div>
           </div>
         </motion.div>

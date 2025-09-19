@@ -166,7 +166,7 @@ export async function corsMiddleware(c: Context, next: Next) {
   c.header('Vary', 'Origin');
   
   if (c.req.method === 'OPTIONS') {
-    return new Response('', { status: 204 });
+    return new Response(null, { status: 204 });
   }
   
   return await next();
