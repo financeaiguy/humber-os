@@ -225,7 +225,7 @@ importers:
         specifier: ^0.38.3
         version: 0.38.4(@cloudflare/workers-types@4.20250913.0)(@types/react@19.1.13)(react@19.1.1)
       hono:
-        specifier: ^4.6.17
+        specifier: ^4.9.7
         version: 4.9.7
       jose:
         specifier: ^5.10.0

@@ -143,18 +143,24 @@ export function OnboardingTrackerClient() {
   }
 
   const handleUpdateCandidate = async (candidateId: string, updates: Partial<OnboardingCandidate>) => {
-    if (!updateCandidate || typeof updateCandidate !== 'function') {
-      // SECURITY: console statement removed: console.warn('updateCandidate is not available')
-      return
-    }
     try {
-      await updateCandidate(candidateId, updates)
-      
-      if (selectedCandidate?.id === candidateId) {
-        setSelectedCandidate(prev => prev ? { ...prev, ...updates } : null)
+      // For now, update the local state directly since we're using static data
+      // In a real implementation, this would call an API
+
+      // Find and update the candidate in the static data
+      const candidateIndex = candidates.findIndex(c => c.id === candidateId);
+      if (candidateIndex !== -1) {
+        // Update the local state by triggering a re-render
+        // Since we're using static data, we'll just update selectedCandidate
+        if (selectedCandidate?.id === candidateId) {
+          setSelectedCandidate(prev => prev ? { ...prev, ...updates } : null)
+        }
+
+        // Show a success message (you could add a toast notification here)
+        alert(`Status updated to: ${updates.status || 'unchanged'}`)
       }
     } catch (error) {
-      // SECURITY: console statement removed: console.error('Failed to update candidate:', error)
+      alert('Failed to update candidate status')
       throw error
     }
   }
@@ -234,8 +240,28 @@ export function OnboardingTrackerClient() {
 
         {/* Quick Actions */}
         <div className="mt-6 flex gap-3">
-          <button className="flex-1 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
-            Continue Onboarding
+          <button
+            onClick={() => handleViewCandidate(myOnboarding)}
+            className="flex-1 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+          >
+            View Details
+          </button>
+          <button
+            onClick={() => {
+              // Move to next phase
+              const nextStatus = myOnboarding.status === 'vetting' ? 'offer_letter' :
+                               myOnboarding.status === 'offer_letter' ? 'legal' :
+                               myOnboarding.status === 'legal' ? 'immigration' :
+                               myOnboarding.status === 'immigration' ? 'final_review' : 'completed';
+              handleUpdateCandidate(myOnboarding.id, {
+                status: nextStatus,
+                progress: Math.min(myOnboarding.progress + 20, 100),
+                phase: Math.min(myOnboarding.phase + 1, 6)
+              });
+            }}
+            className="flex-1 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors"
+          >
+            Complete Step
           </button>
           <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
             View Documents

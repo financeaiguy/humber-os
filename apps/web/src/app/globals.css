@@ -2,6 +2,68 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Force all Recharts backgrounds to be transparent */
+.recharts-wrapper {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.recharts-wrapper svg {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.recharts-surface {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Target any rect elements that might have gray/white fills */
+.recharts-wrapper rect[fill="#f5f5f5"],
+.recharts-wrapper rect[fill="#F5F5F5"],
+.recharts-wrapper rect[fill="#e5e5e5"],
+.recharts-wrapper rect[fill="#E5E5E5"],
+.recharts-wrapper rect[fill="#d3d3d3"],
+.recharts-wrapper rect[fill="#D3D3D3"],
+.recharts-wrapper rect[fill="#ccc"],
+.recharts-wrapper rect[fill="#CCC"],
+.recharts-wrapper rect[fill="#cccccc"],
+.recharts-wrapper rect[fill="#CCCCCC"],
+.recharts-wrapper rect[fill="#ddd"],
+.recharts-wrapper rect[fill="#DDD"],
+.recharts-wrapper rect[fill="#dddddd"],
+.recharts-wrapper rect[fill="#DDDDDD"],
+.recharts-wrapper rect[fill="#eee"],
+.recharts-wrapper rect[fill="#EEE"],
+.recharts-wrapper rect[fill="#eeeeee"],
+.recharts-wrapper rect[fill="#EEEEEE"],
+.recharts-wrapper rect[fill="#fff"],
+.recharts-wrapper rect[fill="#FFF"],
+.recharts-wrapper rect[fill="#ffffff"],
+.recharts-wrapper rect[fill="#FFFFFF"],
+.recharts-wrapper rect[fill="white"],
+.recharts-wrapper rect[fill="lightgray"],
+.recharts-wrapper rect[fill="lightgrey"],
+.recharts-wrapper rect[fill="gray"],
+.recharts-wrapper rect[fill="grey"],
+.recharts-wrapper rect[fill*="gray"],
+.recharts-wrapper rect[fill*="grey"] {
+  fill: transparent !important;
+  fill-opacity: 0 !important;
+}
+
+/* Specifically target the background layer */
+.recharts-layer.recharts-bar-background-rectangle rect {
+  fill: transparent !important;
+  fill-opacity: 0 !important;
+}
+
+/* Target the ResponsiveContainer */
+.recharts-responsive-container {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
 /* Import responsive design system */
 @import '../styles/responsive.css';
 
@@ -114,11 +176,51 @@
     color: rgb(248 250 252); /* slate-50 */
   }
   
-  /* Fix SVG backgrounds in Recharts */
+  /* Fix SVG backgrounds in Recharts - Make all chart backgrounds transparent */
   .recharts-wrapper > svg > rect,
   .recharts-wrapper svg > defs + rect,
-  .recharts-surface > rect {
+  .recharts-surface > rect,
+  .recharts-surface,
+  .recharts-wrapper svg rect:first-child,
+  .recharts-wrapper svg rect:first-of-type,
+  .recharts-cartesian-grid-bg,
+  svg.recharts-surface > rect:first-child,
+  svg.recharts-surface > g > rect,
+  .recharts-bar-rectangle path,
+  .recharts-rectangle {
     fill: transparent !important;
+    fill-opacity: 0 !important;
+  }
+
+  /* Aggressive fix for chart backgrounds */
+  .recharts-wrapper svg {
+    background: transparent !important;
+  }
+
+  .recharts-wrapper svg rect[fill*="#"],
+  .recharts-wrapper svg rect[fill*="rgb"],
+  .recharts-wrapper svg rect[fill*="rgba"],
+  .recharts-wrapper svg rect[fill="white"],
+  .recharts-wrapper svg rect[fill="#fff"],
+  .recharts-wrapper svg rect[fill="#ffffff"],
+  .recharts-wrapper svg rect[fill="#f0f0f0"],
+  .recharts-wrapper svg rect[fill="#e0e0e0"],
+  .recharts-wrapper svg rect[fill="#d0d0d0"],
+  .recharts-wrapper svg rect[fill="#c0c0c0"],
+  .recharts-wrapper svg rect[fill="#ccc"],
+  .recharts-wrapper svg rect[fill="#ddd"],
+  .recharts-wrapper svg rect[fill="#eee"],
+  .recharts-wrapper svg rect[fill*="gray"],
+  .recharts-wrapper svg rect[fill*="grey"] {
+    fill: transparent !important;
+    fill-opacity: 0 !important;
+  }
+
+  /* Ensure bars and data elements remain visible */
+  .recharts-bar-rectangle,
+  .recharts-bar-rectangles rect,
+  .recharts-layer.recharts-bar-rectangles rect {
+    fill-opacity: 1 !important;
   }
   
   /* Remove white/gray backgrounds from any chart elements */

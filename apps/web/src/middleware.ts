@@ -20,9 +20,20 @@ export default auth((req) => {
     '/test-camera'
   ]
 
-  // Skip all middleware processing for NextAuth routes
+  // Skip all middleware processing for NextAuth routes and return with minimal headers
   if (pathname.startsWith('/api/auth/')) {
-    return NextResponse.next()
+    const response = NextResponse.next()
+    
+    // Set minimal headers for auth routes to prevent blocking
+    response.headers.set('Access-Control-Allow-Credentials', 'true')
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate')
+    
+    // Remove strict CSP for auth routes
+    response.headers.delete('Content-Security-Policy')
+    response.headers.delete('X-Frame-Options')
+    response.headers.delete('Strict-Transport-Security')
+    
+    return response
   }
   
   // Check if route is public

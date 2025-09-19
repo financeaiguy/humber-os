@@ -146,13 +146,21 @@ export const config: NextAuthConfig = {
   theme: {
     logo: "/logo.png",
   },
-  // Use NextAuth's built-in pages instead of custom ones
+  pages: {
+    signIn: "/auth/signin",
+    error: "/auth/error",
+  },
   useSecureCookies: false,
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user
-      const isOnDashboard = nextUrl.pathname.startsWith("/")
+      const isApiAuthRoute = nextUrl.pathname.startsWith("/api/auth")
       const isAuthRoute = nextUrl.pathname.startsWith("/auth")
+      
+      // Always allow API auth routes to prevent blocking NextAuth
+      if (isApiAuthRoute) {
+        return true
+      }
       
       if (isAuthRoute) {
         if (isLoggedIn) {
@@ -161,12 +169,17 @@ export const config: NextAuthConfig = {
         return true
       }
       
-      if (isOnDashboard) {
-        if (isLoggedIn) return true
-        return false // Redirect unauthenticated users to login page
+      // Allow public routes (/, /auth/*, etc.)
+      const publicRoutes = ['/']
+      const isPublicRoute = publicRoutes.some(route => nextUrl.pathname === route || nextUrl.pathname.startsWith(route + '/'))
+      
+      if (isPublicRoute) {
+        return true
       }
       
-      return true
+      // For protected routes, require authentication
+      if (isLoggedIn) return true
+      return false // Redirect unauthenticated users to login page
     },
     jwt({ token, user }) {
       if (user) {
@@ -241,6 +254,7 @@ export const config: NextAuthConfig = {
   secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || "humber-nextjs-cloudflare-pages-production-secret-2024",
   debug: process.env.NODE_ENV === 'development', // Only debug in development
   trustHost: true, // Required for Cloudflare Pages
+  basePath: "/api/auth", // Explicitly set the base path
 }
 
 const nextAuth = NextAuth(config)

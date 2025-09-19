@@ -411,15 +411,21 @@ export default function HomePage() {
                 <CartesianGrid {...GRID_STYLE} />
                 <XAxis dataKey="day" {...AXIS_STYLE} />
                 <YAxis {...AXIS_STYLE} domain={[0, 100]} />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#1F2937', 
-                    border: '1px solid #374151',
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#0F172A',
+                    border: '2px solid #3B82F6',
                     borderRadius: '8px',
                     color: '#F9FAFB',
                     zIndex: 9999,
                     position: 'relative',
-                    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.5)'
+                    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.9)',
+                    padding: '10px 14px'
+                  }}
+                  labelStyle={{
+                    color: '#94A3B8',
+                    fontWeight: 600,
+                    marginBottom: '4px'
                   }}
                   wrapperStyle={{
                     zIndex: 9999,
@@ -456,15 +462,21 @@ export default function HomePage() {
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#1F2937', 
-                    border: '1px solid #374151',
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#0F172A',
+                    border: '2px solid #3B82F6',
                     borderRadius: '8px',
                     color: '#F9FAFB',
                     zIndex: 9999,
                     position: 'relative',
-                    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.5)'
+                    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.9)',
+                    padding: '10px 14px'
+                  }}
+                  labelStyle={{
+                    color: '#94A3B8',
+                    fontWeight: 600,
+                    marginBottom: '4px'
                   }}
                   wrapperStyle={{
                     zIndex: 9999,
@@ -479,18 +491,25 @@ export default function HomePage() {
 
           <div className="rounded-xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-6">
             <h3 className="text-lg font-semibold text-white mb-4">Project Status Overview</h3>
-            <ChartWrapper width="100%" height={300}>
-              <BarChart data={projectStatusData} layout="horizontal">
+            <div style={{ backgroundColor: 'transparent !important' }}>
+              <ChartWrapper width="100%" height={300}>
+                <BarChart data={projectStatusData} layout="horizontal" style={{ backgroundColor: 'transparent' }}>
                 <CartesianGrid {...GRID_STYLE} />
                 <XAxis type="number" {...AXIS_STYLE} />
                 <YAxis dataKey="status" type="category" {...AXIS_STYLE} width={80} />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#1F2937', 
-                    border: '1px solid #374151',
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#0F172A',
+                    border: '2px solid #3B82F6',
                     borderRadius: '8px',
                     color: '#F9FAFB',
-                    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.5)'
+                    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.9)',
+                    padding: '10px 14px'
+                  }}
+                  labelStyle={{
+                    color: '#94A3B8',
+                    fontWeight: 600,
+                    marginBottom: '4px'
                   }}
                   formatter={(value) => [value, 'Projects']}
                 />
@@ -500,7 +519,8 @@ export default function HomePage() {
                   ))}
                 </Bar>
               </BarChart>
-            </ChartWrapper>
+              </ChartWrapper>
+            </div>
           </div>
         </div>
 

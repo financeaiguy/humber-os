@@ -2,17 +2,20 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { 
-  X, User, Calendar, Globe, MapPin, Hash, Clock, 
-  CheckCircle, ArrowRight, ArrowLeft, FileText, 
+import {
+  X, User, Calendar, Globe, MapPin, Hash, Clock,
+  CheckCircle, ArrowRight, ArrowLeft, FileText,
   Shield, Briefcase, Building, Phone, Mail,
   Flag, Plane, Key, CreditCard, AlertCircle, Loader2,
   Wifi, WifiOff, RefreshCw, DollarSign, Target, Award,
-  Sparkles, Eye, Download
+  Sparkles, Eye, Download, Upload, FileCheck,
+  CheckSquare, Info, Signature, FileSignature,
+  BadgeCheck, ScrollText, FilePlus
 } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
 import { onboardingApi, getErrorMessage, getFieldErrors, ApiValidationError, ApiNetworkError } from '@/lib/api/onboarding'
 import { useFormValidation, formatLegalIdentifier, getFieldDisplayName } from '@/hooks/useFormValidation'
+import { DocumentViewer } from '../knowledge-base/document-viewer'
 
 interface OnboardingData {
   // Phase 1: Basic Information
@@ -51,10 +54,12 @@ export default function NewOnboardingModal({
   const [currentPhase, setCurrentPhase] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
   const [apiError, setApiError] = useState<string | null>(null)
   const [networkError, setNetworkError] = useState(false)
   const [retryCount, setRetryCount] = useState(0)
   const [submitSuccess, setSubmitSuccess] = useState(false)
+  const [saveSuccess, setSaveSuccess] = useState(false)
   
   const { errors, validateField, validateForm, clearFieldError, setFieldError, clearErrors } = useFormValidation()
   
@@ -97,10 +102,51 @@ export default function NewOnboardingModal({
   const [offerLetterGenerated, setOfferLetterGenerated] = useState(false)
   const [offerLetterPDF, setOfferLetterPDF] = useState<string | null>(null)
 
+  // Phase 3: Documentation & Compliance State
+  const [documents, setDocuments] = useState({
+    i9: { uploaded: false, verified: false, file: null, name: '' },
+    w4: { uploaded: false, verified: false, file: null, name: '' },
+    stateWithholding: { uploaded: false, verified: false, file: null, name: '' },
+    directDeposit: { uploaded: false, verified: false, file: null, name: '' },
+    emergencyContacts: { uploaded: false, verified: false, file: null, name: '' },
+    confidentialityAgreement: { uploaded: false, signed: false, file: null, name: '' },
+    handbookAcknowledgment: { uploaded: false, signed: false, file: null, name: '' },
+    beneficiaryDesignation: { uploaded: false, verified: false, file: null, name: '' },
+    medicalInsurance: { uploaded: false, verified: false, file: null, name: '' },
+    workAuthorization: { uploaded: false, verified: false, file: null, name: '' }
+  })
+
+  const [compliance, setCompliance] = useState({
+    backgroundCheck: { status: 'pending', date: '', notes: '' },
+    drugScreening: { status: 'pending', date: '', notes: '' },
+    referenceChecks: { status: 'pending', date: '', notes: '' },
+    creditCheck: { status: 'not_required', date: '', notes: '' },
+    criminalHistory: { status: 'pending', date: '', notes: '' },
+    educationVerification: { status: 'pending', date: '', notes: '' },
+    employmentVerification: { status: 'pending', date: '', notes: '' },
+    securityClearance: { status: 'not_required', date: '', notes: '' }
+  })
+
+  const [digitalSignatures, setDigitalSignatures] = useState({
+    employeeHandbook: { signed: false, timestamp: '', ipAddress: '' },
+    codeOfConduct: { signed: false, timestamp: '', ipAddress: '' },
+    itSecurityPolicy: { signed: false, timestamp: '', ipAddress: '' },
+    remoteWorkPolicy: { signed: false, timestamp: '', ipAddress: '' },
+    nonCompeteAgreement: { signed: false, timestamp: '', ipAddress: '' }
+  })
+
+  // PDF Viewer State
+  const [showPdfViewer, setShowPdfViewer] = useState(false)
+  const [currentDocumentToSign, setCurrentDocumentToSign] = useState<string | null>(null)
+  const [selectedDocument, setSelectedDocument] = useState<any>(null)
+
   // Auto-populate data from recruitment system with real API
   useEffect(() => {
     if (recruitId && isOpen) {
       fetchRecruitmentData()
+    } else if (isOpen && !recruitId) {
+      // If no recruitId, allow manual entry by skipping the loading state
+      setIsLoading(false)
     }
   }, [recruitId, isOpen])
 
@@ -270,11 +316,201 @@ export default function NewOnboardingModal({
     }
   }
 
+  // Phase 3: Document Upload Handler
+  const handleDocumentUpload = (docType: string, file: File) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      setDocuments(prev => ({
+        ...prev,
+        [docType]: {
+          ...prev[docType as keyof typeof prev],
+          uploaded: true,
+          file: reader.result,
+          name: file.name
+        }
+      }))
+    }
+    reader.readAsDataURL(file)
+  }
+
+  // Phase 3: Digital Signature Handler
+  // Mock document data for digital signatures
+  const signatureDocuments = {
+    employeeHandbook: {
+      id: 'handbook_001',
+      title: 'Employee Handbook Acknowledgment',
+      type: 'pdf' as const,
+      size: 1234567,
+      url: '/documents/employee-handbook.pdf',
+      content: `EMPLOYEE HANDBOOK ACKNOWLEDGMENT\n\nI acknowledge that I have received and read the Employee Handbook. I understand that this handbook provides information about company policies, procedures, benefits, and working conditions.\n\nI understand that the policies, rules, benefits, and procedures described in this handbook are subject to change by the company at any time with or without notice.\n\nI understand that my employment is at-will, meaning that either the company or I may terminate my employment at any time, with or without cause or advance notice.\n\nBy signing below, I acknowledge that I have read, understood, and agree to comply with all policies and procedures outlined in this Employee Handbook.\n\nEmployee Signature: _____________________  Date: _________\n\nPrint Name: ____________________________`,
+      metadata: {
+        author: 'HR Department',
+        createdAt: '2025-01-01T00:00:00Z',
+        updatedAt: '2025-01-15T00:00:00Z',
+        tags: ['handbook', 'acknowledgment', 'employment'],
+        category: 'HR Documents',
+        description: 'Employee handbook acknowledgment form requiring digital signature',
+        version: 1,
+        status: 'approved' as const,
+        accessLevel: 'internal' as const,
+        downloadCount: 0,
+        viewCount: 0,
+        rating: 5,
+        comments: 0
+      }
+    },
+    codeOfConduct: {
+      id: 'conduct_001',
+      title: 'Code of Conduct Agreement',
+      type: 'pdf' as const,
+      size: 987654,
+      url: '/documents/code-of-conduct.pdf',
+      content: `CODE OF CONDUCT AGREEMENT\n\nAs an employee of this organization, I commit to upholding the highest standards of professional conduct and ethical behavior.\n\nI will:\n• Treat all colleagues, clients, and stakeholders with respect and dignity\n• Maintain confidentiality of proprietary and sensitive information\n• Avoid conflicts of interest and disclose any potential conflicts\n• Comply with all applicable laws, regulations, and company policies\n• Report any violations of this code or unethical behavior\n• Use company resources responsibly and for business purposes only\n\nI understand that violations of this Code of Conduct may result in disciplinary action, up to and including termination of employment.\n\nBy signing below, I acknowledge that I have read, understood, and agree to comply with this Code of Conduct.\n\nEmployee Signature: _____________________  Date: _________\n\nPrint Name: ____________________________`,
+      metadata: {
+        author: 'Legal Department',
+        createdAt: '2025-01-01T00:00:00Z',
+        updatedAt: '2025-01-10T00:00:00Z',
+        tags: ['conduct', 'ethics', 'agreement'],
+        category: 'Legal Documents',
+        description: 'Code of conduct agreement requiring employee signature',
+        version: 1,
+        status: 'approved' as const,
+        accessLevel: 'internal' as const,
+        downloadCount: 0,
+        viewCount: 0,
+        rating: 5,
+        comments: 0
+      }
+    },
+    itSecurityPolicy: {
+      id: 'security_001',
+      title: 'IT Security Policy Agreement',
+      type: 'pdf' as const,
+      size: 1567890,
+      url: '/documents/it-security-policy.pdf',
+      content: `IT SECURITY POLICY AGREEMENT\n\nI understand and agree to comply with the company's IT Security Policy, which includes:\n\nPASSWORD SECURITY:\n• Use strong, unique passwords for all accounts\n• Do not share passwords with anyone\n• Change passwords when required or if compromised\n\nDATA PROTECTION:\n• Protect company data and customer information\n• Use only approved software and applications\n• Report security incidents immediately\n\nDEVICE SECURITY:\n• Keep devices physically secure\n• Install security updates promptly\n• Use only company-approved cloud services\n\nACCESS CONTROLS:\n• Access only information necessary for job duties\n• Log out when away from workstation\n• Follow clean desk policy\n\nI understand that failure to comply with these policies may result in disciplinary action and potential legal consequences.\n\nEmployee Signature: _____________________  Date: _________\n\nPrint Name: ____________________________`,
+      metadata: {
+        author: 'IT Security Team',
+        createdAt: '2025-01-01T00:00:00Z',
+        updatedAt: '2025-01-12T00:00:00Z',
+        tags: ['security', 'IT', 'policy'],
+        category: 'Security Documents',
+        description: 'IT security policy agreement and acknowledgment',
+        version: 2,
+        status: 'approved' as const,
+        accessLevel: 'internal' as const,
+        downloadCount: 0,
+        viewCount: 0,
+        rating: 5,
+        comments: 0
+      }
+    },
+    remoteWorkPolicy: {
+      id: 'remote_001',
+      title: 'Remote Work Policy Agreement',
+      type: 'pdf' as const,
+      size: 1123456,
+      url: '/documents/remote-work-policy.pdf',
+      content: `REMOTE WORK POLICY AGREEMENT\n\nI understand and agree to the following terms for remote work:\n\nWORK ENVIRONMENT:\n• Maintain a professional, distraction-free workspace\n• Ensure reliable internet connectivity\n• Provide adequate lighting and ergonomic setup\n\nCOMMUNICATION:\n• Be available during core business hours\n• Respond to messages within reasonable timeframes\n• Participate actively in video conferences\n\nPRODUCTIVITY:\n• Maintain the same work standards as in-office\n• Complete all assigned tasks and meet deadlines\n• Track time accurately if required\n\nSECURITY:\n• Use VPN when accessing company systems\n• Secure all devices and documents\n• Follow IT security policies\n\nI understand that remote work is a privilege that may be revoked at any time.\n\nEmployee Signature: _____________________  Date: _________\n\nPrint Name: ____________________________`,
+      metadata: {
+        author: 'HR Department',
+        createdAt: '2025-01-01T00:00:00Z',
+        updatedAt: '2025-01-08T00:00:00Z',
+        tags: ['remote', 'work', 'policy'],
+        category: 'HR Documents',
+        description: 'Remote work policy and agreement terms',
+        version: 1,
+        status: 'approved' as const,
+        accessLevel: 'internal' as const,
+        downloadCount: 0,
+        viewCount: 0,
+        rating: 5,
+        comments: 0
+      }
+    },
+    nonCompeteAgreement: {
+      id: 'noncompete_001',
+      title: 'Non-Compete Agreement',
+      type: 'pdf' as const,
+      size: 2234567,
+      url: '/documents/non-compete-agreement.pdf',
+      content: `NON-COMPETE AGREEMENT\n\nI agree to the following non-compete terms:\n\nNON-COMPETITION:\n• During employment and for 12 months after termination\n• Will not work for direct competitors\n• Will not solicit company customers or employees\n• Will not start competing business\n\nCONFIDENTIALITY:\n• Protect all proprietary information\n• Do not disclose trade secrets\n• Return all company materials upon termination\n\nNON-SOLICITATION:\n• Will not recruit company employees\n• Will not contact clients for competing purposes\n• Will not interfere with business relationships\n\nThis agreement is binding and enforceable according to applicable state laws.\n\nI acknowledge that I have read and understood this agreement and agree to be bound by its terms.\n\nEmployee Signature: _____________________  Date: _________\n\nPrint Name: ____________________________\n\nWitness Signature: ______________________  Date: _________`,
+      metadata: {
+        author: 'Legal Department',
+        createdAt: '2025-01-01T00:00:00Z',
+        updatedAt: '2025-01-05T00:00:00Z',
+        tags: ['noncompete', 'legal', 'agreement'],
+        category: 'Legal Documents',
+        description: 'Non-compete and confidentiality agreement',
+        version: 1,
+        status: 'approved' as const,
+        accessLevel: 'restricted' as const,
+        downloadCount: 0,
+        viewCount: 0,
+        rating: 5,
+        comments: 0
+      }
+    }
+  }
+
+  const handleDigitalSignature = (agreementType: string) => {
+    // Show PDF viewer first for document review
+    const document = signatureDocuments[agreementType as keyof typeof signatureDocuments]
+    if (document) {
+      setSelectedDocument(document)
+      setCurrentDocumentToSign(agreementType)
+      setShowPdfViewer(true)
+    }
+  }
+
+  const confirmDigitalSignature = () => {
+    if (!currentDocumentToSign) return
+
+    const timestamp = new Date().toISOString()
+    const ipAddress = '192.168.1.1' // In production, get actual IP
+
+    setDigitalSignatures(prev => ({
+      ...prev,
+      [currentDocumentToSign]: {
+        signed: true,
+        timestamp,
+        ipAddress
+      }
+    }))
+
+    // Close PDF viewer and reset state
+    setShowPdfViewer(false)
+    setCurrentDocumentToSign(null)
+    setSelectedDocument(null)
+  }
+
+  const cancelSignature = () => {
+    setShowPdfViewer(false)
+    setCurrentDocumentToSign(null)
+    setSelectedDocument(null)
+  }
+
+  // Phase 3: Compliance Status Update
+  const handleComplianceUpdate = (checkType: string, status: string, notes: string = '') => {
+    setCompliance(prev => ({
+      ...prev,
+      [checkType]: {
+        ...prev[checkType as keyof typeof prev],
+        status,
+        date: new Date().toISOString().split('T')[0],
+        notes
+      }
+    }))
+  }
+
   const handleSubmit = async () => {
-    // Validate the entire form
-    if (!validateForm(onboardingData)) {
-      setApiError('Please fix the validation errors before submitting.')
-      return
+    // Skip Phase 1 validation if we're on Phase 3 (documentation phase)
+    // In Phase 3, we're completing documentation and compliance, not personal info
+    if (currentPhase !== 3) {
+      if (!validateForm(onboardingData)) {
+        setApiError('Please fix the validation errors before submitting.')
+        return
+      }
     }
     
     setIsSubmitting(true)
@@ -312,6 +548,43 @@ export default function NewOnboardingModal({
       }
     } finally {
       setIsSubmitting(false)
+    }
+  }
+
+  const handleSaveForLater = async () => {
+    setIsSaving(true)
+    setApiError(null)
+    setSaveSuccess(false)
+
+    try {
+      const response = await onboardingApi.submitOnboarding({
+        ...onboardingData,
+        recruitId,
+        phase: currentPhase,
+        status: 'draft', // Save as draft instead of completing
+        documents,
+        digitalSignatures,
+        compliance,
+        offerDetails
+      })
+
+      setSaveSuccess(true)
+
+      // Show success message briefly, then close
+      setTimeout(() => {
+        onClose()
+        setSaveSuccess(false)
+      }, 2000)
+
+    } catch (error) {
+      if (error instanceof ApiValidationError) {
+        setApiError('Some validation errors were found, but progress has been saved.')
+        setSaveSuccess(true)
+      } else {
+        setApiError('Failed to save progress. Please try again.')
+      }
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -897,6 +1170,7 @@ export default function NewOnboardingModal({
                 </motion.div>
               )}
 
+              {/* Phase 3: Documentation & Compliance */}
               {currentPhase === 3 && (
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
@@ -904,10 +1178,199 @@ export default function NewOnboardingModal({
                   exit={{ opacity: 0, x: -20 }}
                   className="space-y-6"
                 >
-                  <div className="text-center py-12">
-                    <FileText className="h-16 w-16 text-slate-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-white mb-2">Phase 3: Coming Soon</h3>
-                    <p className="text-slate-400">Documentation and compliance setup</p>
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                      <FileCheck className="h-5 w-5 mr-2 text-green-400" />
+                      Documentation & Compliance Setup
+                    </h3>
+
+                    {/* Required Documents Section */}
+                    <div className="mb-8">
+                      <h4 className="text-md font-medium text-white mb-4 flex items-center">
+                        <Upload className="h-4 w-4 mr-2 text-blue-400" />
+                        Required Documents
+                      </h4>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {Object.entries({
+                          i9: 'I-9 Employment Eligibility Verification',
+                          w4: 'W-4 Federal Tax Withholding',
+                          stateWithholding: 'State Tax Withholding Forms',
+                          directDeposit: 'Direct Deposit Authorization',
+                          emergencyContacts: 'Emergency Contact Information',
+                          workAuthorization: 'Work Authorization Documentation'
+                        }).map(([key, label]) => (
+                          <div key={key} className="p-4 bg-slate-800/50 border border-slate-700 rounded-lg">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-sm font-medium text-white">{label}</span>
+                              {documents[key as keyof typeof documents].uploaded ? (
+                                <BadgeCheck className="h-4 w-4 text-green-400" />
+                              ) : (
+                                <FilePlus className="h-4 w-4 text-slate-400" />
+                              )}
+                            </div>
+
+                            {documents[key as keyof typeof documents].uploaded ? (
+                              <div className="flex items-center space-x-2 text-xs text-green-400">
+                                <CheckCircle className="h-3 w-3" />
+                                <span>{documents[key as keyof typeof documents].name}</span>
+                              </div>
+                            ) : (
+                              <label className="flex items-center justify-center w-full h-20 border-2 border-dashed border-slate-600 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
+                                <input
+                                  type="file"
+                                  className="hidden"
+                                  accept=".pdf,.doc,.docx,.jpg,.png"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0]
+                                    if (file) handleDocumentUpload(key, file)
+                                  }}
+                                />
+                                <div className="text-center">
+                                  <Upload className="h-6 w-6 text-slate-400 mx-auto mb-1" />
+                                  <span className="text-xs text-slate-400">Click to upload</span>
+                                </div>
+                              </label>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Digital Signatures Section */}
+                    <div className="mb-8">
+                      <h4 className="text-md font-medium text-white mb-4 flex items-center">
+                        <FileSignature className="h-4 w-4 mr-2 text-purple-400" />
+                        Digital Signatures Required
+                      </h4>
+
+                      <div className="space-y-3">
+                        {Object.entries({
+                          employeeHandbook: 'Employee Handbook Acknowledgment',
+                          codeOfConduct: 'Code of Conduct Agreement',
+                          itSecurityPolicy: 'IT Security Policy',
+                          remoteWorkPolicy: 'Remote Work Policy',
+                          nonCompeteAgreement: 'Non-Compete Agreement'
+                        }).map(([key, label]) => (
+                          <div key={key} className="flex items-center justify-between p-3 bg-slate-800/30 border border-slate-700 rounded-lg">
+                            <div className="flex items-center space-x-3">
+                              <div>
+                                <p className="text-sm font-medium text-white">{label}</p>
+                                {digitalSignatures[key as keyof typeof digitalSignatures].signed && (
+                                  <p className="text-xs text-slate-400">
+                                    Signed on {new Date(digitalSignatures[key as keyof typeof digitalSignatures].timestamp).toLocaleDateString()}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+
+                            {digitalSignatures[key as keyof typeof digitalSignatures].signed ? (
+                              <div className="flex items-center space-x-2 text-green-400">
+                                <Signature className="h-4 w-4" />
+                                <span className="text-sm">Signed</span>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => handleDigitalSignature(key)}
+                                className="flex items-center space-x-2 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors"
+                              >
+                                <Signature className="h-3 w-3" />
+                                <span>Sign</span>
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Compliance Checks Section */}
+                    <div className="mb-8">
+                      <h4 className="text-md font-medium text-white mb-4 flex items-center">
+                        <Shield className="h-4 w-4 mr-2 text-red-400" />
+                        Background & Compliance Checks
+                      </h4>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {Object.entries({
+                          backgroundCheck: 'Background Check',
+                          drugScreening: 'Drug Screening',
+                          referenceChecks: 'Reference Verification',
+                          educationVerification: 'Education Verification',
+                          employmentVerification: 'Employment History',
+                          criminalHistory: 'Criminal History Check'
+                        }).map(([key, label]) => (
+                          <div key={key} className="p-3 bg-slate-800/30 border border-slate-700 rounded-lg">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-sm font-medium text-white">{label}</span>
+                              <div className={`px-2 py-1 rounded text-xs ${
+                                compliance[key as keyof typeof compliance].status === 'completed'
+                                  ? 'bg-green-500/20 text-green-400'
+                                  : compliance[key as keyof typeof compliance].status === 'in_progress'
+                                  ? 'bg-yellow-500/20 text-yellow-400'
+                                  : compliance[key as keyof typeof compliance].status === 'failed'
+                                  ? 'bg-red-500/20 text-red-400'
+                                  : 'bg-slate-500/20 text-slate-400'
+                              }`}>
+                                {compliance[key as keyof typeof compliance].status.replace('_', ' ')}
+                              </div>
+                            </div>
+
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => handleComplianceUpdate(key, 'in_progress')}
+                                className="flex-1 px-2 py-1 bg-yellow-600/20 text-yellow-400 rounded text-xs hover:bg-yellow-600/30 transition-colors"
+                              >
+                                In Progress
+                              </button>
+                              <button
+                                onClick={() => handleComplianceUpdate(key, 'completed')}
+                                className="flex-1 px-2 py-1 bg-green-600/20 text-green-400 rounded text-xs hover:bg-green-600/30 transition-colors"
+                              >
+                                Complete
+                              </button>
+                              <button
+                                onClick={() => handleComplianceUpdate(key, 'failed')}
+                                className="flex-1 px-2 py-1 bg-red-600/20 text-red-400 rounded text-xs hover:bg-red-600/30 transition-colors"
+                              >
+                                Failed
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Completion Summary */}
+                    <div className="p-4 bg-slate-800/50 border border-slate-700 rounded-lg">
+                      <h4 className="text-md font-medium text-white mb-3 flex items-center">
+                        <CheckSquare className="h-4 w-4 mr-2 text-blue-400" />
+                        Completion Summary
+                      </h4>
+
+                      <div className="grid grid-cols-3 gap-4 text-center">
+                        <div>
+                          <div className="text-2xl font-bold text-blue-400">
+                            {Object.values(documents).filter(doc => doc.uploaded).length}/
+                            {Object.values(documents).length}
+                          </div>
+                          <div className="text-xs text-slate-400">Documents</div>
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-purple-400">
+                            {Object.values(digitalSignatures).filter(sig => sig.signed).length}/
+                            {Object.values(digitalSignatures).length}
+                          </div>
+                          <div className="text-xs text-slate-400">Signatures</div>
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-green-400">
+                            {Object.values(compliance).filter(check => check.status === 'completed').length}/
+                            {Object.values(compliance).length}
+                          </div>
+                          <div className="text-xs text-slate-400">Checks</div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </motion.div>
               )}
@@ -915,12 +1378,17 @@ export default function NewOnboardingModal({
           )}
 
           {/* Error/Success Display */}
-          {(apiError || submitSuccess) && (
+          {(apiError || submitSuccess || saveSuccess) && (
             <div className="px-6 py-3 border-t border-slate-700 bg-slate-800/50">
               {submitSuccess ? (
                 <div className="flex items-center space-x-2 text-green-400">
                   <CheckCircle className="h-4 w-4" />
                   <span className="text-sm font-medium">Onboarding submitted successfully!</span>
+                </div>
+              ) : saveSuccess ? (
+                <div className="flex items-center space-x-2 text-blue-400">
+                  <CheckCircle className="h-4 w-4" />
+                  <span className="text-sm font-medium">Progress saved successfully! You can return to complete this later.</span>
                 </div>
               ) : apiError ? (
                 <div className="flex items-start space-x-2 text-red-400">
@@ -963,33 +1431,100 @@ export default function NewOnboardingModal({
                   <ArrowRight className="h-4 w-4" />
                 </button>
               ) : (
-                <button
-                  onClick={handleSubmit}
-                  disabled={isSubmitting || submitSuccess}
-                  className="px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg font-medium hover:from-green-600 hover:to-emerald-600 transition-all duration-300 flex items-center space-x-2 disabled:opacity-50"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      <span>Submitting...</span>
-                    </>
-                  ) : submitSuccess ? (
-                    <>
-                      <CheckCircle className="h-4 w-4" />
-                      <span>Submitted!</span>
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle className="h-4 w-4" />
-                      <span>Complete Onboarding</span>
-                    </>
-                  )}
-                </button>
+                <>
+                  <button
+                    onClick={handleSaveForLater}
+                    disabled={isSaving || saveSuccess || isSubmitting}
+                    className="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg font-medium hover:from-blue-600 hover:to-indigo-600 transition-all duration-300 flex items-center space-x-2 disabled:opacity-50"
+                  >
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span>Saving...</span>
+                      </>
+                    ) : saveSuccess ? (
+                      <>
+                        <CheckCircle className="h-4 w-4" />
+                        <span>Saved!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Clock className="h-4 w-4" />
+                        <span>Save for Later</span>
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={handleSubmit}
+                    disabled={isSubmitting || submitSuccess || isSaving}
+                    className="px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg font-medium hover:from-green-600 hover:to-emerald-600 transition-all duration-300 flex items-center space-x-2 disabled:opacity-50"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span>Submitting...</span>
+                      </>
+                    ) : submitSuccess ? (
+                      <>
+                        <CheckCircle className="h-4 w-4" />
+                        <span>Submitted!</span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle className="h-4 w-4" />
+                        <span>Complete Onboarding</span>
+                      </>
+                    )}
+                  </button>
+                </>
               )}
             </div>
           </div>
         </motion.div>
       </motion.div>
+
+      {/* PDF Viewer for Digital Signatures */}
+      {showPdfViewer && selectedDocument && (
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[60] flex flex-col">
+          <DocumentViewer
+            isOpen={showPdfViewer}
+            onClose={cancelSignature}
+            document={selectedDocument}
+            documents={[selectedDocument]}
+          />
+
+          {/* Custom Action Bar for Digital Signature */}
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-slate-900 via-slate-900/95 to-transparent p-6">
+            <div className="max-w-4xl mx-auto flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <FileSignature className="h-5 w-5 text-purple-400" />
+                <div>
+                  <h3 className="text-white font-medium">Digital Signature Required</h3>
+                  <p className="text-slate-400 text-sm">
+                    Please review the document above before signing
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={cancelSignature}
+                  className="px-4 py-2 text-slate-400 hover:text-white transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDigitalSignature}
+                  className="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 transition-all duration-300 flex items-center space-x-2"
+                >
+                  <Signature className="h-4 w-4" />
+                  <span>Sign Document</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </AnimatePresence>
   )
 }

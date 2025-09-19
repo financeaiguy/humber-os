@@ -10,29 +10,33 @@ interface ChartWrapperProps {
   className?: string
 }
 
-export function ChartWrapper({ 
-  children, 
-  width = "100%", 
-  height = 300, 
-  className = "" 
+export function ChartWrapper({
+  children,
+  width = "100%",
+  height = 300,
+  className = ""
 }: ChartWrapperProps) {
   return (
-    <div 
+    <div
       className={`relative overflow-visible ${className}`}
-      style={{ 
+      style={{
         zIndex: 1,
-        position: 'relative'
+        position: 'relative',
+        backgroundColor: 'transparent'
       }}
     >
-      <ResponsiveContainer 
-        width={width} 
+      <ResponsiveContainer
+        width={width}
         height={height}
         style={{
           position: 'relative',
-          zIndex: 1
+          zIndex: 1,
+          backgroundColor: 'transparent'
         }}
       >
-        {children}
+        <div style={{ backgroundColor: 'transparent', width: '100%', height: '100%' }}>
+          {children}
+        </div>
       </ResponsiveContainer>
     </div>
   )
@@ -41,24 +45,26 @@ export function ChartWrapper({
 // Enhanced Tooltip props for consistent styling
 export const ENHANCED_TOOLTIP_PROPS = {
   contentStyle: {
-    backgroundColor: '#1e293b !important',
-    background: '#1e293b !important',
-    border: '1px solid #334155',
+    backgroundColor: '#020617 !important',
+    background: '#020617 !important',
+    border: '2px solid #3B82F6',
     borderRadius: '8px',
     color: '#F9FAFB',
     zIndex: 9999,
     position: 'relative' as const,
-    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.5)',
+    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.9)',
     backdropFilter: 'blur(10px)',
     WebkitBackdropFilter: 'blur(10px)',
-    padding: '10px'
+    padding: '12px 16px'
   },
   itemStyle: {
-    color: '#F9FAFB'
+    color: '#F9FAFB',
+    fontWeight: 500
   },
   labelStyle: {
-    color: '#F9FAFB',
-    fontWeight: 600
+    color: '#94A3B8',
+    fontWeight: 600,
+    marginBottom: '4px'
   },
   wrapperStyle: {
     zIndex: 9999,
@@ -66,8 +72,8 @@ export const ENHANCED_TOOLTIP_PROPS = {
     outline: 'none'
   },
   cursor: {
-    stroke: '#334155',
-    strokeWidth: 1,
+    stroke: '#3B82F6',
+    strokeWidth: 2,
     strokeDasharray: '3 3'
   },
   allowEscapeViewBox: { x: false, y: false },

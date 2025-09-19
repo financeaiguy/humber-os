@@ -582,8 +582,8 @@ export default function ProjectDetailModal({
                     </Card>
                   )}
                   
-                  {[...projectDetails.tasks, ...projectTasks].map((task) => (
-                    <Card key={task.id} className="bg-slate-800/50 border-slate-700">
+                  {[...projectDetails.tasks, ...projectTasks].map((task, index) => (
+                    <Card key={task.id || `task-${index}`} className="bg-slate-800/50 border-slate-700">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3">
@@ -623,7 +623,7 @@ export default function ProjectDetailModal({
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {[...project.engineers, ...projectTeam].map((engineer, idx) => (
-                      <Card key={engineer.id || idx} className="bg-slate-800/50 border-slate-700">
+                      <Card key={engineer.id || `engineer-${idx}`} className="bg-slate-800/50 border-slate-700">
                         <CardContent className="p-4">
                           <div className="flex items-center space-x-3">
                             <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-sm font-semibold">
@@ -706,7 +706,7 @@ export default function ProjectDetailModal({
                       <CardContent>
                         <div className="space-y-4">
                           {projectDetails.financials.categories.map((category, idx) => (
-                            <div key={idx} className="space-y-2">
+                            <div key={category.id || category.name || `category-${idx}`} className="space-y-2">
                               <div className="flex justify-between text-sm">
                                 <span className="text-slate-400">{category.name}</span>
                                 <span className="text-white">
@@ -842,8 +842,8 @@ export default function ProjectDetailModal({
                       </CardContent>
                     </Card>
                   )}
-                  {[...projectDetails.risks, ...projectRisks].map((risk) => (
-                    <Card key={risk.id} className="bg-slate-800/50 border-slate-700">
+                  {[...projectDetails.risks, ...projectRisks].map((risk, index) => (
+                    <Card key={risk.id || `risk-${index}`} className="bg-slate-800/50 border-slate-700">
                       <CardContent className="p-4">
                         <div className="space-y-3">
                           <div className="flex items-start justify-between">
