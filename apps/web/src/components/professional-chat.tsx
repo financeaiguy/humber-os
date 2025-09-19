@@ -499,7 +499,7 @@ export function ProfessionalChat({ isOpen, onToggle }: ProfessionalChatProps) {
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
                 chatMode === 'documents'
                   ? 'bg-blue-500/20 text-blue-300 shadow-lg border border-blue-500/30'
-                  : 'text-slate-300 hover:text-white hover:bg-white/5'
+                  : 'text-white hover:text-white hover:bg-white/20 border border-transparent'
               }`}
             >
               <FileText className="h-4 w-4 text-current" />
@@ -510,7 +510,7 @@ export function ProfessionalChat({ isOpen, onToggle }: ProfessionalChatProps) {
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
                 chatMode === 'engineer'
                   ? 'bg-green-500/20 text-green-300 shadow-lg border border-green-500/30'
-                  : 'text-slate-300 hover:text-white hover:bg-white/5'
+                  : 'text-white hover:text-white hover:bg-white/20 border border-transparent'
               }`}
             >
               <Users className="h-4 w-4 text-current" />
@@ -521,7 +521,7 @@ export function ProfessionalChat({ isOpen, onToggle }: ProfessionalChatProps) {
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
                 chatMode === 'general'
                   ? 'bg-purple-500/20 text-purple-300 shadow-lg border border-purple-500/30'
-                  : 'text-slate-300 hover:text-white hover:bg-white/5'
+                  : 'text-white hover:text-white hover:bg-white/20 border border-transparent'
               }`}
             >
               <Brain className="h-4 w-4 text-current" />
@@ -532,7 +532,7 @@ export function ProfessionalChat({ isOpen, onToggle }: ProfessionalChatProps) {
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
                 chatMode === 'help'
                   ? 'bg-orange-500/20 text-orange-300 shadow-lg border border-orange-500/30'
-                  : 'text-slate-300 hover:text-white hover:bg-white/5'
+                  : 'text-white hover:text-white hover:bg-white/20 border border-transparent'
               }`}
             >
               <HelpCircle className="h-4 w-4 text-current" />

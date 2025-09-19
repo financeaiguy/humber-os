@@ -4,11 +4,11 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { 
-  UserPlus, CheckCircle, Clock, AlertCircle, FileCheck, 
+import {
+  UserPlus, CheckCircle, Clock, AlertCircle, FileCheck,
   Shield, Briefcase, GraduationCap, Heart, Home, Car,
   CreditCard, Users, Building, Calendar, TrendingUp, ChevronRight,
-  Plus
+  Plus, X, MessageSquare
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 
@@ -146,6 +146,64 @@ export default function OnboardingPage() {
   const [onboardingData, setOnboardingData] = useState(onboardingQueue)
   const [selectedEmployee, setSelectedEmployee] = useState<any>(null)
   const [showDetailsModal, setShowDetailsModal] = useState(false)
+
+  // Note entry modal state
+  const [showNoteModal, setShowNoteModal] = useState(false)
+  const [noteAction, setNoteAction] = useState<'pause' | 'flag' | null>(null)
+  const [noteEmployee, setNoteEmployee] = useState<any>(null)
+  const [noteText, setNoteText] = useState('')
+
+  // Helper functions for note actions
+  const openNoteModal = (action: 'pause' | 'flag', employee: any) => {
+    setNoteAction(action)
+    setNoteEmployee(employee)
+    setNoteText('')
+    setShowNoteModal(true)
+  }
+
+  const handleNoteSubmit = () => {
+    if (!noteText.trim()) {
+      alert('Please enter a note before proceeding.')
+      return
+    }
+
+    if (noteAction === 'pause') {
+      setOnboardingData(prevData =>
+        prevData.map(emp =>
+          emp.id === noteEmployee.id
+            ? { ...emp, status: 'paused', pauseNote: noteText }
+            : emp
+        )
+      )
+      if (selectedEmployee && selectedEmployee.id === noteEmployee.id) {
+        setSelectedEmployee({ ...selectedEmployee, status: 'paused', pauseNote: noteText })
+      }
+    } else if (noteAction === 'flag') {
+      setOnboardingData(prevData =>
+        prevData.map(emp =>
+          emp.id === noteEmployee.id
+            ? { ...emp, flaggedForReview: true, priority: 'high', flagNote: noteText }
+            : emp
+        )
+      )
+    }
+
+    setShowNoteModal(false)
+    setNoteAction(null)
+    setNoteEmployee(null)
+    setNoteText('')
+
+    if (noteAction === 'flag' && showDetailsModal) {
+      setShowDetailsModal(false)
+    }
+  }
+
+  const closeNoteModal = () => {
+    setShowNoteModal(false)
+    setNoteAction(null)
+    setNoteEmployee(null)
+    setNoteText('')
+  }
 
   return (
     <>
@@ -394,32 +452,12 @@ export default function OnboardingPage() {
                     Complete Step
                   </button>
                   <button
-                    onClick={() => {
-                      // Pause onboarding process
-                      setOnboardingData(prevData =>
-                        prevData.map(emp =>
-                          emp.id === employee.id
-                            ? { ...emp, status: 'paused' }
-                            : emp
-                        )
-                      )
-                      alert(`Onboarding paused for ${employee.name}`)
-                    }}
+                    onClick={() => openNoteModal('pause', employee)}
                     className="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded text-xs hover:bg-yellow-500/30 transition-colors cursor-pointer">
                     Pause
                   </button>
                   <button
-                    onClick={() => {
-                      // Flag for partner review
-                      setOnboardingData(prevData =>
-                        prevData.map(emp =>
-                          emp.id === employee.id
-                            ? { ...emp, flaggedForReview: true, priority: 'high' }
-                            : emp
-                        )
-                      )
-                      alert(`${employee.name} has been flagged for partner review`)
-                    }}
+                    onClick={() => openNoteModal('flag', employee)}
                     className="px-3 py-1 bg-red-500/20 text-red-400 rounded text-xs hover:bg-red-500/30 transition-colors cursor-pointer">
                     Flag
                   </button>
@@ -628,35 +666,13 @@ export default function OnboardingPage() {
             <div className="flex justify-between items-center mt-6">
               <div className="flex space-x-2">
                 <button
-                  onClick={() => {
-                    // Pause onboarding
-                    setOnboardingData(prevData =>
-                      prevData.map(emp =>
-                        emp.id === selectedEmployee.id
-                          ? { ...emp, status: 'paused' }
-                          : emp
-                      )
-                    )
-                    setSelectedEmployee({ ...selectedEmployee, status: 'paused' })
-                    alert(`Onboarding paused for ${selectedEmployee.name}`)
-                  }}
+                  onClick={() => openNoteModal('pause', selectedEmployee)}
                   className="px-4 py-2 bg-yellow-600/20 text-yellow-400 border border-yellow-600/50 rounded-lg hover:bg-yellow-600/30 transition-colors"
                 >
                   Pause Onboarding
                 </button>
                 <button
-                  onClick={() => {
-                    // Flag for review
-                    setOnboardingData(prevData =>
-                      prevData.map(emp =>
-                        emp.id === selectedEmployee.id
-                          ? { ...emp, flaggedForReview: true, priority: 'high' }
-                          : emp
-                      )
-                    )
-                    alert(`${selectedEmployee.name} has been flagged for partner review`)
-                    setShowDetailsModal(false)
-                  }}
+                  onClick={() => openNoteModal('flag', selectedEmployee)}
                   className="px-4 py-2 bg-red-600/20 text-red-400 border border-red-600/50 rounded-lg hover:bg-red-600/30 transition-colors"
                 >
                   Flag for Review

@@ -19,25 +19,12 @@ import { JobsDashboard } from '@/components/jobs-dashboard'
 import { useEffect, useState } from 'react'
 import { SimpleTooltip } from '@/components/walkthrough/SimpleTooltip'
 import { useWalkthrough } from '@/lib/walkthrough-manager'
-import { 
-  LineChart, 
-  Line, 
-  AreaChart, 
-  Area, 
-  BarChart, 
-  Bar, 
-  PieChart, 
-  Pie, 
-  Cell, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  Legend,
-  ComposedChart
-} from 'recharts'
-import { ChartWrapper, ENHANCED_TOOLTIP_PROPS, ENHANCED_LEGEND_PROPS, AXIS_STYLE, GRID_STYLE } from '@/components/ui/chart-wrapper'
+import {
+  RevenueChart,
+  UtilizationChart,
+  ClientDistributionChart,
+  ProjectStatusChart
+} from '@/components/dashboard/client-charts'
 
 const stats = [
   {
@@ -88,42 +75,6 @@ const upcomingDeadlines = [
   { id: 4, task: 'HIROTEC Commissioning', date: '2024-01-25', priority: 'high' },
 ]
 
-// Humber Engineering Analytics Data
-const revenueData = [
-  { month: 'Jan', revenue: 850000, projects: 12, utilization: 78 },
-  { month: 'Feb', revenue: 920000, projects: 14, utilization: 82 },
-  { month: 'Mar', revenue: 1150000, projects: 16, utilization: 85 },
-  { month: 'Apr', revenue: 980000, projects: 13, utilization: 79 },
-  { month: 'May', revenue: 1200000, projects: 18, utilization: 88 },
-  { month: 'Jun', revenue: 1350000, projects: 20, utilization: 92 }
-]
-
-const utilizationData = [
-  { day: 'Mon', electrical: 85, mechanical: 78, software: 92, systems: 88 },
-  { day: 'Tue', electrical: 88, mechanical: 82, software: 89, systems: 85 },
-  { day: 'Wed', electrical: 92, mechanical: 85, software: 94, systems: 90 },
-  { day: 'Thu', electrical: 87, mechanical: 80, software: 91, systems: 87 },
-  { day: 'Fri', electrical: 83, mechanical: 77, software: 88, systems: 84 },
-  { day: 'Sat', electrical: 45, mechanical: 40, software: 52, systems: 48 },
-  { day: 'Sun', electrical: 25, mechanical: 22, software: 30, systems: 28 }
-]
-
-const clientDistribution = [
-  { name: 'General Motors', value: 35, color: '#3B82F6' },
-  { name: 'Ford', value: 28, color: '#10B981' },
-  { name: 'Stellantis', value: 22, color: '#F59E0B' },
-  { name: 'HIROTEC', value: 15, color: '#EF4444' }
-]
-
-const projectStatusData = [
-  { status: 'Planning', count: 3, color: '#F59E0B' },
-  { status: 'In Progress', count: 12, color: '#3B82F6' },
-  { status: 'Testing', count: 5, color: '#8B5CF6' },
-  { status: 'Deployed', count: 8, color: '#10B981' },
-  { status: 'On Hold', count: 2, color: '#EF4444' }
-]
-
-const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6']
 
 export default function HomePage() {
   const { data: session } = useSession()
@@ -366,80 +317,12 @@ export default function HomePage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="rounded-xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-6">
             <h3 className="text-lg font-semibold text-white mb-4">Revenue & Project Volume</h3>
-            <ChartWrapper width="100%" height={300}>
-              <ComposedChart data={revenueData}>
-                <CartesianGrid {...GRID_STYLE} />
-                <XAxis dataKey="month" {...AXIS_STYLE} />
-                <YAxis yAxisId="left" {...AXIS_STYLE} />
-                <YAxis yAxisId="right" orientation="right" {...AXIS_STYLE} />
-                <Tooltip 
-                  {...ENHANCED_TOOLTIP_PROPS}
-                  formatter={(value: any, name: any) => [
-                    name === 'revenue' ? `$${(Number(value) / 1000).toFixed(0)}K` : value,
-                    name === 'revenue' ? 'Revenue' : 'Projects'
-                  ]}
-                />
-                <Area
-                  yAxisId="left"
-                  type="monotone"
-                  dataKey="revenue"
-                  stroke="#3B82F6"
-                  fill="url(#revenueGradient)"
-                  strokeWidth={2}
-                />
-                <Line
-                  yAxisId="right"
-                  type="monotone"
-                  dataKey="projects"
-                  stroke="#10B981"
-                  strokeWidth={3}
-                />
-                <defs>
-                  <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-              </ComposedChart>
-            </ChartWrapper>
+            <RevenueChart />
           </div>
 
           <div className="rounded-xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-6">
             <h3 className="text-lg font-semibold text-white mb-4">Engineer Utilization by Discipline</h3>
-            <ChartWrapper width="100%" height={300}>
-              <LineChart data={utilizationData}>
-                <CartesianGrid {...GRID_STYLE} />
-                <XAxis dataKey="day" {...AXIS_STYLE} />
-                <YAxis {...AXIS_STYLE} domain={[0, 100]} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#0F172A',
-                    border: '2px solid #3B82F6',
-                    borderRadius: '8px',
-                    color: '#F9FAFB',
-                    zIndex: 9999,
-                    position: 'relative',
-                    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.9)',
-                    padding: '10px 14px'
-                  }}
-                  labelStyle={{
-                    color: '#94A3B8',
-                    fontWeight: 600,
-                    marginBottom: '4px'
-                  }}
-                  wrapperStyle={{
-                    zIndex: 9999,
-                    position: 'relative'
-                  }}
-                  formatter={(value) => [`${value}%`, '']}
-                />
-                <Legend {...ENHANCED_LEGEND_PROPS} />
-                <Line type="monotone" dataKey="electrical" stroke="#3B82F6" strokeWidth={2} name="Electrical" />
-                <Line type="monotone" dataKey="mechanical" stroke="#10B981" strokeWidth={2} name="Mechanical" />
-                <Line type="monotone" dataKey="software" stroke="#F59E0B" strokeWidth={2} name="Software" />
-                <Line type="monotone" dataKey="systems" stroke="#EF4444" strokeWidth={2} name="Systems" />
-              </LineChart>
-            </ChartWrapper>
+            <UtilizationChart />
           </div>
         </div>
 
@@ -447,80 +330,12 @@ export default function HomePage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="rounded-xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-6">
             <h3 className="text-lg font-semibold text-white mb-4">Client Revenue Distribution</h3>
-            <ChartWrapper width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={clientDistribution}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  innerRadius={60}
-                  paddingAngle={2}
-                  dataKey="value"
-                >
-                  {clientDistribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#0F172A',
-                    border: '2px solid #3B82F6',
-                    borderRadius: '8px',
-                    color: '#F9FAFB',
-                    zIndex: 9999,
-                    position: 'relative',
-                    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.9)',
-                    padding: '10px 14px'
-                  }}
-                  labelStyle={{
-                    color: '#94A3B8',
-                    fontWeight: 600,
-                    marginBottom: '4px'
-                  }}
-                  wrapperStyle={{
-                    zIndex: 9999,
-                    position: 'relative'
-                  }}
-                  formatter={(value) => [`${value}%`, 'Revenue Share']}
-                />
-                <Legend {...ENHANCED_LEGEND_PROPS} />
-              </PieChart>
-            </ChartWrapper>
+            <ClientDistributionChart />
           </div>
 
           <div className="rounded-xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-6">
             <h3 className="text-lg font-semibold text-white mb-4">Project Status Overview</h3>
-            <div style={{ backgroundColor: 'transparent !important' }}>
-              <ChartWrapper width="100%" height={300}>
-                <BarChart data={projectStatusData} layout="horizontal" style={{ backgroundColor: 'transparent' }}>
-                <CartesianGrid {...GRID_STYLE} />
-                <XAxis type="number" {...AXIS_STYLE} />
-                <YAxis dataKey="status" type="category" {...AXIS_STYLE} width={80} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#0F172A',
-                    border: '2px solid #3B82F6',
-                    borderRadius: '8px',
-                    color: '#F9FAFB',
-                    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.9)',
-                    padding: '10px 14px'
-                  }}
-                  labelStyle={{
-                    color: '#94A3B8',
-                    fontWeight: 600,
-                    marginBottom: '4px'
-                  }}
-                  formatter={(value) => [value, 'Projects']}
-                />
-                <Bar dataKey="count" fill="#3B82F6">
-                  {projectStatusData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Bar>
-              </BarChart>
-              </ChartWrapper>
-            </div>
+            <ProjectStatusChart />
           </div>
         </div>
 

@@ -668,6 +668,53 @@ curl -X POST http://localhost:8787/documents/search \\
   return c.html(html);
 });
 
+// Proxy endpoint for Next.js APIs to avoid CORS issues
+app.all('/proxy/nextjs/*', async (c) => {
+  try {
+    const path = c.req.path.replace('/proxy/nextjs', '')
+    const url = new URL(c.req.url)
+    const nextjsUrl = `http://localhost:3000${path}${url.search}`
+    
+    // Prepare headers
+    const headers: Record<string, string> = {
+      'Authorization': 'Bearer test-token-for-api-testing',
+      'X-Tenant-ID': 'demo-tenant',
+      'X-Requested-With': 'XMLHttpRequest'
+    }
+    
+    // Add Content-Type for POST/PUT requests
+    if (c.req.method === 'POST' || c.req.method === 'PUT') {
+      headers['Content-Type'] = 'application/json'
+    }
+    
+    // Forward the request to Next.js server
+    const response = await fetch(nextjsUrl, {
+      method: c.req.method,
+      headers,
+      body: c.req.method !== 'GET' && c.req.method !== 'HEAD' ? await c.req.text() : undefined
+    })
+    
+    const responseText = await response.text()
+    
+    // Return the response with CORS headers
+    return new Response(responseText, {
+      status: response.status,
+      headers: {
+        'Content-Type': response.headers.get('Content-Type') || 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Tenant-ID, X-Requested-With'
+      }
+    })
+  } catch (error) {
+    return c.json({
+      success: false,
+      error: 'Proxy request failed',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    }, 500)
+  }
+})
+
 // SECURE API Testing Interface (requires authentication)
 app.get('/api-test', (c) => {
   // This endpoint now requires authentication due to middleware above
@@ -2077,7 +2124,7 @@ app.get('/api-test', (c) => {
             // Route API endpoints to appropriate server
             let baseUrl = BASE_URL;
 
-            // Route certain API endpoints to Next.js server (port 3000)
+            // Route certain API endpoints to Next.js server via proxy to avoid CORS issues
             const nextjsApiEndpoints = [
                 '/api/recruits', '/api/offboarding', '/api/payments',
                 '/api/invoices'
@@ -2085,7 +2132,9 @@ app.get('/api-test', (c) => {
 
             const shouldUseNextjsApi = nextjsApiEndpoints.some(prefix => endpoint.startsWith(prefix));
             if (shouldUseNextjsApi) {
-                baseUrl = 'http://localhost:3000';
+                // Use worker proxy to avoid CORS issues
+                baseUrl = BASE_URL;
+                endpoint = '/proxy/nextjs' + endpoint;
             }
 
             const options = {

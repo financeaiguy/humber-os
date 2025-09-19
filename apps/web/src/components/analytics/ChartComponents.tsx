@@ -276,11 +276,19 @@ interface ChartComponentsProps {
 }
 
 const ChartComponents: React.FC<ChartComponentsProps> = ({ data }) => {
+  // Debug data structure
+  console.log('ChartComponents received data:', data);
+  
   // Validate data before rendering charts
   if (!data || typeof data !== 'object') {
+    console.log('Data validation failed: invalid data structure');
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {[...Array(4)].map((_, i) => (
+        <div className="bg-slate-800/50 backdrop-blur-xl p-6 rounded-xl border border-slate-700/50">
+          <h3 className="text-lg font-semibold text-white mb-4">Data Loading Issue</h3>
+          <p className="text-slate-400">No valid data received. Please check the data source.</p>
+        </div>
+        {[...Array(3)].map((_, i) => (
           <div key={i} className="animate-pulse bg-slate-700 rounded-xl h-[350px]" />
         ))}
       </div>
@@ -296,17 +304,62 @@ const ChartComponents: React.FC<ChartComponentsProps> = ({ data }) => {
 
   // Additional validation to ensure data is properly structured
   const validateData = (data: any[]): boolean => {
-    return Array.isArray(data) && 
+    const isValid = Array.isArray(data) && 
            data.length > 0 && 
            data.every(item => item && typeof item === 'object');
+    console.log('Data validation result:', { data, isValid });
+    return isValid;
   };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {validateData(revenueData) && <RevenueChart data={revenueData} />}
-      {validateData(deploymentEfficiencyData) && <DeploymentChart data={deploymentEfficiencyData} />}
-      {validateData(pipelineConversionData) && <PipelineChart data={pipelineConversionData} />}
-      {validateData(clientRetentionData) && <ClientDistributionChart data={clientRetentionData} />}
+      {validateData(revenueData) ? (
+        <RevenueChart data={revenueData} />
+      ) : (
+        <div className="bg-slate-800/50 backdrop-blur-xl p-6 rounded-xl border border-slate-700/50">
+          <h3 className="text-lg font-semibold text-white mb-4">Revenue & Project Volume</h3>
+          <p className="text-slate-400">No revenue data available</p>
+          <div className="bg-slate-700 rounded h-[250px] mt-4 flex items-center justify-center">
+            <span className="text-slate-500">Chart data not loaded</span>
+          </div>
+        </div>
+      )}
+      
+      {validateData(deploymentEfficiencyData) ? (
+        <DeploymentChart data={deploymentEfficiencyData} />
+      ) : (
+        <div className="bg-slate-800/50 backdrop-blur-xl p-6 rounded-xl border border-slate-700/50">
+          <h3 className="text-lg font-semibold text-white mb-4">Engineer Utilization by Discipline</h3>
+          <p className="text-slate-400">No deployment data available</p>
+          <div className="bg-slate-700 rounded h-[250px] mt-4 flex items-center justify-center">
+            <span className="text-slate-500">Chart data not loaded</span>
+          </div>
+        </div>
+      )}
+      
+      {validateData(pipelineConversionData) ? (
+        <PipelineChart data={pipelineConversionData} />
+      ) : (
+        <div className="bg-slate-800/50 backdrop-blur-xl p-6 rounded-xl border border-slate-700/50">
+          <h3 className="text-lg font-semibold text-white mb-4">Client Revenue Distribution</h3>
+          <p className="text-slate-400">No pipeline data available</p>
+          <div className="bg-slate-700 rounded h-[250px] mt-4 flex items-center justify-center">
+            <span className="text-slate-500">Chart data not loaded</span>
+          </div>
+        </div>
+      )}
+      
+      {validateData(clientRetentionData) ? (
+        <ClientDistributionChart data={clientRetentionData} />
+      ) : (
+        <div className="bg-slate-800/50 backdrop-blur-xl p-6 rounded-xl border border-slate-700/50">
+          <h3 className="text-lg font-semibold text-white mb-4">Project Status Overview</h3>
+          <p className="text-slate-400">No client data available</p>
+          <div className="bg-slate-700 rounded h-[250px] mt-4 flex items-center justify-center">
+            <span className="text-slate-500">Chart data not loaded</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
