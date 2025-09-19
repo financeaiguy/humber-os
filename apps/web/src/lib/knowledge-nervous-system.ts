@@ -16,12 +16,8 @@ import { r2Client as r2ClientBrowser } from './storage/r2-client-browser'
 // Use browser-safe stub on client-side, real implementation on server
 let r2Client = r2ClientBrowser
 
-// Dynamically replace with real client on server-side
-if (typeof window === 'undefined') {
-  // Use eval to prevent webpack from analyzing this
-  const getR2Client = () => eval('require("./storage/r2-client").r2Client')
-  r2Client = getR2Client()
-}
+// For now, use the browser-safe client everywhere to avoid Edge Runtime issues
+// TODO: Re-enable server-side r2-client when Edge Runtime supports it better
 
 interface KnowledgeNode {
   id: string

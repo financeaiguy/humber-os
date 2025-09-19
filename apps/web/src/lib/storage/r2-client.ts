@@ -14,8 +14,17 @@ const getCrypto = () => {
   if (typeof globalThis !== 'undefined' && globalThis.crypto) {
     return globalThis.crypto
   }
-  // Fallback to Node.js crypto (server-side only)
-  return require('crypto').webcrypto || require('crypto')
+  // For Node.js environments, try webcrypto first
+  if (typeof require !== 'undefined') {
+    try {
+      const crypto = require('crypto')
+      return crypto.webcrypto || crypto
+    } catch {
+      // Fallback for environments without crypto
+      throw new Error('Crypto API not available')
+    }
+  }
+  throw new Error('Crypto API not available')
 }
 
 const createHash = async (data: string): Promise<string> => {
