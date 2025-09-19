@@ -332,15 +332,24 @@ async function validateApiKey(db: D1Database, apiKey: string): Promise<{ id: str
     
     if (!result) return null;
     
+    // Type the result properly
+    const typedResult = result as { 
+      id: string; 
+      tenant_id: string; 
+      permissions: string | null; 
+      status: string; 
+      expires_at: string | null; 
+    };
+    
     // Check expiration
-    if (result.expires_at && new Date(result.expires_at) < new Date()) {
+    if (typedResult.expires_at && new Date(typedResult.expires_at) < new Date()) {
       return null;
     }
     
     return {
-      id: result.id,
-      tenantId: result.tenant_id,
-      permissions: result.permissions ? JSON.parse(result.permissions) : []
+      id: typedResult.id as string,
+      tenantId: typedResult.tenant_id as string,
+      permissions: typedResult.permissions ? JSON.parse(typedResult.permissions as string) : []
     };
   } catch (error) {
     // SECURITY: console statement removederror('API key validation error:', error);
@@ -375,11 +384,19 @@ async function getUserStatus(db: D1Database, userId: string) {
       LIMIT 1
     `).bind(userId).first();
     
-    if (result?.locked_until && new Date(result.locked_until) > new Date()) {
+    if (!result) return null;
+    
+    // Type the result properly
+    const typedResult = result as { 
+      status: string; 
+      locked_until: string | null; 
+    };
+    
+    if (typedResult.locked_until && new Date(typedResult.locked_until) > new Date()) {
       return { status: 'locked' };
     }
     
-    return result;
+    return typedResult;
   } catch (error) {
     // SECURITY: console statement removederror('User status lookup error:', error);
     return null;
@@ -400,8 +417,14 @@ async function verifyTenantAccess(db: D1Database, userId: string, tenantId: stri
     
     if (!result) return false;
     
+    // Type the result properly
+    const typedResult = result as { 
+      role: string; 
+      expires_at: string | null; 
+    };
+    
     // Check if role has expired
-    if (result.expires_at && new Date(result.expires_at) < new Date()) {
+    if (typedResult.expires_at && new Date(typedResult.expires_at) < new Date()) {
       return false;
     }
     
@@ -543,7 +566,7 @@ export function validateInput<T extends z.ZodType>(schema: T) {
       const body = await c.req.json();
       const validated = schema.parse(body);
       c.set('validatedInput', validated);
-      await next();
+      return await next();
     } catch (error) {
       const userId = c.get('userId') as string;
       const tenantId = c.get('tenantId') as string;

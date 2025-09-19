@@ -1,10 +1,16 @@
 import { Hono } from 'hono';
-import { drizzle } from 'drizzle-orm/d1';
-import { eq, and, desc } from 'drizzle-orm';
-import type { Env, ChatRequestInput, ChatMessage } from '@humber/types';
+import type { Env } from '@humber/types';
 import { Logger, generateChatId } from '@humber/utils';
 
-const chatRouter = new Hono<{ Bindings: Env }>();
+interface AppVariables {
+  requestId?: string;
+  tenantId?: string;
+  userId?: string;
+  role?: string;
+  authenticated?: boolean;
+}
+
+const chatRouter = new Hono<{ Bindings: Env; Variables: AppVariables }>();
 
 // Chat with RAG
 chatRouter.post('/message', async (c) => {
@@ -23,7 +29,7 @@ chatRouter.post('/message', async (c) => {
     const currentSessionId = sessionId || generateChatId();
     
     // Step 1: Perform RAG search if enabled
-    let sourceDocuments = [];
+    let sourceDocuments: any[] = [];
     let ragContext = '';
     
     if (useRAG) {
@@ -41,33 +47,36 @@ chatRouter.post('/message', async (c) => {
     const aiResponse = await generateAIResponse(message, ragContext, tenantId);
     
     // Step 3: Save conversation to database (mock for now)
-    const userMessage: ChatMessage = {
-      id: generateChatId(),
-      sessionId: currentSessionId,
-      tenantId,
-      role: 'user',
-      content: message,
-      sourceDocuments: [],
-      createdAt: Date.now(),
-      updatedAt: Date.now()
-    };
+    // Note: In production, these messages would be saved to the database
+    // For now we just return the response without saving
     
-    const assistantMessage: ChatMessage = {
-      id: messageId,
-      sessionId: currentSessionId,
-      tenantId,
-      role: 'assistant',
-      content: aiResponse.content,
-      sourceDocuments: sourceDocuments.map(doc => ({
-        documentId: doc.documentId,
-        documentTitle: doc.metadata.documentTitle,
-        chunkId: doc.chunkId,
-        relevanceScore: doc.score,
-        snippet: doc.content.substring(0, 200) + '...'
-      })),
-      createdAt: Date.now(),
-      updatedAt: Date.now()
-    };
+    // const userMessage: ChatMessage = {
+    //   id: generateChatId(),
+    //   sessionId: currentSessionId,
+    //   tenantId,
+    //   role: 'user',
+    //   content: message,
+    //   sourceDocuments: [],
+    //   createdAt: Date.now(),
+    //   updatedAt: Date.now()
+    // };
+    
+    // const assistantMessage: ChatMessage = {
+    //   id: messageId,
+    //   sessionId: currentSessionId,
+    //   tenantId,
+    //   role: 'assistant',
+    //   content: aiResponse.content,
+    //   sourceDocuments: sourceDocuments.map(doc => ({
+    //     documentId: doc.documentId,
+    //     documentTitle: doc.metadata.documentTitle,
+    //     chunkId: doc.chunkId,
+    //     relevanceScore: doc.score,
+    //     snippet: doc.content.substring(0, 200) + '...'
+    //   })),
+    //   createdAt: Date.now(),
+    //   updatedAt: Date.now()
+    // };
     
     logger.info('Chat message processed', { 
       messageId, 
@@ -101,7 +110,7 @@ chatRouter.post('/message', async (c) => {
 // Get Chat History
 chatRouter.get('/sessions/:sessionId/messages', async (c) => {
   const logger = new Logger('chat-history');
-  const tenantId = c.get('tenantId') as string || 'demo-tenant';
+  // Note: tenantId would be used for database filtering in production
   const sessionId = c.req.param('sessionId');
   
   try {
@@ -146,34 +155,222 @@ chatRouter.get('/sessions/:sessionId/messages', async (c) => {
   }
 });
 
-// Get Chat Sessions
+// Get Chat Sessions - Enhanced for comprehensive history
 chatRouter.get('/sessions', async (c) => {
   const logger = new Logger('chat-sessions');
   const tenantId = c.get('tenantId') as string || 'demo-tenant';
+  const userId = c.get('userId') as string || 'user_current';
+  
+  // Query parameters
+  const category = c.req.query('category') || 'all';
+  const scope = c.req.query('scope') || 'my'; // 'my', 'all', 'shared'
+  const search = c.req.query('search') || '';
+  const sortBy = c.req.query('sortBy') || 'recent';
+  const limit = parseInt(c.req.query('limit') || '50');
+  const offset = parseInt(c.req.query('offset') || '0');
   
   try {
-    // Mock sessions (would query actual database)
-    const mockSessions = [
+    // Enhanced mock sessions with comprehensive data
+    const allMockSessions = [
       {
         id: 'session_001',
-        title: 'Electrical Safety Protocols',
-        messageCount: 6,
+        title: 'Electrical Safety Protocols Discussion',
+        description: 'Detailed conversation about automotive plant safety requirements',
+        messageCount: 12,
         lastMessageAt: Date.now() - 300000,
-        createdAt: Date.now() - 86400000
+        createdAt: Date.now() - 86400000,
+        userId: 'user_current',
+        userName: 'You',
+        userAvatar: 'YO',
+        tenantId,
+        isShared: false,
+        isPublic: false,
+        isPinned: true,
+        isStarred: false,
+        tags: ['safety', 'electrical', 'protocols'],
+        category: 'documents',
+        lastMessage: {
+          role: 'assistant',
+          content: 'The lockout/tagout procedures must be followed strictly according to OSHA standards...',
+          timestamp: Date.now() - 300000
+        },
+        participants: []
       },
       {
-        id: 'session_002', 
-        title: 'PLC Programming Questions',
-        messageCount: 4,
+        id: 'session_002',
+        title: 'Sarah Johnson - Engineer Profile Review',
+        messageCount: 8,
         lastMessageAt: Date.now() - 3600000,
-        createdAt: Date.now() - 86400000 * 2
+        createdAt: Date.now() - 172800000,
+        userId: 'user_current',
+        userName: 'You',
+        userAvatar: 'YO',
+        tenantId,
+        isShared: true,
+        isPublic: false,
+        isPinned: false,
+        isStarred: true,
+        tags: ['engineer', 'profile', 'deployment'],
+        category: 'engineer',
+        lastMessage: {
+          role: 'user',
+          content: 'What projects has Sarah worked on recently?',
+          timestamp: Date.now() - 3600000
+        },
+        participants: [
+          { id: 'user_002', name: 'John Smith', role: 'Project Manager', avatar: 'JS' },
+          { id: 'user_003', name: 'Mary Johnson', role: 'Engineering Lead', avatar: 'MJ' }
+        ]
+      },
+      {
+        id: 'session_003',
+        title: 'PLC Programming Best Practices',
+        messageCount: 15,
+        lastMessageAt: Date.now() - 7200000,
+        createdAt: Date.now() - 259200000,
+        userId: 'user_002',
+        userName: 'John Smith',
+        userAvatar: 'JS',
+        tenantId,
+        isShared: true,
+        isPublic: true,
+        isPinned: false,
+        isStarred: false,
+        tags: ['plc', 'programming', 'automation'],
+        category: 'documents',
+        lastMessage: {
+          role: 'assistant',
+          content: 'Here are the structured programming practices recommended for industrial PLCs...',
+          timestamp: Date.now() - 7200000
+        },
+        participants: [
+          { id: 'user_004', name: 'Jennifer Davis', role: 'Quality Manager', avatar: 'JD' },
+          { id: 'user_005', name: 'Michael Wilson', role: 'Deployment Lead', avatar: 'MW' }
+        ]
+      },
+      {
+        id: 'session_004',
+        title: 'Time Tracking System Tutorial',
+        messageCount: 6,
+        lastMessageAt: Date.now() - 10800000,
+        createdAt: Date.now() - 345600000,
+        userId: 'user_003',
+        userName: 'Mary Johnson',
+        userAvatar: 'MJ',
+        tenantId,
+        isShared: false,
+        isPublic: true,
+        isPinned: false,
+        isStarred: false,
+        tags: ['tutorial', 'time-tracking', 'help'],
+        category: 'help',
+        lastMessage: {
+          role: 'assistant',
+          content: 'To enable biometric authentication, navigate to Settings > Security...',
+          timestamp: Date.now() - 10800000
+        },
+        participants: []
+      },
+      {
+        id: 'session_005',
+        title: 'Project Budget Analysis - GM Contract',
+        description: 'Financial analysis and resource allocation discussion',
+        messageCount: 20,
+        lastMessageAt: Date.now() - 14400000,
+        createdAt: Date.now() - 432000000,
+        userId: 'user_004',
+        userName: 'Jennifer Davis',
+        userAvatar: 'JD',
+        tenantId,
+        isShared: true,
+        isPublic: false,
+        isPinned: true,
+        isStarred: true,
+        tags: ['budget', 'gm', 'analysis', 'resources'],
+        category: 'general',
+        lastMessage: {
+          role: 'user',
+          content: 'Can you break down the hourly rates by engineering category?',
+          timestamp: Date.now() - 14400000
+        },
+        participants: [
+          { id: 'user_006', name: 'Sarah Martinez', role: 'Client Success', avatar: 'SM' },
+          { id: 'user_007', name: 'David Thompson', role: 'Technical Lead', avatar: 'DT' }
+        ]
       }
     ];
+
+    // Filter sessions based on scope
+    let filteredSessions = allMockSessions;
+    
+    if (scope === 'my') {
+      filteredSessions = allMockSessions.filter(s => s.userId === userId);
+    } else if (scope === 'shared') {
+      filteredSessions = allMockSessions.filter(s => s.isShared || s.isPublic);
+    }
+    // 'all' scope includes all sessions
+    
+    // Filter by category
+    if (category !== 'all') {
+      filteredSessions = filteredSessions.filter(s => s.category === category);
+    }
+    
+    // Filter by search
+    if (search) {
+      const searchLower = search.toLowerCase();
+      filteredSessions = filteredSessions.filter(s => 
+        s.title.toLowerCase().includes(searchLower) ||
+        s.lastMessage.content.toLowerCase().includes(searchLower) ||
+        s.tags.some(tag => tag.toLowerCase().includes(searchLower)) ||
+        (s.description && s.description.toLowerCase().includes(searchLower))
+      );
+    }
+    
+    // Sort sessions
+    filteredSessions.sort((a, b) => {
+      switch (sortBy) {
+        case 'recent':
+          return b.lastMessageAt - a.lastMessageAt;
+        case 'oldest':
+          return a.createdAt - b.createdAt;
+        case 'most-active':
+          return b.messageCount - a.messageCount;
+        case 'alphabetical':
+          return a.title.localeCompare(b.title);
+        default:
+          return b.lastMessageAt - a.lastMessageAt;
+      }
+    });
+    
+    // Apply pagination
+    const paginatedSessions = filteredSessions.slice(offset, offset + limit);
+    
+    logger.info('Chat sessions retrieved', { 
+      tenantId, 
+      userId, 
+      scope, 
+      category, 
+      search, 
+      total: filteredSessions.length,
+      returned: paginatedSessions.length
+    });
     
     return c.json({
       success: true,
-      sessions: mockSessions,
-      totalSessions: mockSessions.length
+      sessions: paginatedSessions,
+      totalSessions: filteredSessions.length,
+      hasMore: offset + limit < filteredSessions.length,
+      filters: {
+        scope,
+        category,
+        search,
+        sortBy
+      },
+      pagination: {
+        offset,
+        limit,
+        total: filteredSessions.length
+      }
     });
     
   } catch (error) {
@@ -182,8 +379,53 @@ chatRouter.get('/sessions', async (c) => {
   }
 });
 
+// Get Session Stats
+chatRouter.get('/stats', async (c) => {
+  const logger = new Logger('chat-stats');
+  // Note: tenantId and userId would be used for filtering stats in production
+  
+  try {
+    // Mock stats (would calculate from actual database)
+    const stats = {
+      totalConversations: 24,
+      myConversations: 8,
+      sharedConversations: 12,
+      publicConversations: 4,
+      totalMessages: 156,
+      categoryCounts: {
+        documents: 10,
+        engineer: 6,
+        general: 5,
+        help: 3
+      },
+      recentActivity: {
+        conversationsThisWeek: 3,
+        messagesThisWeek: 28,
+        mostActiveDay: 'Tuesday',
+        averageMessagesPerConversation: 8.5
+      },
+      topTags: [
+        { tag: 'safety', count: 5 },
+        { tag: 'plc', count: 4 },
+        { tag: 'automation', count: 3 },
+        { tag: 'protocols', count: 3 },
+        { tag: 'analysis', count: 2 }
+      ]
+    };
+    
+    return c.json({
+      success: true,
+      stats
+    });
+    
+  } catch (error) {
+    logger.error('Error getting chat stats', error);
+    return c.json({ error: 'Failed to load chat statistics' }, 500);
+  }
+});
+
 // Helper function for vector search (mock implementation)
-async function performVectorSearch(query: string, tenantId: string, env: Env, maxResults: number) {
+async function performVectorSearch(_query: string, _tenantId: string, _env: Env, _maxResults: number) {
   // In production, this would:
   // 1. Generate embedding for the query using AI
   // 2. Search Vectorize index for similar document chunks
@@ -219,7 +461,7 @@ async function performVectorSearch(query: string, tenantId: string, env: Env, ma
 }
 
 // Helper function for AI response generation (mock implementation)
-async function generateAIResponse(message: string, ragContext: string, tenantId: string) {
+async function generateAIResponse(message: string, _ragContext: string, _tenantId: string) {
   // In production, this would call Claude API with the RAG context
   
   // Mock response based on common engineering questions

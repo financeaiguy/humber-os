@@ -440,6 +440,11 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
   
   // Verify if device is approved (mock - replace with actual API call)
   const verifyDevice = async (fingerprint: string): Promise<boolean> => {
+    // In demo/development mode, always approve devices
+    if (isDemoMode() || process.env.NODE_ENV === 'development') {
+      return true
+    }
+
     // In production, this would check against a whitelist of approved devices
     // For now, simulate approval check
     const approvedDevices = localStorage.getItem('approvedDevices')
@@ -448,7 +453,7 @@ export default function EmployeeClockView({ employeeData, onClose }: EmployeeClo
       localStorage.setItem('approvedDevices', JSON.stringify([fingerprint]))
       return true
     }
-    
+
     const devices = JSON.parse(approvedDevices)
     return devices.includes(fingerprint)
   }

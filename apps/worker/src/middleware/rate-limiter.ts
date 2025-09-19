@@ -232,7 +232,7 @@ export class AdvancedRateLimiter {
   /**
    * Log security event
    */
-  private static async logSecurityEvent(c: Context, eventType: string, details: any): Promise<void> {
+  private static async logSecurityEvent(_c: Context, _eventType: string, _details: any): Promise<void> {
     // SECURITY: console statement removed - security event logged
   }
   

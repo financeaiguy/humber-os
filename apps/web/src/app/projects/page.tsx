@@ -510,12 +510,22 @@ export default function ProjectsPage() {
                 
                 <div className="px-4 py-3 bg-slate-900/30 border-t border-slate-700/50 flex items-center justify-between">
                   <button 
-                    onClick={() => handleProjectClick(project)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleProjectClick(project)
+                    }}
                     className="text-sm text-blue-400 hover:text-blue-300 font-medium transition-colors"
                   >
                     View Project Details →
                   </button>
-                  <button className="text-sm text-slate-400 hover:text-slate-300 transition-colors">
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      // Export functionality would go here
+                      alert('Export report functionality coming soon')
+                    }}
+                    className="text-sm text-slate-400 hover:text-slate-300 transition-colors"
+                  >
                     Export Report
                   </button>
                 </div>

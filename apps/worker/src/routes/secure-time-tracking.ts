@@ -147,7 +147,7 @@ secureTimeTrackingRouter.post('/clock-action', async (c) => {
 // Get Active Time Tracking Sessions
 secureTimeTrackingRouter.get('/active-sessions', async (c) => {
   const logger = new Logger('active-time-sessions');
-  const tenantId = c.get('tenantId') as string || 'demo-tenant';
+  // Note: tenantId would be used for database filtering in production
   
   try {
     // Mock active sessions (would query actual database)
@@ -250,7 +250,7 @@ secureTimeTrackingRouter.get('/active-sessions', async (c) => {
 // Get Work Sites for Geolocation Verification
 secureTimeTrackingRouter.get('/work-sites', async (c) => {
   const logger = new Logger('work-sites');
-  const tenantId = c.get('tenantId') as string || 'demo-tenant';
+  // Note: tenantId would be used for database filtering in production
   
   try {
     // Mock work sites (would query actual database)
@@ -332,7 +332,7 @@ secureTimeTrackingRouter.post('/verify-location', async (c) => {
 });
 
 // Helper Functions
-async function verifyBiometric(biometric: any, engineerId: string, env: Env) {
+async function verifyBiometric(biometric: any, _engineerId: string, _env: Env) {
   // In production, would verify against stored biometric templates
   // For demo/testing, accept simplified verification data
   
@@ -362,7 +362,7 @@ async function verifyBiometric(biometric: any, engineerId: string, env: Env) {
   };
 }
 
-async function verifyGeolocation(geolocation: any, workSiteId: string | undefined, env: Env) {
+async function verifyGeolocation(geolocation: any, _workSiteId: string | undefined, _env: Env) {
   // Mock geolocation verification
   const isWithinWorkSite = geolocation.isWithinWorkLocation;
   const hasHighAccuracy = geolocation.accuracy <= 50;
@@ -380,7 +380,7 @@ async function verifyGeolocation(geolocation: any, workSiteId: string | undefine
   };
 }
 
-async function verifyDevice(deviceInfo: any, engineerId: string, env: Env) {
+async function verifyDevice(deviceInfo: any, _engineerId: string, _env: Env) {
   // Mock device verification with flexible test data support
   const isTrustedDevice = deviceInfo.trustLevel === 'TRUSTED' || deviceInfo.trustLevel === 'VERIFIED';
   const hasSecureFeatures = deviceInfo.hasSecureElement && deviceInfo.supportsBiometrics;
@@ -411,7 +411,7 @@ async function verifyDevice(deviceInfo: any, engineerId: string, env: Env) {
   };
 }
 
-async function processClockAction(data: any, env: Env): Promise<{ id: string }> {
+async function processClockAction(_data: any, _env: Env): Promise<{ id: string }> {
   // In production, would save to database and create time entry record
   // For now, return mock time entry
   
@@ -422,7 +422,7 @@ async function processClockAction(data: any, env: Env): Promise<{ id: string }> 
   return { id: timeEntryId };
 }
 
-async function verifyLocationAgainstWorkSites(location: any, tenantId: string, env: Env) {
+async function verifyLocationAgainstWorkSites(location: any, _tenantId: string, _env: Env) {
   // Mock work site verification
   const workSites = [
     { id: 'site_001', name: 'GM Assembly Plant', lat: 42.3314, lng: -83.0458, radius: 500 },

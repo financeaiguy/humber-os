@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   X, 
@@ -46,6 +46,7 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import ProjectActionPanel from './ProjectActionPanel'
+import BullPenSelectionModal from './BullPenSelectionModal'
 
 interface ProjectDetailModalProps {
   project: any
@@ -97,6 +98,53 @@ export default function ProjectDetailModal({
 }: ProjectDetailModalProps) {
   const [activeTab, setActiveTab] = useState('actions')
   const [isEditing, setIsEditing] = useState(false)
+  const [projectRisks, setProjectRisks] = useState<any[]>([])
+  const [showAddRiskForm, setShowAddRiskForm] = useState(false)
+  const [newRisk, setNewRisk] = useState({
+    description: '',
+    impact: 'medium',
+    probability: 'medium',
+    mitigation: ''
+  })
+  const [showAddTaskForm, setShowAddTaskForm] = useState(false)
+  const [projectTasks, setProjectTasks] = useState<any[]>([])
+  const [newTask, setNewTask] = useState({
+    name: '',
+    assignee: '',
+    priority: 'medium',
+    dueDate: '',
+    status: 'planning'
+  })
+  const [showBullPenModal, setShowBullPenModal] = useState(false)
+  const [projectTeam, setProjectTeam] = useState<any[]>([])
+
+  // Reset form states when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setShowAddRiskForm(false)
+      setShowAddTaskForm(false)
+      setShowBullPenModal(false)
+      setActiveTab('actions')
+      setNewRisk({
+        description: '',
+        impact: 'medium',
+        probability: 'medium',
+        mitigation: ''
+      })
+      setNewTask({
+        name: '',
+        assignee: '',
+        priority: 'medium',
+        dueDate: '',
+        status: 'planning'
+      })
+    }
+  }, [isOpen])
+
+  // Debug logging to see form state
+  useEffect(() => {
+    console.log('showAddRiskForm:', showAddRiskForm, 'activeTab:', activeTab)
+  }, [showAddRiskForm, activeTab])
 
   if (!project) return null
 
@@ -405,12 +453,136 @@ export default function ProjectDetailModal({
                 <TabsContent value="tasks" className="space-y-4">
                   <div className="flex justify-between items-center">
                     <h3 className="text-white font-semibold">Active Tasks</h3>
-                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                    <Button
+                      size="sm"
+                      className="bg-blue-600 hover:bg-blue-700"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setShowAddTaskForm(true)
+                      }}
+                    >
                       <Plus className="h-4 w-4 mr-2" />
                       Add Task
                     </Button>
                   </div>
-                  {projectDetails.tasks.map((task) => (
+                  
+                  {/* Add Task Form */}
+                  {showAddTaskForm && (
+                    <Card className="bg-slate-900/50 border-blue-600/50">
+                      <CardContent className="p-4 space-y-3">
+                        <div>
+                          <label className="text-sm text-slate-300">Task Name</label>
+                          <input
+                            type="text"
+                            value={newTask.name}
+                            onChange={(e) => setNewTask({...newTask, name: e.target.value})}
+                            className="w-full mt-1 px-3 py-2 bg-slate-800 border border-slate-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter task name..."
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="text-sm text-slate-300">Assignee</label>
+                            <select
+                              value={newTask.assignee}
+                              onChange={(e) => setNewTask({...newTask, assignee: e.target.value})}
+                              className="w-full mt-1 px-3 py-2 bg-slate-800 border border-slate-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                              <option value="">Select assignee...</option>
+                              {project.engineers.map((eng: any) => (
+                                <option key={eng.name} value={eng.name}>{eng.name}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div>
+                            <label className="text-sm text-slate-300">Priority</label>
+                            <select
+                              value={newTask.priority}
+                              onChange={(e) => setNewTask({...newTask, priority: e.target.value})}
+                              className="w-full mt-1 px-3 py-2 bg-slate-800 border border-slate-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                              <option value="low">Low</option>
+                              <option value="medium">Medium</option>
+                              <option value="high">High</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="text-sm text-slate-300">Due Date</label>
+                            <input
+                              type="date"
+                              value={newTask.dueDate}
+                              onChange={(e) => setNewTask({...newTask, dueDate: e.target.value})}
+                              className="w-full mt-1 px-3 py-2 bg-slate-800 border border-slate-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm text-slate-300">Status</label>
+                            <select
+                              value={newTask.status}
+                              onChange={(e) => setNewTask({...newTask, status: e.target.value})}
+                              className="w-full mt-1 px-3 py-2 bg-slate-800 border border-slate-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                              <option value="planning">Planning</option>
+                              <option value="in_progress">In Progress</option>
+                              <option value="completed">Completed</option>
+                              <option value="on_hold">On Hold</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button
+                            size="sm"
+                            className="bg-blue-600 hover:bg-blue-700 text-white font-medium border-0"
+                            style={{ color: 'white', backgroundColor: '#2563eb' }}
+                            onClick={() => {
+                              if (newTask.name && newTask.assignee) {
+                                const task = {
+                                  id: Date.now(),
+                                  ...newTask
+                                }
+                                setProjectTasks([...projectTasks, task])
+                                onCreateTask?.(project.id, task)
+                                setNewTask({
+                                  name: '',
+                                  assignee: '',
+                                  priority: 'medium',
+                                  dueDate: '',
+                                  status: 'planning'
+                                })
+                                setShowAddTaskForm(false)
+                              }
+                            }}
+                          >
+                            <Save className="h-4 w-4 mr-2" style={{ color: 'white' }} />
+                            Save Task
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="bg-slate-700 border border-slate-600 text-white hover:bg-slate-600 font-medium"
+                            style={{ color: 'white', backgroundColor: '#374151', borderColor: '#4b5563' }}
+                            onClick={() => {
+                              setShowAddTaskForm(false)
+                              setNewTask({
+                                name: '',
+                                assignee: '',
+                                priority: 'medium',
+                                dueDate: '',
+                                status: 'planning'
+                              })
+                            }}
+                          >
+                            <X className="h-4 w-4 mr-2" style={{ color: 'white' }} />
+                            Cancel
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+                  
+                  {[...projectDetails.tasks, ...projectTasks].map((task) => (
                     <Card key={task.id} className="bg-slate-800/50 border-slate-700">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
@@ -437,22 +609,32 @@ export default function ProjectDetailModal({
                 <TabsContent value="team" className="space-y-4">
                   <div className="flex justify-between items-center">
                     <h3 className="text-white font-semibold">Project Team</h3>
-                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                    <Button
+                      size="sm"
+                      className="bg-blue-600 hover:bg-blue-700"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setShowBullPenModal(true)
+                      }}
+                    >
                       <Plus className="h-4 w-4 mr-2" />
                       Add Member
                     </Button>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {project.engineers.map((engineer, idx) => (
-                      <Card key={idx} className="bg-slate-800/50 border-slate-700">
+                    {[...project.engineers, ...projectTeam].map((engineer, idx) => (
+                      <Card key={engineer.id || idx} className="bg-slate-800/50 border-slate-700">
                         <CardContent className="p-4">
                           <div className="flex items-center space-x-3">
                             <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-sm font-semibold">
-                              {engineer.name.split(' ').map(n => n[0]).join('')}
+                              {engineer.avatar || engineer.name.split(' ').map(n => n[0]).join('')}
                             </div>
                             <div className="flex-1">
                               <h4 className="text-white font-medium">{engineer.name}</h4>
                               <p className="text-slate-400 text-sm">{engineer.role}</p>
+                              {engineer.location && (
+                                <p className="text-slate-500 text-xs">{engineer.location}</p>
+                              )}
                             </div>
                             <div className="flex space-x-1">
                               <Button variant="ghost" size="sm">
@@ -549,12 +731,118 @@ export default function ProjectDetailModal({
                 <TabsContent value="risks" className="space-y-4">
                   <div className="flex justify-between items-center">
                     <h3 className="text-white font-semibold">Project Risks</h3>
-                    <Button size="sm" className="bg-red-600 hover:bg-red-700">
-                      <Plus className="h-4 w-4 mr-2" />
+                    <Button 
+                      size="sm" 
+                      className="bg-red-600 hover:bg-red-700 text-white font-medium border-0"
+                      style={{ color: 'white', backgroundColor: '#dc2626' }}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setShowAddRiskForm(true)
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-2" style={{ color: 'white' }} />
                       Add Risk
                     </Button>
                   </div>
-                  {projectDetails.risks.map((risk) => (
+                  
+                  {/* Add Risk Form */}
+                  {showAddRiskForm && (
+                    <Card className="bg-slate-900/50 border-yellow-600/50">
+                      <CardContent className="p-4 space-y-3">
+                        <div>
+                          <label className="text-sm text-slate-300">Risk Description</label>
+                          <input
+                            type="text"
+                            value={newRisk.description}
+                            onChange={(e) => setNewRisk({...newRisk, description: e.target.value})}
+                            className="w-full mt-1 px-3 py-2 bg-slate-800 border border-slate-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                            placeholder="Describe the risk..."
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="text-sm text-slate-300">Impact</label>
+                            <select
+                              value={newRisk.impact}
+                              onChange={(e) => setNewRisk({...newRisk, impact: e.target.value})}
+                              className="w-full mt-1 px-3 py-2 bg-slate-800 border border-slate-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                            >
+                              <option value="low">Low</option>
+                              <option value="medium">Medium</option>
+                              <option value="high">High</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="text-sm text-slate-300">Probability</label>
+                            <select
+                              value={newRisk.probability}
+                              onChange={(e) => setNewRisk({...newRisk, probability: e.target.value})}
+                              className="w-full mt-1 px-3 py-2 bg-slate-800 border border-slate-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                            >
+                              <option value="low">Low</option>
+                              <option value="medium">Medium</option>
+                              <option value="high">High</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-sm text-slate-300">Mitigation Plan</label>
+                          <textarea
+                            value={newRisk.mitigation}
+                            onChange={(e) => setNewRisk({...newRisk, mitigation: e.target.value})}
+                            className="w-full mt-1 px-3 py-2 bg-slate-800 border border-slate-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                            rows={2}
+                            placeholder="How will you mitigate this risk?"
+                          />
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button
+                            size="sm"
+                            className="bg-red-600 hover:bg-red-700 text-white font-medium border-0"
+                            style={{ color: 'white', backgroundColor: '#dc2626' }}
+                            onClick={() => {
+                              if (newRisk.description && newRisk.mitigation) {
+                                const risk = {
+                                  id: Date.now(),
+                                  ...newRisk
+                                }
+                                setProjectRisks([...projectRisks, risk])
+                                setNewRisk({
+                                  description: '',
+                                  impact: 'medium',
+                                  probability: 'medium',
+                                  mitigation: ''
+                                })
+                                setShowAddRiskForm(false)
+                              }
+                            }}
+                          >
+                            <Save className="h-4 w-4 mr-2" style={{ color: 'white' }} />
+                            Save Risk
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="bg-slate-700 border border-slate-600 text-white hover:bg-slate-600 font-medium"
+                            style={{ color: 'white', backgroundColor: '#374151', borderColor: '#4b5563' }}
+                            onClick={() => {
+                              setShowAddRiskForm(false)
+                              setNewRisk({
+                                description: '',
+                                impact: 'medium',
+                                probability: 'medium',
+                                mitigation: ''
+                              })
+                            }}
+                          >
+                            <X className="h-4 w-4 mr-2" style={{ color: 'white' }} />
+                            Cancel
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+                  {[...projectDetails.risks, ...projectRisks].map((risk) => (
                     <Card key={risk.id} className="bg-slate-800/50 border-slate-700">
                       <CardContent className="p-4">
                         <div className="space-y-3">
@@ -638,8 +926,8 @@ export default function ProjectDetailModal({
                   <Button variant="outline" onClick={onClose} className="bg-slate-800 border-slate-600 text-white hover:bg-slate-700">
                     Close
                   </Button>
-                  <Button className="bg-blue-600 hover:bg-blue-700">
-                    <Save className="h-4 w-4 mr-2" />
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white font-medium">
+                    <Save className="h-4 w-4 mr-2 text-white" />
                     Save Changes
                   </Button>
                 </div>
@@ -648,6 +936,20 @@ export default function ProjectDetailModal({
           </motion.div>
         </div>
       )}
+
+      {/* Bull Pen Selection Modal */}
+      <BullPenSelectionModal
+        isOpen={showBullPenModal}
+        onClose={() => setShowBullPenModal(false)}
+        onSelectEngineers={(selectedEngineers) => {
+          setProjectTeam(prev => [...prev, ...selectedEngineers])
+          // Also call the parent callback if provided
+          selectedEngineers.forEach(engineer => {
+            onAssignEngineer?.(project.id, engineer.id)
+          })
+        }}
+        project={project}
+      />
     </AnimatePresence>
   )
 }

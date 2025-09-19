@@ -1,6 +1,5 @@
 import { Hono } from 'hono';
 import { drizzle } from 'drizzle-orm/d1';
-import { eq, and } from 'drizzle-orm';
 import type { Env } from '@humber/types';
 import {
   RecruitingStep1Schema,
@@ -9,11 +8,18 @@ import {
   OfferLetterVisaSchema,
   DeploymentSchema,
 } from '@humber/types';
-import { candidates, operationLogs } from '@humber/database';
-import { generateCandidateId, generateLogId, Logger } from '@humber/utils';
+import { generateCandidateId, Logger } from '@humber/utils';
 import { sanitizeError, auditLog } from '../middleware/security';
 
-const operationsRouter = new Hono<{ Bindings: Env }>();
+interface AppVariables {
+  requestId?: string;
+  tenantId?: string;
+  userId?: string;
+  role?: string;
+  authenticated?: boolean;
+}
+
+const operationsRouter = new Hono<{ Bindings: Env; Variables: AppVariables }>();
 
 // Helper function for consistent error handling with security
 function handleOperationError(error: any, operationName: string, logger: Logger, c: any) {
@@ -80,8 +86,8 @@ operationsRouter.post('/recruiting-step-1', async (c) => {
     try {
       // Try database operations with fallback to mock
       if (c.env.DB) {
-        const input = RecruitingStep1Schema.parse({ ...body, tenantId });
-        const db = drizzle(c.env.DB);
+        RecruitingStep1Schema.parse({ ...body, tenantId });
+        drizzle(c.env.DB);
         
         // Database operations would go here
         // For now, just log the attempt
@@ -140,8 +146,8 @@ operationsRouter.post('/hiring-vetting-step-2', async (c) => {
     try {
       // Try database operations with fallback to mock
       if (c.env.DB) {
-        const input = HiringVettingStep2Schema.parse({ ...body, tenantId });
-        const db = drizzle(c.env.DB);
+        HiringVettingStep2Schema.parse({ ...body, tenantId });
+        drizzle(c.env.DB);
         
         // Database operations would go here
         logger.info('Database operations would be performed here', { candidateId, tenantId });
@@ -212,8 +218,8 @@ operationsRouter.post('/background-checks', async (c) => {
     try {
       // Try database operations with fallback to mock
       if (c.env.DB) {
-        const input = BackgroundCheckSchema.parse({ ...body, tenantId });
-        const db = drizzle(c.env.DB);
+        BackgroundCheckSchema.parse({ ...body, tenantId });
+        drizzle(c.env.DB);
         
         // Database operations would go here
         logger.info('Background check database operations would be performed here', { candidateId, tenantId });
@@ -280,8 +286,8 @@ operationsRouter.post('/offer-letter-visa', async (c) => {
     try {
       // Try database operations with fallback to mock
       if (c.env.DB) {
-        const input = OfferLetterVisaSchema.parse({ ...body, tenantId });
-        const db = drizzle(c.env.DB);
+        OfferLetterVisaSchema.parse({ ...body, tenantId });
+        drizzle(c.env.DB);
         
         // Database operations would go here
         logger.info('Offer letter database operations would be performed here', { candidateId, tenantId });
@@ -341,8 +347,8 @@ operationsRouter.post('/deployment', async (c) => {
     try {
       // Try database operations with fallback to mock
       if (c.env.DB) {
-        const input = DeploymentSchema.parse({ ...body, tenantId });
-        const db = drizzle(c.env.DB);
+        DeploymentSchema.parse({ ...body, tenantId });
+        drizzle(c.env.DB);
         
         // Database operations would go here
         logger.info('Deployment database operations would be performed here', { candidateId, tenantId });

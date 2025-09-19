@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, companyId, accessCode } = await request.json()
+    const body = await request.json() as { email: string; companyId: string; accessCode: string }
+    const { email, companyId, accessCode } = body
     
     // Customer portal authentication implementation
     return NextResponse.json({

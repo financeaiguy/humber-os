@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { drizzle } from 'drizzle-orm/d1';
-import { eq, and, desc, like } from 'drizzle-orm';
+import { eq, and, like } from 'drizzle-orm';
 import type { Env } from '@humber/types';
 import { documents, documentChunks, documentProcessingJobs } from '@humber/database';
 import { Logger, generateDocumentId } from '@humber/utils';
@@ -155,7 +155,7 @@ realDocumentsRouter.get('/', async (c) => {
   const tenantId = c.get('tenantId') as string || 'demo-tenant';
   
   try {
-    const db = drizzle(c.env.DB);
+    // Note: Database operations would use drizzle(c.env.DB) in production
     
     // Get query parameters
     const query = c.req.query('query');

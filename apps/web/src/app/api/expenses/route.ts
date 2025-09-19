@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     const rawData = await request.json()
     
     // SECURITY: Validate and sanitize all input
-    const validation = InputValidator.validateObject(rawData)
+    const validation = InputValidator.validateObject(rawData as Record<string, any>)
     if (!validation.isValid) {
       return NextResponse.json({ 
         error: 'Invalid input detected',
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
       savedExpense.approvedAt = new Date().toISOString()
     } else {
       // Send for approval
-      await sendForApproval(savedExpense, type, projectId)
+      await sendForApproval(savedExpense, type, validatedData.projectId || 'default')
     }
 
     // SECURITY: console statement removed: console.log(`💰 ${type} expense created:`, savedExpense.id, savedExpense.amount)
@@ -301,11 +301,11 @@ async function checkAutoApproval(expense: TravelExpense | MiscExpense, type: str
 
   if (type === 'travel') {
     const travelExpense = expense as TravelExpense
-    const limit = autoApprovalLimits.travel[travelExpense.type] || autoApprovalLimits.travel.other
+    const limit = autoApprovalLimits.travel[travelExpense.type as keyof typeof autoApprovalLimits.travel] || autoApprovalLimits.travel.other
     return travelExpense.amount <= limit
   } else {
     const miscExpense = expense as MiscExpense
-    const limit = autoApprovalLimits.misc[miscExpense.category] || autoApprovalLimits.misc.other
+    const limit = autoApprovalLimits.misc[miscExpense.category as keyof typeof autoApprovalLimits.misc] || autoApprovalLimits.misc.other
     return miscExpense.amount <= limit
   }
 }

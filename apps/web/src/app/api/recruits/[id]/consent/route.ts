@@ -226,10 +226,10 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const recruitId = params.id
+    const { id: recruitId } = await params
     const url = new URL(request.url)
     const consentType = url.searchParams.get('type')
 
@@ -308,10 +308,10 @@ export async function DELETE(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const recruitId = params.id
+    const { id: recruitId } = await params
     const body = await request.json()
 
     // Handle consent verification/audit

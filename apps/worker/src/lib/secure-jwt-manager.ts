@@ -8,10 +8,11 @@
  * - Comprehensive security headers
  */
 
-import { sign, verify, decode } from 'hono/jwt'
+import { sign, verify } from 'hono/jwt'
 import { Context } from 'hono'
+import type { JWTPayload as HonoJWTPayload } from 'hono/utils/jwt/types'
 
-export interface JWTPayload {
+export interface JWTPayload extends HonoJWTPayload {
   sub: string           // Subject (user ID)
   iat: number          // Issued at
   exp: number          // Expiration
@@ -146,7 +147,7 @@ export class SecureJWTManager {
   async verifyToken(token: string, context: Context): Promise<JWTPayload | null> {
     try {
       // Decode and verify signature
-      const payload = await verify(token, this.secret, 'HS256') as JWTPayload
+      const payload = await verify(token, this.secret, 'HS256') as unknown as JWTPayload
       
       // Check if token is revoked
       if (SecureJWTManager.revokedTokens.has(payload.jti)) {
@@ -241,7 +242,7 @@ export class SecureJWTManager {
    */
   async revokeAllUserTokens(userId: string): Promise<void> {
     // Deactivate all sessions for user
-    for (const [sessionId, session] of SecureJWTManager.sessions.entries()) {
+    for (const [, session] of SecureJWTManager.sessions.entries()) {
       if (session.userId === userId) {
         session.isActive = false
       }

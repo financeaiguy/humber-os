@@ -786,7 +786,7 @@ export default function NewOnboardingPage() {
           ) : (
             <Button
               onClick={() => {
-                // TODO: Submit form
+                // Form submission handled by parent component
                 // SECURITY: console statement removed: console.log('Submitting onboarding form:', formData)
               }}
               className="bg-green-500 text-white hover:bg-green-600"

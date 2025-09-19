@@ -26,17 +26,17 @@ const querySchema = z.object({
 })
 
 export async function GET(request: NextRequest) {
-  try {
-    console.log('🔍 API REQUEST - GET /api/recruits', {
-      url: request.url,
-      method: request.method,
-      headers: Object.fromEntries(request.headers.entries()),
-      timestamp: new Date().toISOString()
-    })
+  // Add CORS headers for API testing
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Content-Type': 'application/json',
+  }
 
+  try {
     const url = new URL(request.url)
     const queryParams = Object.fromEntries(url.searchParams.entries())
-    console.log('📊 Query parameters:', queryParams)
     
     const validation = querySchema.safeParse(queryParams)
     if (!validation.success) {
@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
 
     // Apply sorting
     recruits.sort((a, b) => {
-      let aValue: any, bValue: any
+      let aValue: string | number, bValue: string | number
       
       switch (sortBy) {
         case 'created':
@@ -185,20 +185,11 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString()
     }
 
-    console.log('✅ API SUCCESS - GET /api/recruits', {
-      recruitCount: enrichedRecruits.length,
-      totalRecruits: total,
-      responseTime: Date.now()
+    return NextResponse.json(response, {
+      status: 200,
+      headers
     })
-
-    return NextResponse.json(response, { status: 200 })
   } catch (error) {
-    console.error('❌ API ERROR - GET /api/recruits', {
-      error: error instanceof Error ? error.message : error,
-      stack: error instanceof Error ? error.stack : undefined,
-      timestamp: new Date().toISOString()
-    })
-
     return NextResponse.json(
       {
         success: false,
@@ -211,21 +202,19 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    console.log('🔍 API REQUEST - POST /api/recruits', {
-      url: request.url,
-      method: request.method,
-      headers: Object.fromEntries(request.headers.entries()),
-      timestamp: new Date().toISOString()
-    })
+  // Add CORS headers for API testing
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Content-Type': 'application/json',
+  }
 
-    // Enhanced validation for request body
+  try {
     let body
     try {
       body = await request.json()
-      console.log('📝 Request body received:', body)
     } catch (error) {
-      console.error('❌ Invalid JSON in request body:', error)
       return NextResponse.json(
         {
           success: false,
@@ -280,7 +269,7 @@ export async function POST(request: NextRequest) {
         nextSteps: getNextStepsForStatus(newRecruit.status)
       },
       timestamp: new Date().toISOString()
-    }, { status: 201 })
+    }, { status: 201, headers })
   } catch (error) {
     return NextResponse.json(
       {
@@ -376,6 +365,21 @@ export async function DELETE(request: NextRequest) {
       { status: 500 }
     )
   }
+}
+
+// Handle OPTIONS requests for CORS preflight
+export async function OPTIONS(request: NextRequest) {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+    'Access-Control-Max-Age': '86400',
+  }
+
+  return new NextResponse(null, {
+    status: 204,
+    headers
+  })
 }
 
 // Helper functions

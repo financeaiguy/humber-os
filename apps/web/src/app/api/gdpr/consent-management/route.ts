@@ -82,7 +82,7 @@ export const POST = withAuditLog('GDPR_CONSENT_RECORD')(
         legalBasis: getLegalBasisForConsentType(consentType),
         consentGiven,
         consentDate: new Date().toISOString(),
-        ipAddress: request.ip || 'unknown',
+        ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
         userAgent: request.headers.get('user-agent') || 'unknown',
         consentMethod,
         dataRetentionPeriod,
@@ -174,7 +174,7 @@ export const GET = withAuditLog('GDPR_CONSENT_VIEW')(
 export const PUT = withAuditLog('GDPR_CONSENT_WITHDRAWAL')(
   async function handler(request: NextRequest) {
     try {
-      const requestData = await request.json()
+      const requestData = await request.json() as { consentId: string; withdrawalMethod: string; reason?: string; userId?: string }
       const { consentId, withdrawalMethod, reason, userId } = requestData
 
       if (!consentId) {
@@ -203,9 +203,9 @@ export const PUT = withAuditLog('GDPR_CONSENT_WITHDRAWAL')(
       const withdrawal: ConsentWithdrawal = {
         consentId,
         withdrawalDate: new Date().toISOString(),
-        withdrawalMethod: withdrawalMethod || 'user_request',
+        withdrawalMethod: (withdrawalMethod || 'user_request') as 'user_request' | 'admin_action' | 'automatic_expiry',
         reason,
-        ipAddress: request.ip || 'unknown',
+        ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
         confirmed: true
       }
 

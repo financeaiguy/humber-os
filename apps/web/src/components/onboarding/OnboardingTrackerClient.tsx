@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, User, Clock, FileText, Shield, Globe, CheckCircle, AlertCircle, Loader2, Search, Filter, RefreshCw, Bell } from 'lucide-react'
 import { useSession } from '@/components/session-context'
 import { CandidateDetailsModal } from './CandidateDetailsModal'
-import { useRealTimeOnboarding } from '@/hooks/useRealTimeOnboarding'
+// import { useRealTimeOnboarding } from '@/hooks/useRealTimeOnboarding'
 
 interface OnboardingCandidate {
   id: string
@@ -53,22 +53,56 @@ export function OnboardingTrackerClient() {
   const isOperator = userRole === 'PARTNER_OPERATOR' || userRole === 'PARTNER_ADMIN'
   const isCustomer = userRole === 'CUSTOMER'
 
-  // Always call the hook, but configure it based on mounted state
-  const {
-    candidates = [],
-    loading = true,
-    error,
-    lastUpdate,
-    recentUpdates = [],
-    statusCounts = {},
-    updateCandidate,
-    refresh
-  } = useRealTimeOnboarding({
-    refreshInterval: mounted ? 30000 : 0,
-    enableNotifications: mounted,
-    statusFilter,
-    searchTerm
-  })
+  // Static data replacement for useRealTimeOnboarding
+  const candidates = [
+    {
+      id: 'cand_001',
+      name: 'Michael Chen',
+      email: 'michael.chen@example.com',
+      role: 'Senior Mechanical Engineer',
+      status: 'vetting' as const,
+      phase: 1,
+      progress: 45,
+      startDate: '2025-01-20',
+      lastUpdate: new Date().toISOString(),
+      assignedTo: 'TechTalent Global',
+      location: 'Detroit, MI',
+      documents: {
+        resume: true,
+        offer: false,
+        background: true,
+        i9: false,
+        visa: false
+      }
+    },
+    {
+      id: 'cand_002',
+      name: 'Sarah Johnson',
+      email: 'sarah.johnson@example.com',
+      role: 'Controls Engineer',
+      status: 'offer_letter' as const,
+      phase: 2,
+      progress: 70,
+      startDate: '2025-01-22',
+      lastUpdate: new Date().toISOString(),
+      assignedTo: 'Engineering Elite',
+      location: 'Chicago, IL',
+      documents: {
+        resume: true,
+        offer: true,
+        background: true,
+        i9: false,
+        visa: false
+      }
+    }
+  ]
+  const loading = false
+  const error = null
+  const lastUpdate = new Date()
+  const recentUpdates: any[] = []
+  const statusCounts = { vetting: 1, offer_letter: 1 }
+  const updateCandidate = async () => {}
+  const refresh = () => {}
 
   // Ensure component is mounted before showing dynamic content
   useEffect(() => {

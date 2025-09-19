@@ -15,6 +15,7 @@ import {
   Plus
 } from 'lucide-react'
 import { NewCustomerModal } from '@/components/clients/NewCustomerModal'
+import { CustomerDetailModal } from '@/components/clients/CustomerDetailModal'
 
 const clients = [
   {
@@ -22,11 +23,16 @@ const clients = [
     name: 'General Motors',
     industry: 'Automotive Manufacturing',
     location: 'Detroit, MI',
-    contact: {
-      name: 'Demo Contact',
-      email: 'demo@example.com',
-      phone: '+1 (555) 000-0000'
-    },
+    contacts: [
+      {
+        id: 'gm_contact_1',
+        name: 'Demo Contact',
+        email: 'demo@example.com',
+        phone: '+1 (555) 000-0000',
+        role: 'Primary Contact',
+        isPrimary: true
+      }
+    ],
     projects: {
       active: 2,
       completed: 8,
@@ -48,11 +54,16 @@ const clients = [
     name: 'Ford Motor Company',
     industry: 'Automotive Manufacturing',
     location: 'Dearborn, MI',
-    contact: {
-      name: 'Maria Garcia',
-      email: 'demo@example.com',
-      phone: '+1 (313) 555-0456'
-    },
+    contacts: [
+      {
+        id: 'ford_contact_1',
+        name: 'Maria Garcia',
+        email: 'demo@example.com',
+        phone: '+1 (313) 555-0456',
+        role: 'Engineering Manager',
+        isPrimary: true
+      }
+    ],
     projects: {
       active: 1,
       completed: 5,
@@ -74,11 +85,16 @@ const clients = [
     name: 'Stellantis',
     industry: 'Automotive Manufacturing',
     location: 'Auburn Hills, MI',
-    contact: {
-      name: 'Robert Wilson',
-      email: 'demo@example.com',
-      phone: '+1 (248) 555-0789'
-    },
+    contacts: [
+      {
+        id: 'stellantis_contact_1',
+        name: 'Robert Wilson',
+        email: 'demo@example.com',
+        phone: '+1 (248) 555-0789',
+        role: 'Project Director',
+        isPrimary: true
+      }
+    ],
     projects: {
       active: 1,
       completed: 3,
@@ -100,11 +116,16 @@ const clients = [
     name: 'HIROTEC America',
     industry: 'Automotive Supplier',
     location: 'Howell, MI',
-    contact: {
-      name: 'Takeshi Yamamoto',
-      email: 'demo@example.com',
-      phone: '+1 (517) 555-0321'
-    },
+    contacts: [
+      {
+        id: 'hirotec_contact_1',
+        name: 'Takeshi Yamamoto',
+        email: 'demo@example.com',
+        phone: '+1 (517) 555-0321',
+        role: 'Operations Manager',
+        isPrimary: true
+      }
+    ],
     projects: {
       active: 1,
       completed: 4,
@@ -135,6 +156,8 @@ const getStatusColor = (status: string) => {
 export default function ClientsPage() {
   const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false)
   const [clientList, setClientList] = useState(clients)
+  const [selectedCustomer, setSelectedCustomer] = useState(null)
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   
   const totalRevenue = clientList.reduce((sum, client) => sum + client.projects.totalValue, 0)
   const totalProjects = clientList.reduce((sum, client) => sum + client.projects.active + client.projects.completed, 0)
@@ -145,6 +168,16 @@ export default function ClientsPage() {
     const customerWithId = {
       ...newCustomer,
       id: Math.max(...clientList.map(c => c.id)) + 1,
+      contacts: newCustomer.contacts || [
+        {
+          id: Math.random().toString(36).substr(2, 9),
+          name: newCustomer.contact?.name || '',
+          email: newCustomer.contact?.email || '',
+          phone: newCustomer.contact?.phone || '',
+          role: 'Primary Contact',
+          isPrimary: true
+        }
+      ],
       relationship: {
         ...newCustomer.relationship,
         since: new Date().toISOString().split('T')[0],
@@ -152,8 +185,25 @@ export default function ClientsPage() {
         lastContact: new Date().toISOString().split('T')[0]
       }
     }
+    // Remove the old contact field if it exists
+    delete customerWithId.contact
     setClientList([...clientList, customerWithId])
     setIsNewCustomerModalOpen(false)
+  }
+
+  const handleCustomerClick = (customer: any) => {
+    setSelectedCustomer(customer)
+    setIsDetailModalOpen(true)
+  }
+
+  const handleCustomerUpdate = (updatedCustomer: any) => {
+    setClientList(clientList.map(client =>
+      client.id === updatedCustomer.id ? updatedCustomer : client
+    ))
+  }
+
+  const handleCustomerDelete = (customerId: number) => {
+    setClientList(clientList.filter(client => client.id !== customerId))
   }
 
   return (
@@ -247,7 +297,8 @@ export default function ClientsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="rounded-2xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-6 hover:border-slate-600 transition-all duration-300"
+            onClick={() => handleCustomerClick(client)}
+            className="rounded-2xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-6 hover:border-slate-600 hover:bg-slate-800/70 transition-all duration-300 cursor-pointer"
           >
             {/* Client Header */}
             <div className="flex items-start justify-between mb-4">
@@ -264,22 +315,49 @@ export default function ClientsPage() {
             <div className="bg-slate-900/50 rounded-lg p-4 mb-4">
               <h4 className="text-sm font-medium text-white mb-3">Primary Contact</h4>
               <div className="space-y-2">
-                <div className="flex items-center space-x-2 text-sm text-slate-300">
-                  <Users className="h-4 w-4 text-slate-400" />
-                  <span>{client.contact.name}</span>
-                </div>
-                <div className="flex items-center space-x-2 text-sm text-slate-300">
-                  <Mail className="h-4 w-4 text-slate-400" />
-                  <span>{client.contact.email}</span>
-                </div>
-                <div className="flex items-center space-x-2 text-sm text-slate-300">
-                  <Phone className="h-4 w-4 text-slate-400" />
-                  <span>{client.contact.phone}</span>
-                </div>
-                <div className="flex items-center space-x-2 text-sm text-slate-300">
-                  <MapPin className="h-4 w-4 text-slate-400" />
-                  <span>{client.location}</span>
-                </div>
+                {client.contacts.find(contact => contact.isPrimary) && (
+                  <>
+                    <div className="flex items-center space-x-2 text-sm text-slate-300">
+                      <Users className="h-4 w-4 text-slate-400" />
+                      <span>{client.contacts.find(contact => contact.isPrimary)?.name}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm text-slate-300">
+                      <Mail className="h-4 w-4 text-slate-400" />
+                      <span>{client.contacts.find(contact => contact.isPrimary)?.email}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm text-slate-300">
+                      <Phone className="h-4 w-4 text-slate-400" />
+                      <span>{client.contacts.find(contact => contact.isPrimary)?.phone}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm text-slate-300">
+                      <MapPin className="h-4 w-4 text-slate-400" />
+                      <span>{client.location}</span>
+                    </div>
+                  </>
+                )}
+                {!client.contacts.find(contact => contact.isPrimary) && client.contacts.length > 0 && (
+                  <>
+                    <div className="flex items-center space-x-2 text-sm text-slate-300">
+                      <Users className="h-4 w-4 text-slate-400" />
+                      <span>{client.contacts[0].name}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm text-slate-300">
+                      <Mail className="h-4 w-4 text-slate-400" />
+                      <span>{client.contacts[0].email}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm text-slate-300">
+                      <Phone className="h-4 w-4 text-slate-400" />
+                      <span>{client.contacts[0].phone}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm text-slate-300">
+                      <MapPin className="h-4 w-4 text-slate-400" />
+                      <span>{client.location}</span>
+                    </div>
+                  </>
+                )}
+                {client.contacts.length === 0 && (
+                  <div className="text-sm text-slate-400">No contacts available</div>
+                )}
               </div>
             </div>
 
@@ -325,6 +403,15 @@ export default function ClientsPage() {
         isOpen={isNewCustomerModalOpen}
         onClose={() => setIsNewCustomerModalOpen(false)}
         onSubmit={handleAddCustomer}
+      />
+
+      {/* Customer Detail Modal */}
+      <CustomerDetailModal
+        customer={selectedCustomer}
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        onUpdate={handleCustomerUpdate}
+        onDelete={handleCustomerDelete}
       />
     </div>
   )

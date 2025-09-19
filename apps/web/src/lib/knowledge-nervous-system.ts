@@ -7,10 +7,21 @@
 import { logger } from './logger'
 import { knowledgeCache, modelCache, memoryMonitor } from './memory-manager'
 import { d1Client } from './db/d1-client'
-import { r2Client } from './storage/r2-client'
 import { kvCache, sessionCache, modelCache as kvModelCache } from './cache/kv-client'
 import type { TenantContext } from './db/d1-client'
-import * as crypto from 'crypto'
+
+// Import browser-safe version, will be replaced on server-side
+import { r2Client as r2ClientBrowser } from './storage/r2-client-browser'
+
+// Use browser-safe stub on client-side, real implementation on server
+let r2Client = r2ClientBrowser
+
+// Dynamically replace with real client on server-side
+if (typeof window === 'undefined') {
+  // Use eval to prevent webpack from analyzing this
+  const getR2Client = () => eval('require("./storage/r2-client").r2Client')
+  r2Client = getR2Client()
+}
 
 interface KnowledgeNode {
   id: string

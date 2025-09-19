@@ -49,15 +49,14 @@ export default function SignInPage() {
 
     try {
       const result = await signIn(email, password)
-      
-      if (result.success) {
-        router.push('/')
-        router.refresh()
+
+      if (!result.success) {
+        setError(result.error)
       } else {
-        setError(result.error || 'Invalid credentials')
+        // Success - redirect will happen automatically via the signIn function
+        // router.push('/') and router.refresh() are handled by the signIn function
       }
     } catch (error) {
-      // SECURITY: console statement removed: console.error('Signin error:', error)
       setError('Authentication failed. Please check your credentials.')
     } finally {
       setLoading(false)
@@ -72,15 +71,14 @@ export default function SignInPage() {
 
     try {
       const result = await signIn(credentials.email, credentials.password)
-      
-      if (result.success) {
-        router.push('/')
-        router.refresh()
+
+      if (!result.success) {
+        setError(result.error)
       } else {
-        setError(result.error || 'Invalid credentials')
+        // Success - redirect will happen automatically via the signIn function
+        // router.push('/') and router.refresh() are handled by the signIn function
       }
     } catch (error) {
-      // SECURITY: console statement removed: console.error('Signin error:', error)
       setError('Authentication failed. Please check your credentials.')
     } finally {
       setLoading(false)

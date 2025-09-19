@@ -455,7 +455,7 @@ export default function OnboardingPage() {
     <NewOnboardingModal
       isOpen={showNewOnboardingModal}
       onClose={() => setShowNewOnboardingModal(false)}
-      recruitId="example_recruit_123" // This would come from recruitment system integration
+      recruitId="rec_123" // This would come from recruitment system integration
     />
 
     {/* Customer Onboarding Modal */}

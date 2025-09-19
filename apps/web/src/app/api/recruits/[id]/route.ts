@@ -251,7 +251,7 @@ function isValidStatusTransition(currentStatus: string, newStatus: string): bool
   return validTransitions[currentStatus]?.includes(newStatus) || currentStatus === newStatus
 }
 
-function getAvailableActions(recruit: any): string[] {
+function getAvailableActions(recruit: { status: string }): string[] {
   const actions = ['view', 'edit']
 
   switch (recruit.status) {

@@ -11,6 +11,7 @@ export default auth((req) => {
     '/auth/signin',
     '/auth/signup',
     '/auth/error',
+    '/api/auth',
     '/privacy',
     '/terms',
     '/_next',
@@ -18,6 +19,11 @@ export default auth((req) => {
     '/camera-test.html',
     '/test-camera'
   ]
+
+  // Skip all middleware processing for NextAuth routes
+  if (pathname.startsWith('/api/auth/')) {
+    return NextResponse.next()
+  }
   
   // Check if route is public
   const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route))

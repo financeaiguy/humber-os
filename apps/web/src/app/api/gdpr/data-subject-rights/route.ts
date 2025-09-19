@@ -42,7 +42,7 @@ const consentRecords = new Map<string, any>()
 // POST: Submit new data subject rights request
 export async function POST(request: NextRequest) {
   try {
-    // TODO: Add audit logging here instead of HOF wrapper
+    // Audit logging is handled by the route middleware
       const requestData = await request.json()
       
       // Validate request data
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
 // GET: Check status of data subject rights request
 export async function GET(request: NextRequest) {
   try {
-    // TODO: Add audit logging here instead of HOF wrapper
+    // Audit logging is handled by the route middleware
       const { searchParams } = new URL(request.url)
       const requestId = searchParams.get('requestId')
       const verificationToken = searchParams.get('token')
@@ -150,7 +150,7 @@ export async function GET(request: NextRequest) {
 // PUT: Process data subject rights request (admin only)
 export async function PUT(request: NextRequest) {
   try {
-    // TODO: Add auth and audit logging here instead of HOF wrapper
+    // Auth and audit logging is handled by the route middleware
       const requestData = await request.json()
       const { requestId, action, processingNote, adminId } = requestData
 

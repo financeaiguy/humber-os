@@ -4,10 +4,10 @@
 
 import { motion } from 'framer-motion'
 import { useSession } from '@/components/session-context'
-import { 
-  TrendingUp, 
-  Users, 
-  Clock, 
+import {
+  TrendingUp,
+  Users,
+  Clock,
   DollarSign,
   Activity,
   AlertCircle,
@@ -17,6 +17,8 @@ import Link from 'next/link'
 import { hasPermission } from '@/lib/permissions'
 import { JobsDashboard } from '@/components/jobs-dashboard'
 import { useEffect, useState } from 'react'
+import { SimpleTooltip } from '@/components/walkthrough/SimpleTooltip'
+import { useWalkthrough } from '@/lib/walkthrough-manager'
 import { 
   LineChart, 
   Line, 
@@ -126,12 +128,20 @@ const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6']
 export default function HomePage() {
   const { data: session } = useSession()
   const [isJobsMode, setIsJobsMode] = useState(false)
+  const [showTooltips, setShowTooltips] = useState(false)
+  const walkthrough = useWalkthrough()
 
   useEffect(() => {
     // Check for Jobs mode
     const designMode = document.documentElement.getAttribute('data-design-mode')
     setIsJobsMode(designMode === 'jobs')
-  }, [])
+
+    // Check if first-time visit
+    if (walkthrough.isFirstTimeVisit('dashboard')) {
+      setShowTooltips(true)
+      walkthrough.markPageAsVisited('dashboard')
+    }
+  }, [walkthrough])
 
   if (!session?.user) {
     return (
@@ -177,15 +187,21 @@ export default function HomePage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        {stats.map((stat, index) => (
-          <motion.div
-            key={stat.name}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-4 sm:p-6"
-          >
+      <SimpleTooltip
+        show={showTooltips}
+        content="These boxes show your work numbers. Green means things are getting better!"
+        onClose={() => setShowTooltips(false)}
+        position="bottom"
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          {stats.map((stat, index) => (
+            <motion.div
+              key={stat.name}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-4 sm:p-6"
+            >
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
                 <p className="text-xs sm:text-sm text-slate-200 truncate">{stat.name}</p>
@@ -200,22 +216,29 @@ export default function HomePage() {
           </motion.div>
         ))}
       </div>
+    </SimpleTooltip>
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Recent Projects */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.4 }}
-          className="lg:col-span-2 rounded-xl sm:rounded-2xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-4 sm:p-6"
+        <SimpleTooltip
+          show={false}
+          content="This is where you can see all your current jobs and how much work is done on each one."
+          onClose={() => setShowTooltips(false)}
+          position="top"
         >
-          <div className="flex items-center justify-between mb-4 sm:mb-6">
-            <h2 className="text-lg sm:text-xl font-semibold text-white">Active Projects</h2>
-            <Link href="/projects" className="text-xs sm:text-sm text-blue-400 hover:text-blue-300 transition-colors">
-              View all →
-            </Link>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 }}
+            className="lg:col-span-2 rounded-xl sm:rounded-2xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-4 sm:p-6"
+          >
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl font-semibold text-white">Active Projects</h2>
+              <Link href="/projects" className="text-xs sm:text-sm text-blue-400 hover:text-blue-300 transition-colors">
+                View all →
+              </Link>
+            </div>
           <div className="space-y-3 sm:space-y-4">
             {recentProjects.map((project) => (
               <div key={project.id} className="bg-slate-900/50 rounded-lg sm:rounded-xl p-3 sm:p-4 hover:bg-slate-900/70 transition-colors">
@@ -248,6 +271,7 @@ export default function HomePage() {
             ))}
           </div>
         </motion.div>
+        </SimpleTooltip>
 
         {/* Upcoming Deadlines */}
         <motion.div
@@ -284,18 +308,24 @@ export default function HomePage() {
       </div>
 
       {/* Quick Actions */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6 }}
-        className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4"
+      <SimpleTooltip
+        show={false}
+        content="Click these buttons to do important tasks. Log Time is where you mark when you arrive and leave work each day."
+        onClose={() => setShowTooltips(false)}
+        position="top"
       >
-        {[
-          { label: 'Log Time', href: '/time', icon: Clock, color: 'from-blue-500 to-cyan-500', permission: 'canLogTime' },
-          { label: 'New Project', href: '/projects/new', icon: Activity, color: 'from-purple-500 to-pink-500', permission: 'canManageProjects' },
-          { label: 'Team Report', href: '/team', icon: Users, color: 'from-green-500 to-emerald-500', permission: 'canViewTeam' },
-          { label: 'Analytics', href: '/analytics', icon: TrendingUp, color: 'from-orange-500 to-red-500', permission: 'canViewAnalytics' },
-        ].filter((action) => hasPermission(session.user.role, action.permission as any)).map((action) => (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4"
+        >
+          {[
+            { label: 'Log Time', href: '/time', icon: Clock, color: 'from-blue-500 to-cyan-500', permission: 'canLogTime' },
+            { label: 'New Project', href: '/projects/new', icon: Activity, color: 'from-purple-500 to-pink-500', permission: 'canManageProjects' },
+            { label: 'Team Report', href: '/team', icon: Users, color: 'from-green-500 to-emerald-500', permission: 'canViewTeam' },
+            { label: 'Analytics', href: '/analytics', icon: TrendingUp, color: 'from-orange-500 to-red-500', permission: 'canViewAnalytics' },
+          ].filter((action) => hasPermission(session.user.role, action.permission as any)).map((action) => (
           <Link
             key={action.label}
             href={action.href}
@@ -311,6 +341,7 @@ export default function HomePage() {
           </Link>
         ))}
       </motion.div>
+    </SimpleTooltip>
 
       {/* Visual Analytics Dashboard */}
       <motion.div

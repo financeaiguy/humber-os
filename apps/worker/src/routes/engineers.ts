@@ -5,7 +5,15 @@ import type { Env } from '@humber/types';
 import { candidates } from '@humber/database';
 import { Logger } from '@humber/utils';
 
-const engineersRouter = new Hono<{ Bindings: Env }>();
+interface AppVariables {
+  requestId?: string;
+  tenantId?: string;
+  userId?: string;
+  role?: string;
+  authenticated?: boolean;
+}
+
+const engineersRouter = new Hono<{ Bindings: Env; Variables: AppVariables }>();
 
 // Get all engineers
 engineersRouter.get('/', async (c) => {
@@ -16,7 +24,7 @@ engineersRouter.get('/', async (c) => {
     // For development/testing: Return mock engineers data
     // In production, this would query the database
     
-    let engineers = [];
+    let engineers: any[] = [];
     
     try {
       // Try database operations with fallback to mock
@@ -32,11 +40,11 @@ engineersRouter.get('/', async (c) => {
           name: `${engineer.firstName} ${engineer.lastName}`,
           email: engineer.email,
           phone: engineer.phone,
-          category: engineer.category,
+          category: (engineer as any).category || 'SOFTWARE_ENGINEER',
           status: engineer.status,
-          hourlyRate: engineer.hourlyRate,
-          currentClient: engineer.currentClientName,
-          currentProject: engineer.currentProjectName,
+          hourlyRate: (engineer as any).hourlyRate || 85,
+          currentClient: (engineer as any).currentClientName || null,
+          currentProject: (engineer as any).currentProjectName || null,
           deployedAt: engineer.deployedAt,
           createdAt: engineer.createdAt,
           updatedAt: engineer.updatedAt
@@ -146,6 +154,9 @@ engineersRouter.get('/:id', async (c) => {
     }
     
     const engineerData = engineer[0];
+    if (!engineerData) {
+      return c.json({ error: 'Engineer not found' }, 404);
+    }
 
     return c.json({
       success: true,
@@ -154,11 +165,11 @@ engineersRouter.get('/:id', async (c) => {
         name: `${engineerData.firstName} ${engineerData.lastName}`,
         email: engineerData.email,
         phone: engineerData.phone,
-        category: engineerData.category,
+        category: (engineerData as any).category || 'SOFTWARE_ENGINEER',
         status: engineerData.status,
-        hourlyRate: engineerData.hourlyRate,
-        currentClient: engineerData.currentClientName,
-        currentProject: engineerData.currentProjectName,
+        hourlyRate: (engineerData as any).hourlyRate || 85,
+        currentClient: (engineerData as any).currentClientName || null,
+        currentProject: (engineerData as any).currentProjectName || null,
         
         // Required checks status
         requiredChecks: {

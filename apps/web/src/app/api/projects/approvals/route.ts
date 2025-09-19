@@ -31,7 +31,14 @@ export async function POST(request: NextRequest) {
   if (isDevelopment && authHeader === 'Bearer test-token-for-api-testing') {
     // Simplified test mode without knowledge middleware
     try {
-      const requestData = await request.json()
+      const requestData = await request.json() as {
+        projectId: string;
+        requestType: string;
+        requesterId: string;
+        requesterName: string;
+        budgetAmount: number;
+        deploymentDetails: any;
+      }
       const { projectId, requestType, requesterId, requesterName, budgetAmount, deploymentDetails } = requestData
 
       // Create simplified approval for testing
@@ -190,7 +197,7 @@ export async function PUT(request: NextRequest) {
 
     if (isDevelopment && authHeader === 'Bearer test-token-for-api-testing') {
       // Simplified test mode
-      const requestData = await request.json()
+      const requestData = await request.json() as Record<string, any>
       return NextResponse.json({
         success: true,
         approval: { ...requestData, status: 'approved', approvalDate: new Date().toISOString() },
