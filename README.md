@@ -1056,7 +1056,7 @@ graph TB
 
 ```mermaid
 graph TB
-    subgraph "🏢 Enterprise Clients"
+    subgraph "Enterprise Clients"
         subgraph "Tier 1 - Dedicated Infrastructure"
             GM[General Motors<br/>500+ Engineers<br/>Dedicated Resources]
             FORD[Ford Motor Company<br/>300+ Engineers<br/>Premium SLA]
@@ -1070,7 +1070,7 @@ graph TB
         end
     end
 
-    subgraph "🔧 Infrastructure Allocation"
+    subgraph "Infrastructure Allocation"
         subgraph "Dedicated Resources"
             DEDICATED_DB[(Dedicated DB Cluster<br/>High Performance)]
             DEDICATED_CACHE[(Dedicated Cache<br/>Sub-10ms Response)]
@@ -1080,13 +1080,13 @@ graph TB
         subgraph "Shared Resources"
             SHARED_DB[(Shared DB Cluster<br/>Cost Optimized)]
             SHARED_CACHE[(Shared Cache Pool<br/>Efficient Scaling)]
-            SHARED_WORKER[Shared Worker Pool<br/>Auto-scaling)]
+            SHARED_WORKER[Shared Worker Pool<br/>Auto-scaling]
         end
         
         subgraph "Common Services"
-            AUTH_SVC[🔐 Authentication Service]
-            AUDIT_SVC[📋 Audit Service]
-            NOTIF_SVC[📧 Notification Service]
+            AUTH_SVC[Authentication Service]
+            AUDIT_SVC[Audit Service]
+            NOTIF_SVC[Notification Service]
         end
     end
 
