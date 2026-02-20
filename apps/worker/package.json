@@ -23,7 +23,7 @@
     "@humber/types": "workspace:*",
     "@humber/utils": "workspace:*",
     "drizzle-orm": "^0.38.4",
-    "hono": "^4.9.8",
+    "hono": "^4.11.10",
     "jose": "^5.10.0",
     "zod": "^4.1.9"
   },
@@ -33,6 +33,6 @@
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8",
-    "wrangler": "^4.38.0"
+    "wrangler": "^4.59.1"
   }
 }
